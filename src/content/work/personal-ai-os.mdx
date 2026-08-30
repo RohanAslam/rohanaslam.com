@@ -1,0 +1,16 @@
+---
+title: "Personal AI Operating System"
+date: 2026-06-20
+summary: "A Telegram message in, an organized Notion page out, and no filing decisions in between."
+tags: ["ai-tools"]
+stack: ["n8n", "Telegram API", "Notion API", "Claude API", "PikaPods"]
+status: "in-progress"
+featured: true
+---
+Every note app I've tried has died the same way. Not because capture was slow, but because filing was a decision, and at 11pm on the GO Train I don't want a decision.
+
+So I built the filing away. It's n8n self hosted on PikaPods, with a Telegram bot as the front door. I send it anything, Claude classifies and summarizes it, and n8n routes it to the right Notion page. One message, zero decisions.
+
+Self hosting kept it cheap and private. Telegram beat building an app because the best capture tool is the one already on your home screen. The genuinely annoying part was n8n's JSON expression handling between nodes, which taught me more about the platform than any tutorial did.
+
+It's been running daily since June. It's also the layer everything else plugs into now, so new automations start at step three instead of step one.

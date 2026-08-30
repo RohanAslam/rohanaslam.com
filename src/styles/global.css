@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Implements DESIGN.md. Transit wayfinding system.
+   Radius is 0 or full. Rules are ink. No shadows. No serif.
+   ============================================================ */
+
+@theme {
+  --color-ground: #F4F4F2;
+  --color-surface: #E9E9E6;
+  --color-ink: #0B0E12;
+  --color-ink-muted: #535A63;
+  --color-ink-faint: #7A828C;
+  --color-cobalt: #1B44D9;
+  --font-sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+
+:root {
+  --ground: #F4F4F2;
+  --surface: #E9E9E6;
+  --ink: #0B0E12;
+  --ink-muted: #535A63;
+  --ink-faint: #7A828C;
+  --rule-soft: #D3D3CE;
+
+  --line-1: #1B44D9;
+  --line-2: #F2B705;
+  --line-3: #D6246E;
+  --line-4: #00875A;
+  --line-5: #7A828C;
+
+  --cobalt: #1B44D9;
+  --cobalt-hover: #1739B4;
+
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 100ms;
+  --dur-base: 200ms;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0D1014;
+    --surface: #1A1F26;
+    --ink: #EDEFF2;
+    --ink-muted: #9AA3AE;
+    --ink-faint: #727C88;
+    --rule-soft: #2A313A;
+    --line-1: #6E90FF;
+    --line-2: #FFC933;
+    --line-3: #FF6FA3;
+    --line-4: #3FCC94;
+    --line-5: #8B95A1;
+    --cobalt: #6E90FF;
+    --cobalt-hover: #8FA9FF;
+    color-scheme: dark;
+  }
+}
+
+html {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+::selection { background: var(--cobalt); color: #fff; }
+
+:focus-visible {
+  outline: 3px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+/* ---- The system bar -------------------------------------- */
+.system-bar {
+  display: flex;
+  height: 6px;
+  width: 100%;
+}
+.system-bar span { flex: 1; }
+
+/* ---- Type ------------------------------------------------ */
+.station {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+.h1 {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 34px;
+  line-height: 1.05;
+}
+.h2 {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 22px;
+  line-height: 1.15;
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* ---- Rules ----------------------------------------------- */
+.rule-heavy { border: 0; border-top: 3px solid var(--ink); }
+.rule-base  { border: 0; border-top: 2px solid var(--ink); }
+
+/* ---- Route bullets --------------------------------------- */
+.bullet {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bullet-1 { background: var(--line-1); color: #fff; }
+.bullet-2 { background: var(--line-2); color: #0B0E12; }
+.bullet-3 { background: var(--line-3); color: #fff; }
+.bullet-4 { background: var(--line-4); color: #fff; }
+.bullet-5 { background: var(--line-5); color: #fff; }
+@media (prefers-color-scheme: dark) {
+  .bullet-1, .bullet-3, .bullet-4, .bullet-5 { color: #0D1014; }
+}
+
+/* stack labels are outlined, not filled: they are not routes */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border: 2px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ---- Buttons --------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid transparent;
+  transition: background-color var(--dur-micro) var(--ease),
+              color var(--dur-micro) var(--ease),
+              border-color var(--dur-micro) var(--ease);
+}
+.btn-primary { background: var(--cobalt); color: #fff; }
+.btn-primary:hover { background: var(--cobalt-hover); }
+@media (prefers-color-scheme: dark) { .btn-primary { color: #0D1014; } }
+.btn-secondary { border-color: var(--ink); color: var(--ink); }
+.btn-secondary:hover { background: var(--ink); color: var(--ground); }
+
+/* ---- Station card ---------------------------------------- */
+.station-card {
+  position: relative;
+  display: block;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  padding: 20px 20px 20px 32px;
+  background: var(--ground);
+  transition: border-color var(--dur-micro) var(--ease);
+}
+.station-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: var(--route, var(--line-5));
+}
+.station-card:hover { border-color: var(--cobalt); }
+
+/* ---- Prose ----------------------------------------------- */
+.prose { max-width: 68ch; font-size: 16px; line-height: 1.65; }
+.prose p { margin: 16px 0; }
+.prose h2 {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-size: 22px;
+  line-height: 1.15;
+  margin: 32px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--ink);
+}
+.prose strong { font-weight: 700; }
+.prose a {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.prose ul { list-style: none; padding-left: 0; margin: 16px 0; }
+.prose li { position: relative; padding-left: 20px; margin: 6px 0; }
+.prose li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.6em;
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--cobalt);
+}
+.prose img { border: 2px solid var(--ink); border-radius: 0; margin: 24px 0; }
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surface);
+  padding: 0.1em 0.35em;
+}
+
+/* ---- Route diagram --------------------------------------- */
+.route-line {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  animation: draw 2200ms var(--ease) forwards;
+}
+.route-station { opacity: 0; animation: pop 300ms var(--ease) forwards; }
+.route-label { opacity: 0; animation: fade 400ms var(--ease) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop  { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+@keyframes fade { to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .route-line { stroke-dashoffset: 0; }
+  .route-station, .route-label { opacity: 1; }
+}

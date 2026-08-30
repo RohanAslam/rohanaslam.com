@@ -1,0 +1,77 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import RouteMap from '../components/RouteMap.astro';
+
+const all = (await getCollection('work')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const featured = all.filter((e) => e.data.featured).slice(0, 3);
+const now = all.filter((e) => e.data.status !== 'shipped').slice(0, 3);
+---
+
+<Base>
+  <section class="pt-10 sm:pt-14">
+    <h1 class="station text-[32px] sm:text-[52px]">
+      <span class="text-(--cobalt)">Five</span> internships in.<br />Still building on weekends.
+    </h1>
+    <p class="mt-6 max-w-[68ch] text-[18px] leading-relaxed text-(--ink-muted)">
+      I'm Rohan. Five internships across RBC, Ontario Teachers', the U of T Innovation Hub, Dye
+      and Durham, and Sun Life, where I'm now full time on the SunAdvantage team.
+    </p>
+    <p class="mt-4 max-w-[68ch] text-[18px] leading-relaxed text-(--ink-muted)">
+      On the side I co-founded SmartSyllabus out of ICUBE, and most weekends I'm building some
+      small tool to test an idea I couldn't argue my way to. Some of it works. What works is
+      below.
+    </p>
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a href="/work" class="btn btn-primary">See the work</a>
+      <a href="/about" class="btn btn-secondary">About me</a>
+    </div>
+  </section>
+
+  <section class="mt-16">
+    <div class="label flex items-center justify-between border-b-2 border-(--ink) pb-2">
+      <span>The line so far</span>
+      <span class="text-(--ink-faint)">2022 → now</span>
+    </div>
+    <RouteMap />
+    <div class="label flex flex-wrap gap-x-4 gap-y-2 border-t-2 border-(--ink) pt-3">
+      <span class="bullet bullet-1">Line 1 · Strategy</span>
+      <span class="bullet bullet-2">Line 2 · AI Tools</span>
+      <span class="bullet bullet-3">Line 3 · Startup</span>
+    </div>
+  </section>
+
+  {
+    now.length > 0 && (
+      <section class="mt-16">
+        <div class="label border-b-2 border-(--ink) pb-2">Building now</div>
+        <ul class="mt-0">
+          {now.map((e) => (
+            <li class="border-b-2 border-(--rule-soft)">
+              <a
+                href={`/work/${e.id}`}
+                class="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3 transition-colors hover:text-(--cobalt)"
+              >
+                <span class="text-[17px] font-bold">{e.data.title}</span>
+                <span class="label ml-auto text-(--ink-faint)">{e.data.status}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="mt-16">
+    <div class="label flex items-center justify-between border-b-2 border-(--ink) pb-2">
+      <span>Featured</span>
+      <a href="/work" class="transition-colors hover:text-(--cobalt)">All work →</a>
+    </div>
+    <div class="mt-5 grid gap-4">
+      {featured.map((entry) => <ProjectCard entry={entry} />)}
+    </div>
+  </section>
+</Base>

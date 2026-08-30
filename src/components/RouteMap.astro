@@ -1,0 +1,95 @@
+---
+/**
+ * The route diagram. Rohan's path as a transit line.
+ * 45 and 90 degree angles only. Draws itself once on load.
+ * Decorative: the same information is available as text below it.
+ *
+ * Geometry, exact, so stroke-dashoffset draws in the right direction:
+ *   main   M 70 200 H 1220             = 1150
+ *   branch M 810 200 L 890 ±80 H 1220  = sqrt(80²+80²) + 330 = 443.14
+ * Station delays are the fraction of each line's length at that station's x,
+ * so a dot pops exactly when the line arrives. Change one, recompute both.
+ */
+const MAIN_LEN = 1150;
+const BRANCH_LEN = 444;
+const MAIN_DUR = 1500;
+const BRANCH_START = 965; // main line reaches the interchange at x=810
+const BRANCH_DUR = 750;
+
+const stations = [
+  { x: 70, y: 200, label: 'RBC', sub: '2022', line: 1, delay: 100 },
+  { x: 240, y: 200, label: 'OTPP', sub: '2023', line: 1, delay: 220 },
+  { x: 430, y: 200, label: 'INNOVATION HUB', sub: '2025', line: 1, delay: 470 },
+  { x: 620, y: 200, label: 'DYE & DURHAM', sub: '2025', line: 1, delay: 715 },
+  { x: 1000, y: 200, label: 'SUNADVANTAGE', sub: '2026', line: 1, delay: 1215 },
+  { x: 990, y: 120, label: 'SMARTSYLLABUS', sub: 'ICUBE', line: 3, delay: 1325 },
+  { x: 1140, y: 120, label: 'SMARTSYLLABUS.CA', sub: 'LIVE', line: 3, delay: 1578 },
+  { x: 990, y: 280, label: 'PERSONAL AI OS', sub: 'N8N', line: 2, delay: 1325 },
+  { x: 1140, y: 280, label: 'JOB PIPELINE', sub: 'APIFY', line: 2, delay: 1578 },
+];
+const routeVar = { 1: 'var(--line-1)', 2: 'var(--line-2)', 3: 'var(--line-3)' };
+---
+
+<figure class="my-0" aria-hidden="true">
+  <svg viewBox="0 0 1240 360" class="w-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Line 1 · strategy -->
+    <path
+      d="M 70 200 H 1220"
+      stroke="var(--line-1)" stroke-width="9" stroke-linecap="butt"
+      class="route-line"
+      style={`--len:${MAIN_LEN}; animation-delay:0ms; animation-duration:${MAIN_DUR}ms`}
+    />
+    <!-- Line 3 · startup, branches up at 45 -->
+    <path
+      d="M 810 200 L 890 120 H 1220"
+      stroke="var(--line-3)" stroke-width="9" stroke-linecap="butt" stroke-linejoin="miter"
+      class="route-line"
+      style={`--len:${BRANCH_LEN}; animation-delay:${BRANCH_START}ms; animation-duration:${BRANCH_DUR}ms`}
+    />
+    <!-- Line 2 · ai tools, branches down at 45 -->
+    <path
+      d="M 810 200 L 890 280 H 1220"
+      stroke="var(--line-2)" stroke-width="9" stroke-linecap="butt" stroke-linejoin="miter"
+      class="route-line"
+      style={`--len:${BRANCH_LEN}; animation-delay:${BRANCH_START}ms; animation-duration:${BRANCH_DUR}ms`}
+    />
+
+    <!-- Interchange: Sun Life, where all three lines meet -->
+    <g class="route-station" style={`animation-delay:${BRANCH_START}ms; transform-origin:810px 200px`}>
+      <circle cx="810" cy="200" r="16" fill="var(--ground)" stroke="var(--ink)" stroke-width="7" />
+      <circle cx="810" cy="200" r="4" fill="var(--ink)" />
+    </g>
+    <text
+      x="786" y="176" class="route-label" style={`animation-delay:${BRANCH_START + 200}ms`}
+      text-anchor="end" fill="var(--ink)"
+      font-family="var(--font-mono)" font-size="15" font-weight="500" letter-spacing="1.2"
+    >SUN LIFE</text>
+    <text
+      x="786" y="158" class="route-label" style={`animation-delay:${BRANCH_START + 280}ms`}
+      text-anchor="end" fill="var(--ink-faint)"
+      font-family="var(--font-mono)" font-size="10" letter-spacing="1"
+    >INTERCHANGE</text>
+
+    {
+      stations.map((s) => (
+        <>
+          <g class="route-station" style={`animation-delay:${s.delay}ms; transform-origin:${s.x}px ${s.y}px`}>
+            <circle cx={s.x} cy={s.y} r="11" fill="var(--ground)" stroke={routeVar[s.line]} stroke-width="7" />
+          </g>
+          <text
+            x={s.x} y={s.y === 280 ? s.y + 36 : s.y - 26}
+            class="route-label" style={`animation-delay:${s.delay + 200}ms`}
+            text-anchor="middle" fill="var(--ink)"
+            font-family="var(--font-mono)" font-size="13" font-weight="500" letter-spacing="1"
+          >{s.label}</text>
+          <text
+            x={s.x} y={s.y === 280 ? s.y + 52 : s.y - 43}
+            class="route-label" style={`animation-delay:${s.delay + 280}ms`}
+            text-anchor="middle" fill="var(--ink-faint)"
+            font-family="var(--font-mono)" font-size="10" letter-spacing="1"
+          >{s.sub}</text>
+        </>
+      ))
+    }
+  </svg>
+</figure>

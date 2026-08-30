@@ -1,0 +1,16 @@
+---
+title: "Kronos Forecasting Research"
+date: 2026-07-05
+summary: "Reading a financial foundation model closely enough to find out the tokenizer is the whole trick."
+tags: ["data", "ai-tools"]
+stack: ["Python", "Transformers", "Kronos"]
+status: "experiment"
+featured: false
+---
+Foundation models for time series are having a moment, and the open source Kronos repo is one of the clearest examples pointed at finance. I wanted to understand it below the headline.
+
+So I worked through the architecture and wrote it up for myself. Binary Spherical Quantization turns continuous price data into tokens, and once it's tokens the Transformer treats forecasting as sequence prediction, which is the same trick language models run on text.
+
+The tokenizer is the whole ballgame. Once market data becomes a vocabulary, everything the last five years taught us about pretraining and scale applies to it.
+
+That changed how I read any "AI for finance" claim. The first question is no longer what the model predicts. It's what the model eats.

@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('work');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary, date, stack, status, links, tags } = entry.data;
+const fmt = new Intl.DateTimeFormat('en-CA', { month: 'short', year: 'numeric' });
+
+const ROUTES = {
+  strategy: { n: 1, name: 'Line 1 · Strategy' },
+  'ai-tools': { n: 2, name: 'Line 2 · AI Tools' },
+  startup: { n: 3, name: 'Line 3 · Startup' },
+  data: { n: 4, name: 'Line 4 · Data' },
+  'earlier-work': { n: 5, name: 'Line 5 · Earlier' },
+};
+const routes = tags.map((t) => ROUTES[t]).filter(Boolean);
+---
+
+<Base title={`${title} · Rohan Aslam`} description={summary}>
+  <article class="pt-8">
+    <a href="/work" class="label transition-colors hover:text-(--cobalt)">← All work</a>
+
+    <div class="mt-6 flex flex-wrap items-center gap-2">
+      {routes.map((r) => <span class={`bullet bullet-${r.n}`}>{r.name}</span>)}
+    </div>
+
+    <h1 class="h1 mt-4">{title}</h1>
+    <hr class="rule-heavy mt-3" />
+
+    <div class="label mt-3 flex flex-wrap gap-x-4 gap-y-1">
+      <span>{fmt.format(date)}</span>
+      <span class="text-(--ink-faint)">{status}</span>
+      {stack.length > 0 && <span class="text-(--ink-faint)">{stack.join(' · ')}</span>}
+    </div>
+
+    <p class="mt-5 max-w-[68ch] text-[18px] leading-relaxed text-(--ink-muted)">{summary}</p>
+
+    {
+      (links.repo || links.live) && (
+        <div class="mt-5 flex flex-wrap gap-3">
+          {links.live && <a href={links.live} class="btn btn-primary">Live site</a>}
+          {links.repo && <a href={links.repo} class="btn btn-secondary">Code</a>}
+        </div>
+      )
+    }
+
+    <hr class="rule-base my-8" />
+    <div class="prose"><Content /></div>
+  </article>
+</Base>

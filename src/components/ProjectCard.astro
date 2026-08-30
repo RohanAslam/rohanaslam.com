@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props { entry: CollectionEntry<'work'> }
+
+const { entry } = Astro.props;
+const { title, summary, stack, status, date, tags } = entry.data;
+const fmt = new Intl.DateTimeFormat('en-CA', { month: 'short', year: 'numeric' });
+
+const ROUTES = {
+  strategy: { n: 1, name: 'Line 1 · Strategy' },
+  'ai-tools': { n: 2, name: 'Line 2 · AI Tools' },
+  startup: { n: 3, name: 'Line 3 · Startup' },
+  data: { n: 4, name: 'Line 4 · Data' },
+  'earlier-work': { n: 5, name: 'Line 5 · Earlier' },
+};
+const primary = ROUTES[tags[0]] ?? ROUTES['earlier-work'];
+---
+
+<a
+  href={`/work/${entry.id}`}
+  class="station-card group"
+  style={`--route: var(--line-${primary.n})`}
+  data-tags={tags.join(' ')}
+>
+  <div class="label flex flex-wrap items-center gap-x-3 gap-y-2">
+    <span class={`bullet bullet-${primary.n}`}>{primary.name}</span>
+    <span>{fmt.format(date)}</span>
+    <span class="text-(--ink-faint)">{status}</span>
+  </div>
+  <h3 class="mt-3 text-[19px] font-bold leading-snug transition-colors group-hover:text-(--cobalt)">
+    {title}
+  </h3>
+  <p class="mt-2 max-w-[68ch] text-sm leading-relaxed text-(--ink-muted)">{summary}</p>
+  {
+    stack.length > 0 && (
+      <div class="mt-4 flex flex-wrap gap-1.5">
+        {stack.slice(0, 4).map((s) => <span class="tag">{s}</span>)}
+      </div>
+    )
+  }
+</a>

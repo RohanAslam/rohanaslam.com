@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const all = (await getCollection('work')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const routes = [
+  { key: 'all', n: 0, name: 'All lines' },
+  { key: 'strategy', n: 1, name: 'Line 1 · Strategy' },
+  { key: 'ai-tools', n: 2, name: 'Line 2 · AI Tools' },
+  { key: 'startup', n: 3, name: 'Line 3 · Startup' },
+  { key: 'data', n: 4, name: 'Line 4 · Data' },
+  { key: 'earlier-work', n: 5, name: 'Line 5 · Earlier' },
+];
+---
+
+<Base title="Work · Rohan Aslam">
+  <div class="pt-8">
+    <h1 class="h1">Work</h1>
+    <hr class="rule-heavy mt-3" />
+    <p class="mt-4 max-w-[68ch] text-(--ink-muted)">
+      Startup strategy, AI tools, and experiments. New things land here as soon as they ship.
+    </p>
+    <div class="label mt-2 text-(--ink-faint)">{all.length} stations · 5 lines</div>
+
+    <div class="mt-6 flex flex-wrap gap-2" id="filters">
+      {
+        routes.map((r) => (
+          <button
+            data-filter={r.key}
+            data-n={r.n}
+            class:list={[
+              r.n === 0 ? 'tag uppercase tracking-[0.08em]' : `bullet bullet-${r.n}`,
+              'transition-opacity',
+              r.key !== 'all' && 'opacity-40',
+            ]}
+          >
+            {r.name}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="mt-6 grid gap-4" id="grid">
+      {all.map((entry) => <ProjectCard entry={entry} />)}
+    </div>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('#filters button');
+    const cards = document.querySelectorAll<HTMLElement>('#grid [data-tags]');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter!;
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.classList.toggle('opacity-40', !active && b.dataset.n !== '0');
+          if (b.dataset.n === '0') b.style.opacity = active ? '1' : '0.4';
+        });
+        cards.forEach((c) => {
+          c.style.display = f === 'all' || c.dataset.tags!.split(' ').includes(f) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</Base>

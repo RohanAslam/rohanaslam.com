@@ -1,0 +1,123 @@
+---
+import Base from '../layouts/Base.astro';
+
+const ground = [
+  { name: 'ground', hex: '#F4F4F2', note: 'Page' },
+  { name: 'surface', hex: '#E9E9E6', note: 'Panels' },
+  { name: 'ink', hex: '#0B0E12', note: 'Text · 17.56' },
+  { name: 'ink-muted', hex: '#535A63', note: 'Secondary · 6.33' },
+];
+const lines = [
+  { n: 1, name: 'Strategy', hex: '#1B44D9', note: 'white on fill · 7.30' },
+  { n: 2, name: 'AI Tools', hex: '#F2B705', note: 'ink on fill · 10.64' },
+  { n: 3, name: 'Startup', hex: '#D6246E', note: 'white on fill · 4.84' },
+  { n: 4, name: 'Data', hex: '#00875A', note: 'white on fill · 4.55' },
+  { n: 5, name: 'Earlier', hex: '#7A828C', note: 'white on fill' },
+];
+---
+
+<Base title="Style · Rohan Aslam" description="Living implementation of DESIGN.md.">
+  <div class="pt-8">
+    <div class="label">Living style guide</div>
+    <h1 class="h1 mt-2">Wayfinding system</h1>
+    <hr class="rule-heavy mt-3" />
+    <p class="mt-4 max-w-[68ch] text-(--ink-muted)">
+      Work categories are routes. Projects are stations. Every token here is defined in
+      <code>DESIGN.md</code> and implemented in <code>global.css</code>. Contrast ratios are
+      measured, not estimated.
+    </p>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Routes</div>
+    <div class="mt-4 grid gap-3">
+      {
+        lines.map((l) => (
+          <div class="flex flex-wrap items-center gap-4 border-b-2 border-(--rule-soft) pb-3">
+            <span style={`background:${l.hex}`} class="h-8 w-16" />
+            <span class={`bullet bullet-${l.n}`}>Line {l.n} · {l.name}</span>
+            <span class="label text-(--ink-faint)">{l.hex}</span>
+            <span class="label ml-auto text-(--ink-faint)">{l.note}</span>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mt-4 max-w-[68ch] text-sm text-(--ink-muted)">
+      Route colors are fills, never text on the ground. Amber measures 1.65 on ground and is
+      invisible as text. Cobalt is the one exception: it is also the interface color for links,
+      buttons, and focus.
+    </p>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Ground and ink</div>
+    <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {
+        ground.map((s) => (
+          <div class="border-2 border-(--ink)">
+            <div style={`background:${s.hex};height:56px`} />
+            <div class="border-t-2 border-(--ink) p-2">
+              <div class="label">{s.name}</div>
+              <div class="label text-(--ink-faint)">{s.hex}</div>
+              <div class="mt-1 text-[12px] text-(--ink-muted)">{s.note}</div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Type · Archivo + IBM Plex Mono</div>
+    <div class="mt-4 space-y-4">
+      <div class="border-b-2 border-(--rule-soft) pb-4">
+        <div class="label mb-1">station 56 / 800</div>
+        <div class="station text-[56px]">Ship the thing</div>
+      </div>
+      <div class="border-b-2 border-(--rule-soft) pb-4">
+        <div class="label mb-1">h1 34 / 800</div>
+        <div class="h1">Ship the thing</div>
+      </div>
+      <div class="border-b-2 border-(--rule-soft) pb-4">
+        <div class="label mb-1">h2 22 / 700</div>
+        <div class="h2">Ship the thing</div>
+      </div>
+      <div class="border-b-2 border-(--rule-soft) pb-4">
+        <div class="label mb-1">base 16 / 400</div>
+        <div class="text-[16px]">Ship the thing.</div>
+      </div>
+      <div>
+        <div class="label mb-1">label 12 / mono</div>
+        <div class="label">Aug 2026 · Shipped · Line 2</div>
+      </div>
+    </div>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Buttons · radius 0 · 44px</div>
+    <div class="mt-4 flex flex-wrap gap-3">
+      <button class="btn btn-primary">See the work</button>
+      <button class="btn btn-secondary">Read the case</button>
+    </div>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Station card</div>
+    <div class="mt-4">
+      <a href="#" class="station-card group" style="--route: var(--line-2)">
+        <div class="label flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span class="bullet bullet-2">Line 2 · AI Tools</span>
+          <span>Aug 2026</span>
+          <span class="text-(--ink-faint)">experiment</span>
+        </div>
+        <h3 class="mt-3 text-[19px] font-bold transition-colors group-hover:text-(--cobalt)">
+          Card title goes here
+        </h3>
+        <p class="mt-2 text-sm text-(--ink-muted)">
+          A 6px platform marker in the route color runs down the left edge. Hover moves the
+          border to cobalt. Nothing lifts, nothing scales.
+        </p>
+        <div class="mt-4 flex gap-1.5">
+          <span class="tag">Apify</span><span class="tag">Claude</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="label mt-12 border-b-2 border-(--ink) pb-2">Rules</div>
+    <div class="mt-4 space-y-4">
+      <div><div class="label mb-2">system 6px</div><div class="system-bar"><span style="background:var(--line-1)"></span><span style="background:var(--line-2)"></span><span style="background:var(--line-3)"></span><span style="background:var(--line-4)"></span><span style="background:var(--line-5)"></span></div></div>
+      <div><div class="label mb-2">heavy 3px</div><hr class="rule-heavy" /></div>
+      <div><div class="label mb-2">base 2px</div><hr class="rule-base" /></div>
+    </div>
+  </div>
+</Base>

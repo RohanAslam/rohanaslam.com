@@ -1,0 +1,81 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Rohan Aslam',
+  description = 'Strategy and AI builder in Toronto. I think in strategy and prove it by shipping.',
+} = Astro.props;
+
+const nav = [
+  { href: '/work', label: 'Work' },
+  { href: '/about', label: 'About' },
+];
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen">
+    <!-- The system bar. Five routes. Every page, always. -->
+    <div class="system-bar" aria-hidden="true">
+      <span style="background:var(--line-1)"></span>
+      <span style="background:var(--line-2)"></span>
+      <span style="background:var(--line-3)"></span>
+      <span style="background:var(--line-4)"></span>
+      <span style="background:var(--line-5)"></span>
+    </div>
+
+    <div class="mx-auto max-w-5xl px-5 sm:px-8">
+      <header class="flex items-center justify-between border-b-2 border-(--ink) py-5">
+        <a href="/" class="station text-[19px] hover:text-(--cobalt)">Rohan Aslam</a>
+        <nav class="flex gap-6">
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  'label transition-colors hover:text-(--cobalt)',
+                  path.startsWith(item.href) && 'text-(--cobalt)',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+
+      <main class="pb-24">
+        <slot />
+      </main>
+
+      <hr class="rule-heavy" />
+      <footer class="flex flex-wrap items-center gap-x-6 gap-y-3 py-6">
+        <a class="label transition-colors hover:text-(--cobalt)" href="https://www.linkedin.com/in/rohanaslam">LinkedIn</a>
+        <a class="label transition-colors hover:text-(--cobalt)" href="https://github.com/RohanAslam">GitHub</a>
+        <a class="label transition-colors hover:text-(--cobalt)" href="mailto:rohanaslam24@gmail.com">rohanaslam24@gmail.com</a>
+        <span class="label ml-auto text-(--ink-faint)">43.7°N 79.3°W · Toronto</span>
+      </footer>
+    </div>
+  </body>
+</html>

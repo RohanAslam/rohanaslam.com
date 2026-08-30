@@ -1,0 +1,16 @@
+---
+title: "Job Search Automation Pipeline"
+date: 2026-08-10
+summary: "18 ranked roles out of a feed that would have taken hours to read by hand."
+tags: ["ai-tools", "data"]
+stack: ["Apify", "LinkedIn scraping", "Claude"]
+status: "experiment"
+featured: false
+---
+Job boards are built for browsing, not deciding. You run the same search every morning and the board remembers nothing about what you already rejected yesterday.
+
+So I stopped browsing. The pipeline uses Apify's LinkedIn scraper to pull Ontario roles, then scores them against what I actually care about. The first run surfaced 18 strong matches, ranked, out of a feed that would have taken hours to read properly.
+
+I used an off the shelf scraper on purpose. The interesting problem is the ranking, not the plumbing, and I've watched enough side projects die inside the plumbing.
+
+Next is a small personal portal with the scraping on a schedule, so the pipeline runs itself and the portal is just the morning read. The pattern generalizes to anything you'd otherwise check every day and forget.
