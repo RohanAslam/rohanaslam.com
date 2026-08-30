@@ -12,14 +12,18 @@ npm run dev      # localhost:4321
 npm run build    # validates all content against the schema
 ```
 
-## Deploy (one-time setup)
+## Deploy
 
-1. Push this repo to GitHub.
-2. [vercel.com](https://vercel.com) → Add New Project → import the repo. Astro is auto-detected; accept defaults.
-3. Project → Settings → Domains → add `rohanaslam.com`. Vercel shows the DNS records to set at your registrar (an A record and a CNAME for www).
-4. Once the domain resolves, cancel Adobe Portfolio.
+Hosted on **GitHub Pages**, built by GitHub Actions. `.github/workflows/deploy.yml` runs on every push to `main`, builds with `withastro/action`, and publishes. `public/CNAME` pins the custom domain.
 
-After setup, every push to `main` deploys automatically.
+One-time setup:
+
+1. Repo -> Settings -> Pages -> Source: **GitHub Actions**.
+2. Repo -> Settings -> Pages -> Custom domain: `rohanaslam.com`, then tick **Enforce HTTPS** once the certificate is issued.
+3. At the domain registrar, point the apex at GitHub Pages with four A records: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`. Add a CNAME for `www` pointing at `rohanaslam.github.io`.
+4. Once it resolves, cancel Adobe Portfolio.
+
+After that, every push to `main` deploys in about a minute. Watch it under the repo's Actions tab.
 
 ## Add work with AI
 
