@@ -17,22 +17,22 @@ const routes = [
 ---
 
 <Base title="Work · Rohan Aslam">
-  <div class="pt-8">
+  <div class="pt-10">
     <h1 class="h1">Work</h1>
     <hr class="rule-heavy mt-3" />
-    <p class="mt-4 max-w-[68ch] text-(--ink-muted)">
+    <p class="mt-5 max-w-[85ch] text-[18px] leading-relaxed text-(--ink-muted)">
       Startup strategy, AI tools, and experiments. New things land here as soon as they ship.
     </p>
-    <div class="label mt-2 text-(--ink-faint)">{all.length} stations · 5 lines</div>
+    <div class="label mt-3 text-[14px] text-(--ink-faint)">{all.length} STATIONS · 5 LINES</div>
 
-    <div class="mt-6 flex flex-wrap gap-2" id="filters">
+    <div class="mt-8 flex flex-wrap gap-3" id="filters">
       {
         routes.map((r) => (
           <button
             data-filter={r.key}
             data-n={r.n}
             class:list={[
-              r.n === 0 ? 'tag uppercase tracking-[0.08em]' : `bullet bullet-${r.n}`,
+              r.n === 0 ? 'tag uppercase tracking-[0.08em] text-[13px] font-bold py-1 px-3 cursor-pointer' : `bullet bullet-${r.n} text-[13px] font-bold py-1 px-3 cursor-pointer`,
               'transition-opacity',
               r.key !== 'all' && 'opacity-40',
             ]}
@@ -43,7 +43,7 @@ const routes = [
       }
     </div>
 
-    <div class="mt-6 grid gap-4" id="grid">
+    <div class="mt-8 grid gap-5" id="grid">
       {all.map((entry) => <ProjectCard entry={entry} />)}
     </div>
   </div>

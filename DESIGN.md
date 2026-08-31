@@ -463,7 +463,7 @@ Number opener. Contractions. Plain statement of the work. A concrete admission t
 
   /* Layout */
   --measure: 68ch;
-  --shell: 1120px;
+  --shell: 1680px;
 }
 
 @media (prefers-color-scheme: dark) {

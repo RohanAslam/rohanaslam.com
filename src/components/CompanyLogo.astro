@@ -1,0 +1,38 @@
+---
+interface Props {
+  name: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus' | 'n8n';
+  class?: string;
+  size?: number;
+  width?: number;
+  height?: number;
+  [key: string]: unknown;
+}
+
+const { name, class: className = '', size = 28, width, height, ...rest } = Astro.props;
+
+const labels: Record<string, string> = {
+  rbc: 'RBC Royal Bank',
+  otpp: "Ontario Teachers' Pension Plan",
+  uoft: 'University of Toronto',
+  dyedurham: 'Dye & Durham',
+  sunlife: 'Sun Life',
+  smartsyllabus: 'SmartSyllabus',
+  n8n: 'n8n',
+};
+
+const w = width ?? size;
+const h = height ?? size;
+---
+
+<img
+  {...rest}
+  src={`/images/logos/${name}.png`}
+  alt={`${labels[name] || name} Logo`}
+  width={w}
+  height={h}
+  loading="lazy"
+  class:list={[
+    'object-contain select-none',
+    className,
+  ]}
+/>

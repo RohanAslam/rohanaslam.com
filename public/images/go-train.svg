@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 -45 131 50" width="524" height="200" role="img" aria-label="GO bi-level cab car and coach, side view">
+  <title>GO bi-level train</title>
+  <!--
+    GO bi-level cab car pulling one coach. Side view, nose to the right.
+
+    Coordinate system is the one the route diagram uses, kept as-is so edits can be
+    pasted straight back into RouteMap.astro. The origin (0,0) sits on the track
+    centreline, which is why most y values are negative:
+
+      overall      x -58 to +63     roof y -39, body floor y -9
+      upper band   y -35.5 to -27.5
+      belt gap     y -27.5 to -22.5   body color, not a shape
+      lower band   y -22.5 to -12.5
+      axles        y -3.5, r 4.5     wheel bottoms land at y +1
+
+    Only 45 and 90 degree angles. The roof chamfers, the nose rake and the
+    windscreen all run at 45.
+
+    Colors below are the Line 1 light-mode livery. Swap BODY for the line:
+      Line 1 cobalt  #1B44D9 light / #6E90FF dark
+      Line 2 amber   #F2B705 light / #FFC933 dark
+      Line 3 rose    #D6246E light / #FF6FA3 dark
+    GLASS is #FFFFFF on cobalt and rose in light mode, and #0B0E12 on amber and on
+    every line in dark mode, so it always holds contrast against the body.
+    In dark mode INK becomes #EDEFF2 and GROUND becomes #0D1014.
+
+      INK    #0B0E12   outline, chassis, door split
+      GROUND #F4F4F2   wheel spokes only
+      BODY   #1B44D9   car sides
+      GLASS  #FFFFFF   windows, doors, windscreen, headlight
+  -->
+
+  <g id="chassis" fill="#0B0E12">
+    <!-- gangway between the cars -->
+    <rect x="-6" y="-32" width="9" height="23" />
+    <!-- front coupler -->
+    <rect x="59" y="-20" width="4" height="4" />
+    <!-- trucks, two axles each -->
+    <rect x="-55" y="-10" width="18" height="5" />
+    <rect x="-25" y="-10" width="18" height="5" />
+    <rect x="4" y="-10" width="18" height="5" />
+    <rect x="34" y="-10" width="18" height="5" />
+  </g>
+
+  <g id="bodies" fill="#1B44D9" stroke="#0B0E12" stroke-width="3" stroke-linejoin="miter">
+    <path id="rear-coach" d="M -58 -9 V -35 L -54 -39 H -7 L -3 -35 V -9 Z" />
+    <path id="cab-car" d="M 1 -9 V -35 L 5 -39 H 48 L 60 -27 V -9 Z" />
+  </g>
+
+  <g id="glazing" fill="#FFFFFF">
+    <!-- one continuous band per deck; the body-color gap between them is the belt stripe -->
+    <rect x="-50" y="-35.5" width="40" height="8" />
+    <rect x="9" y="-35.5" width="25" height="8" />
+    <rect x="-40" y="-22.5" width="31" height="10" />
+    <rect x="18" y="-22.5" width="20" height="10" />
+    <!-- one boarding door a car -->
+    <rect x="-52" y="-22.5" width="8" height="13.5" />
+    <rect x="6" y="-22.5" width="8" height="13.5" />
+    <!-- cab: raked windscreen and headlight -->
+    <polygon points="45,-36 57,-24 50,-17 38,-29" />
+    <circle cx="54" cy="-15.5" r="3.2" />
+  </g>
+
+  <g id="door-splits" fill="#0B0E12">
+    <rect x="-48.6" y="-22.5" width="1.2" height="13.5" />
+    <rect x="9.4" y="-22.5" width="1.2" height="13.5" />
+  </g>
+
+  <!-- Axles. One spoke each, in the page ground color so it stays visible on amber,
+       where the glass goes dark. Each group rotates about its own centre. -->
+  <g id="wheels">
+    <g class="wheel">
+      <circle cx="-51" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="-51.9" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="-51" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="-41" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="-41.9" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="-41" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="-21" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="-21.9" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="-21" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="-11" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="-11.9" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="-11" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="8" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="7.1" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="8" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="18" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="17.1" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="18" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="38" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="37.1" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="38" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+    <g class="wheel">
+      <circle cx="48" cy="-3.5" r="4.5" fill="#0B0E12" />
+      <rect x="47.1" y="-6.9" width="1.8" height="6.8" fill="#F4F4F2" />
+      <circle cx="48" cy="-3.5" r="1.4" fill="#0B0E12" />
+    </g>
+  </g>
+</svg>

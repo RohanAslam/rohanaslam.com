@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   title?: string;
@@ -15,6 +16,22 @@ const nav = [
   { href: '/work', label: 'Work' },
   { href: '/about', label: 'About' },
 ];
+
+const socials = [
+  {
+    href: 'https://www.linkedin.com/in/rohanaslam',
+    label: 'LinkedIn',
+    sub: 'Profile',
+    icon: 'linkedin' as const,
+  },
+  {
+    href: 'https://github.com/RohanAslam',
+    label: 'GitHub',
+    sub: 'Code',
+    icon: 'github' as const,
+  },
+];
+
 const path = Astro.url.pathname;
 ---
 
@@ -31,7 +48,7 @@ const path = Astro.url.pathname;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -45,36 +62,83 @@ const path = Astro.url.pathname;
       <span style="background:var(--line-5)"></span>
     </div>
 
-    <div class="mx-auto max-w-5xl px-5 sm:px-8">
-      <header class="flex items-center justify-between border-b-2 border-(--ink) py-5">
-        <a href="/" class="station text-[19px] hover:text-(--cobalt)">Rohan Aslam</a>
-        <nav class="flex gap-6">
+    <div class="mx-auto max-w-[1680px] px-5 sm:px-8 lg:px-12">
+      <header class="flex flex-wrap items-center justify-between gap-y-4 border-b-2 border-(--ink) py-6">
+        <a href="/" class="station text-[22px] tracking-tight transition-colors hover:text-(--cobalt)">
+          Rohan Aslam
+        </a>
+
+        <nav class="flex flex-wrap items-center gap-x-6 sm:gap-x-8 gap-y-2">
           {
             nav.map((item) => (
               <a
                 href={item.href}
                 class:list={[
-                  'label transition-colors hover:text-(--cobalt)',
-                  path.startsWith(item.href) && 'text-(--cobalt)',
+                  'nav-link',
+                  path.startsWith(item.href) && '!text-(--cobalt) font-bold underline',
                 ]}
               >
                 {item.label}
               </a>
             ))
           }
+
+          <span class="hidden h-5 w-[2px] bg-(--rule-soft) sm:inline-block" aria-hidden="true"></span>
+
+          {
+            socials.map((s) => (
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="nav-link"
+                title={`${s.label} (${s.sub})`}
+              >
+                <Icon name={s.icon} size={17} />
+                <span>{s.label}</span>
+              </a>
+            ))
+          }
         </nav>
       </header>
 
-      <main class="pb-24">
+      <main class="pb-28">
         <slot />
       </main>
 
       <hr class="rule-heavy" />
-      <footer class="flex flex-wrap items-center gap-x-6 gap-y-3 py-6">
-        <a class="label transition-colors hover:text-(--cobalt)" href="https://www.linkedin.com/in/rohanaslam">LinkedIn</a>
-        <a class="label transition-colors hover:text-(--cobalt)" href="https://github.com/RohanAslam">GitHub</a>
-        <a class="label transition-colors hover:text-(--cobalt)" href="mailto:rohanaslam24@gmail.com">rohanaslam24@gmail.com</a>
-        <span class="label ml-auto text-(--ink-faint)">43.7°N 79.3°W · Toronto</span>
+      <footer class="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 py-8">
+        <div class="flex flex-wrap items-center gap-x-8 gap-y-3">
+          <a
+            class="footer-link"
+            href="https://www.linkedin.com/in/rohanaslam"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icon name="linkedin" size={17} />
+            <span>LinkedIn</span>
+          </a>
+          <a
+            class="footer-link"
+            href="https://github.com/RohanAslam"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Icon name="github" size={17} />
+            <span>GitHub</span>
+          </a>
+          <a
+            class="footer-link"
+            href="mailto:rohanaslam24@gmail.com"
+          >
+            <Icon name="mail" size={17} />
+            <span>rohanaslam24@gmail.com</span>
+          </a>
+        </div>
+
+        <div class="label text-[13px] text-(--ink-faint)">
+          43.7°N 79.3°W · TORONTO · LINE 1–5
+        </div>
       </footer>
     </div>
   </body>

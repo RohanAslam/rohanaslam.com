@@ -1,12 +1,72 @@
 ---
 import Base from '../layouts/Base.astro';
+import CompanyLogo from '../components/CompanyLogo.astro';
+
+const experience = [
+  {
+    org: 'Sun Life',
+    team: 'SunAdvantage',
+    role: 'Strategy & Operations Specialist',
+    timeframe: '2026 – Present',
+    type: 'Full Time',
+    logo: 'sunlife' as const,
+  },
+  {
+    org: 'SmartSyllabus',
+    team: 'ICUBE at UTM',
+    role: 'Co-Founder & Product Lead',
+    timeframe: '2024 – Present',
+    type: 'Venture',
+    logo: 'smartsyllabus' as const,
+  },
+  {
+    org: 'Sun Life',
+    team: 'Digital Transformation',
+    role: 'Digital Transformation Intern',
+    timeframe: '2026',
+    type: 'Internship',
+    logo: 'sunlife' as const,
+  },
+  {
+    org: 'Dye & Durham',
+    team: 'eCore Product',
+    role: 'Product Management Intern',
+    timeframe: '2025',
+    type: 'Internship',
+    logo: 'dyedurham' as const,
+  },
+  {
+    org: 'U of T Innovation Hub',
+    team: 'Design Research',
+    role: 'Design Research Lead',
+    timeframe: '2025',
+    type: 'Internship',
+    logo: 'uoft' as const,
+  },
+  {
+    org: "Ontario Teachers' Pension Plan",
+    team: 'Experience Design & Innovation',
+    role: 'Experience Design Intern (16 Mos)',
+    timeframe: '2023 – 2024',
+    type: 'Internship',
+    logo: 'otpp' as const,
+  },
+  {
+    org: 'RBC',
+    team: 'Web Development',
+    role: 'Web Development Intern',
+    timeframe: '2022',
+    type: 'Internship',
+    logo: 'rbc' as const,
+  },
+];
 ---
 
 <Base title="About · Rohan Aslam">
-  <div class="pt-8">
-    <h1 class="h1">About</h1>
+  <div class="pt-10">
+    <h1 class="h1 text-[36px] sm:text-[48px]">About</h1>
     <hr class="rule-heavy mt-3" />
-    <div class="prose mt-6">
+    <div class="prose max-w-[85ch] text-[18px] leading-relaxed mt-8">
       <p>
         I'm Rohan Aslam and I live in Scarborough, which means I've spent a meaningful fraction
         of my life on the Lakeshore East line.
@@ -50,12 +110,42 @@ import Base from '../layouts/Base.astro';
         good at logistics.
       </p>
 
+      <h2 class="mt-14">Organizations & Roles</h2>
+    </div>
+
+    <!-- Experience / Organizations departure board -->
+    <div class="mt-6 border-t-2 border-(--ink) max-w-[95ch]">
+      {
+        experience.map((item) => (
+          <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b-2 border-(--ink) py-5 transition-colors hover:bg-(--surface)">
+            <div class="flex items-center gap-5">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--ground) text-(--ink)">
+                <CompanyLogo name={item.logo} size={28} />
+              </div>
+              <div>
+                <div class="text-[19px] font-bold leading-tight text-(--ink)">
+                  {item.org}
+                  <span class="ml-2 text-[15px] font-normal text-(--ink-muted)">· {item.team}</span>
+                </div>
+                <div class="label text-[14px] mt-1 text-(--ink-muted)">{item.role}</div>
+              </div>
+            </div>
+            <div class="label text-right text-(--ink) text-[14px]">
+              <div class="font-bold">{item.timeframe}</div>
+              <div class="text-(--ink-faint)">{item.type}</div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="prose max-w-[85ch] text-[18px] leading-relaxed mt-16">
       <h2>What I'm looking for</h2>
       <p>
         Strategy and operations roles at startups. The kind of job where working out what matters
         and making it real are the same task. If that's your team,
         <a href="mailto:rohanaslam24@gmail.com">email me</a> or find me on
-        <a href="https://www.linkedin.com/in/rohanaslam">LinkedIn</a>.
+        <a href="https://www.linkedin.com/in/rohanaslam" target="_blank" rel="noopener noreferrer">LinkedIn</a>.
       </p>
     </div>
   </div>
