@@ -1,3 +1,8 @@
+---
+description: Read CONTEXT.md and DESIGN.md before any work in this repo
+alwaysApply: true
+---
+
 # Agent instructions
 
 **Read [CONTEXT.md](./CONTEXT.md) first, then [DESIGN.md](./DESIGN.md). Do not start work until you have.**

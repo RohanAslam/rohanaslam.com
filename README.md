@@ -1,6 +1,9 @@
 # rohanaslam.com
 
-Personal portfolio. Astro 5 + MDX + Tailwind 4, deployed on Vercel. The repo is the CMS: every project is one `.mdx` file in `src/content/work/`, and AI agents (Claude Code, Antigravity) add entries by committing files. See [CLAUDE.md](./CLAUDE.md) and [AGENTS.md](./AGENTS.md).
+> **AI agents and new contributors: read [CONTEXT.md](./CONTEXT.md) first, then [DESIGN.md](./DESIGN.md).**
+> They are the canonical brief. `npm run check` enforces the rules in them and runs automatically before every build, so a violation fails the deploy rather than shipping.
+
+Personal portfolio. Astro 5 + MDX + Tailwind 4, deployed on GitHub Pages. The repo is the CMS: every project is one `.mdx` file in `src/content/work/`, and AI agents (Claude Code, Antigravity) add entries by committing files. See [CLAUDE.md](./CLAUDE.md) and [AGENTS.md](./AGENTS.md).
 
 **[DESIGN.md](./DESIGN.md) is the design system: a transit wayfinding language.** Work categories are routes, projects are stations, the career is a line diagram. Color, type, rules, components, motion, and voice, with every contrast ratio measured. Implemented in `src/styles/global.css` and rendered live at `/style`.
 
