@@ -1,0 +1,117 @@
+---
+import Base from '../layouts/Base.astro';
+
+const groups = [
+  {
+    name: 'Essays & Research Papers',
+    items: [
+      {
+        title: 'Rethinking FIFA International Soccer (1993) as a Classic',
+        blurb:
+          "Why a game with a $100,000 budget deserves classic status, argued through what it started rather than how it played.",
+        date: 'April 2026',
+        file: 'fifa-international-soccer.pdf',
+      },
+      {
+        title: 'Intellectual Property Rights: Profitization of Knowledge in Canada',
+        blurb:
+          'How copyright law and weak open access policy let publishers profit from research the public already paid for, plus the reforms that would fix it.',
+        date: 'March 2026',
+        file: 'intellectual-property-rights.pdf',
+      },
+      {
+        title: 'The Repairability and Politics of Infrastructure',
+        blurb:
+          'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable phone have in common.',
+        date: 'August 2025',
+        file: 'repairability-and-politics-of-infrastructure.pdf',
+      },
+      {
+        title: "Searle's Chinese Room Argument and Functionalism",
+        blurb:
+          "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it doesn't.",
+        date: 'August 2025',
+        file: 'chinese-room-argument.pdf',
+      },
+    ],
+  },
+  {
+    name: 'Analyses & Critiques',
+    items: [
+      {
+        title: 'Analyzing Work Collaboration Software',
+        blurb:
+          'Zoom and Slack sold freedom from the office. What they actually built was a circuit that never turns off.',
+        date: 'October 2025',
+        file: 'work-collaboration-software.pdf',
+      },
+      {
+        title: 'A Qualitative Method Analysis',
+        blurb:
+          'A methods critique of a study on hiring managers screening job candidates by their social media, from sample size to consent.',
+        date: 'November 2022',
+        file: 'qualitative-method-analysis.pdf',
+      },
+      {
+        title: 'Close Playing Analysis: Split-Screen Multiplayer in Halo',
+        blurb:
+          'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built community that online play never could.',
+        date: 'November 2025',
+        file: 'close-playing-analysis.pdf',
+      },
+    ],
+  },
+  {
+    name: 'Creative & Reflection',
+    items: [
+      {
+        title: 'Dear Go Train',
+        blurb:
+          'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own job downtown.',
+        date: 'December 2025',
+        file: 'dear-go-train.pdf',
+      },
+    ],
+  },
+];
+---
+
+<Base title="Writing · Rohan Aslam">
+  <div class="pt-10">
+    <h1 class="h1">Writing</h1>
+    <hr class="rule-heavy mt-3" />
+    <p class="mt-5 max-w-[85ch] text-[18px] leading-relaxed text-(--ink-muted)">
+      Research essays and critical writing from university, kept here because the work in them
+      held up. Each one opens as a PDF, exactly as submitted, with student identifiers removed.
+    </p>
+    <div class="label mt-3 text-[14px] text-(--ink-faint)">
+      {groups.reduce((n, g) => n + g.items.length, 0)} PIECES
+    </div>
+
+    {
+      groups.map((group) => (
+        <section class="mt-14">
+          <div class="label border-b-2 border-(--ink) pb-3 text-[15px] font-bold text-(--ink)">
+            {group.name}
+          </div>
+          <div class="mt-6 grid gap-5">
+            {group.items.map((item) => (
+              <a href={`/writing/${item.file}`} target="_blank" rel="noopener noreferrer" class="station-card group">
+                <div class="label flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px]">
+                  <span class="tag text-[12px]">PDF</span>
+                  <span>{item.date}</span>
+                </div>
+                <h3 class="mt-3 text-[21px] font-bold leading-snug transition-colors group-hover:text-(--cobalt)">
+                  {item.title}
+                </h3>
+                <p class="mt-2 max-w-[90ch] text-[15px] leading-relaxed text-(--ink-muted)">
+                  {item.blurb}
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Base>
