@@ -3,3 +3,5 @@ dist/
 .astro/
 .DS_Store
 .env
+_to_delete/
+preview-*.html

@@ -1,0 +1,17 @@
+---
+title: "Source-Grounded Research Assistant"
+date: 2026-08-20
+summary: "A retrieval assistant whose most interesting behaviour is refusing to answer when its sources do not cover the question."
+tags: ["ai-tools", "data"]
+stack: ["Python", "RAG", "Vector search", "Docker", "Gemini"]
+status: "in-progress"
+featured: false
+---
+
+The interesting behaviour is the refusal.
+
+It is a retrieval assistant over a curated document collection. A question gets embedded, matched against indexed passages, and answered only from what comes back, with every claim carrying a numbered citation to a document and a page. If nothing relevant is retrieved, the language model is never called at all and the system returns a fixed refusal. That is the whole design. Hallucination gets prevented architecturally rather than asked for politely in a prompt.
+
+I built the first knowledge base out of Ahmadiyya Muslim Jamaat publications, partly because it is a body of text I know well enough to catch a wrong answer, and partly because scholarship is exactly the domain where a confident wrong answer does the most damage. The architecture is generic. Point it at any folder of PDFs and it becomes a research assistant for that collection.
+
+Retrieval quality is the open problem. Chunking a book by fixed token count splits an argument in half, and the assistant is only ever as honest as the passage it happened to find.

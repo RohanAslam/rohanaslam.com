@@ -8,16 +8,23 @@
  * longer sends the train, because a mouse crossing the diagram used to whip it
  * back and forth.
  *
- * Geometry (viewBox 0 0 1240 640, main line at y=310):
- *   main   M 0 310 H 1240              = 1240
- *   branch M 790 310 L 950 +/-160 H 1240 = sqrt(160^2+160^2) + 290
- * The lines run edge to edge rather than stopping at the outer stations, so the
- * train can park on the first and last station without hanging off the track.
- * The script's constants (junction 790/310, bend 950, branch rows 150/470) mirror
- * these paths so the train follows the drawn line. Change them together.
+ * Geometry (viewBox 0 0 1240 800, main line at y=310). Five routes:
+ *   line 1 strategy      M 0 310 H 1240                    = 1240
+ *   line 3 startup       M 790 310 L 950 150 H 1240        = sqrt(160^2+160^2) + 290
+ *   line 2 ai tools      M 790 310 L 950 470 H 1240        = sqrt(160^2+160^2) + 290
+ *   line 4 data          M 150 310 L 520 680 H 1240        = sqrt(370^2+370^2) + 720
+ *   line 5 earlier work  M 0 110 H 780                     = 780
+ * Line 5 has no junction. It enters from the left edge like line 1 and terminates
+ * at 780, before the line 3 diagonal climbs through that column. Its row is 110
+ * rather than 150 so it clears the line 1 logo block, which starts at y=166. Line 4 leaves the
+ * spine early (x=150) because the data work predates the AI tool work by two years,
+ * and it needs the extra horizontal run to carry six stations.
+ * Every constant below mirrors one of these paths. Change them together.
  *
  * Vertical rhythm per station, measured from the line, mirrored on both sides:
  *   name baseline 40, year baseline 62, logo block from 82 to 138.
+ * Logos are for employers only. Project stations set no company, skip the logo
+ * block entirely, and can therefore sit at a 105 to 130px pitch instead of 150.
  * The stack extent (138) plus node clearance is why the branch offset is 160.
  *
  * Timing. The line draws at one constant speed, so every station delay is derived
@@ -40,9 +47,28 @@ const BRANCH_LEN = BRANCH_DIAG + (LINE_END_X - BEND_X);
 const BRANCH_DUR = Math.round(BRANCH_LEN / DRAW_SPEED);
 const BRANCH_START = Math.round((JUNCTION_X - LINE_START_X) / DRAW_SPEED);
 
+// Line 4 - data. Leaves the spine at x=150 and drops 370px at 45 degrees to its row.
+const DATA_JUNCTION_X = 150;
+const DATA_BEND_X = 520;
+const DATA_ROW_Y = 680;
+const DATA_DROP = DATA_BEND_X - DATA_JUNCTION_X; // 370, equals the vertical drop
+const DATA_DIAG = Math.round(Math.hypot(DATA_DROP, DATA_DROP));
+const DATA_LEN = DATA_DIAG + (LINE_END_X - DATA_BEND_X);
+const DATA_DUR = Math.round(DATA_LEN / DRAW_SPEED);
+const DATA_START = Math.round((DATA_JUNCTION_X - LINE_START_X) / DRAW_SPEED);
+
+// Line 5 - earlier work. No junction, enters from the left edge and terminates.
+const EARLY_ROW_Y = 110;
+const EARLY_END_X = 780;
+const EARLY_LEN = EARLY_END_X - LINE_START_X;
+const EARLY_DUR = Math.round(EARLY_LEN / DRAW_SPEED);
+
 const mainDelay = (x: number) => Math.round((x - LINE_START_X) / DRAW_SPEED);
 const branchDelay = (x: number) =>
   Math.round(BRANCH_START + (BRANCH_DIAG + (x - BEND_X)) / DRAW_SPEED);
+const dataDelay = (x: number) =>
+  Math.round(DATA_START + (DATA_DIAG + (x - DATA_BEND_X)) / DRAW_SPEED);
+const earlyDelay = (x: number) => Math.round((x - LINE_START_X) / DRAW_SPEED);
 
 const LOGO_W = 120;
 const LOGO_H = 56;
@@ -58,7 +84,7 @@ interface StationData {
   routeName: string;
   delay: number;
   interchange?: boolean;
-  company: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus' | 'n8n';
+  company?: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus' | 'n8n';
   role: string;
   organization: string;
   timeframe: string;
@@ -80,9 +106,9 @@ const stations: StationData[] = [
     delay: mainDelay(70),
     company: 'rbc',
     organization: 'Royal Bank of Canada',
-    role: 'Web Development Intern',
+    role: 'Web Developer Intern',
     timeframe: 'May 2022 – Aug 2022',
-    summary: 'Built and maintained internal digital tools. First industry internship translating technical specifications into working software.',
+    summary: 'Front end work, testing and documentation on an internal tool for wealth management advisors. First industry internship, and mostly a lesson in inheriting a codebase somebody else wrote.',
   },
   {
     id: 'otpp',
@@ -90,7 +116,7 @@ const stations: StationData[] = [
     y: 310,
     side: 'above',
     label: 'OTPP',
-    sub: '2023',
+    sub: '2023–24',
     line: 1,
     routeName: 'Line 1 · Strategy',
     delay: mainDelay(250),
@@ -98,9 +124,7 @@ const stations: StationData[] = [
     organization: "Ontario Teachers' Pension Plan",
     role: 'Experience Design & Innovation Intern',
     timeframe: 'May 2023 – Aug 2024 (16 Mos)',
-    summary: '16 months on the Experience Design and Innovation team prototyping enterprise workflows and validating AI tooling for global investment teams.',
-    link: '/work/kronos-forecasting-research',
-    linkLabel: 'Read case study',
+    summary: 'Sixteen straight months across research, Figma prototyping, service mapping and tooling evaluation. A component library from it is still in use, and one process got restructured because the map showed a manual step everyone had stopped noticing.',
   },
   {
     id: 'innovation-hub',
@@ -114,11 +138,9 @@ const stations: StationData[] = [
     delay: mainDelay(430),
     company: 'uoft',
     organization: 'U of T Innovation Hub',
-    role: 'Design Research Lead',
-    timeframe: 'Jan 2025 – Apr 2025',
-    summary: 'Led qualitative research and 20+ in-depth interviews with educators across Ontario to uncover systemic administrative friction in curriculum management.',
-    link: '/work/innovation-hub-design-research',
-    linkLabel: 'Read case study',
+    role: 'Design Researcher',
+    timeframe: 'May 2025 – Aug 2025',
+    summary: 'A summer of interviewing educators across Ontario, 20+ conversations, synthesized into insights the team could act on. The problems that came back were ones nobody would have guessed at from a desk.',
   },
   {
     id: 'dye-durham',
@@ -132,11 +154,9 @@ const stations: StationData[] = [
     delay: mainDelay(610),
     company: 'dyedurham',
     organization: 'Dye & Durham',
-    role: 'Product Management Intern (eCore)',
-    timeframe: 'May 2025 – Aug 2025',
-    summary: 'Worked on eCore legal product workflows, leading competitive teardowns, user research sessions, and feature prioritization matrices.',
-    link: '/work/dye-durham-product',
-    linkLabel: 'Read case study',
+    role: 'Product Intern',
+    timeframe: 'Sep 2025 – Dec 2025',
+    summary: 'Product work on eCore, where the users are lawyers and the constraints are compliance requirements rather than preferences. Mostly translation between what a regulation demands and what someone will tolerate at 4pm on a Friday.',
   },
   {
     id: 'sunlife-interchange',
@@ -151,29 +171,25 @@ const stations: StationData[] = [
     interchange: true,
     company: 'sunlife',
     organization: 'Sun Life',
-    role: 'Digital Transformation & AI Strategy',
-    timeframe: 'Jan 2026 – Apr 2026',
-    summary: 'Digital transformation milestone where strategy, venture development, and AI engineering converged. Built Copilot Studio agents and operational Power BI intelligence.',
-    link: '/work/sunlife-digital-transformation',
-    linkLabel: 'Read case study',
+    role: 'Digital Transformation Coordinator',
+    timeframe: 'May 2026 – Aug 2026',
+    summary: 'Four months on the GTVRE team finding the manual work worth automating, then automating it. Copilot Studio agents, Power BI reporting, and a pitch to business leadership in the Intern Innovation Challenge. It turned into the full time offer.',
   },
   {
     id: 'sunadvantage',
     x: 1080,
     y: 310,
     side: 'above',
-    label: 'SUNADVANTAGE',
-    sub: '2026',
+    label: 'SUN LIFE',
+    sub: '(SUNADVANTAGE)',
     line: 1,
     routeName: 'Line 1 · Strategy',
     delay: mainDelay(1080),
     company: 'sunlife',
     organization: 'Sun Life (SunAdvantage)',
     role: 'Strategy & Operations Specialist',
-    timeframe: '2026 – Present (Full Time)',
-    summary: 'Full-time strategy and operations on the SunAdvantage group benefits platform, modernizing health coverage for small and medium businesses.',
-    link: '/work/sunlife-digital-transformation',
-    linkLabel: 'Read case study',
+    timeframe: 'Sep 2026 – Present (Full Time)',
+    summary: 'Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Just started, so there is nothing to write up yet.',
   },
   {
     id: 'smartsyllabus',
@@ -187,9 +203,9 @@ const stations: StationData[] = [
     delay: branchDelay(1010),
     company: 'smartsyllabus',
     organization: 'SmartSyllabus / ICUBE',
-    role: 'Co-Founder & Product Lead',
-    timeframe: '2024 – Present',
-    summary: 'AI academic planning engine converting multi-format course syllabi into structured schedules. Incubated at UTM ICUBE.',
+    role: 'Co-Founder',
+    timeframe: 'Jan 2026 – Present',
+    summary: 'Started as a CSC301 project in January and stopped being one. AI parsing that turns multi-format syllabi into a structured semester. Incubated at UTM ICUBE from the summer, alongside the Sun Life term.',
     link: '/work/smartsyllabus',
     linkLabel: 'Read case study',
   },
@@ -199,12 +215,12 @@ const stations: StationData[] = [
     y: 150,
     side: 'above',
     label: 'SMARTSYLLABUS.CA',
-    sub: 'LIVE',
+    sub: 'LIVE SITE',
     line: 3,
     routeName: 'Line 3 · Startup',
     delay: branchDelay(1160),
     company: 'smartsyllabus',
-    organization: 'SmartSyllabus Production',
+    organization: 'SmartSyllabus (Live)',
     role: 'Production Web App',
     timeframe: 'Live in Production',
     summary: 'Live at smartsyllabus.ca with parsing engine, semester planner, and user research-backed onboarding flow.',
@@ -213,15 +229,14 @@ const stations: StationData[] = [
   },
   {
     id: 'personal-ai-os',
-    x: 1010,
+    x: 985,
     y: 470,
     side: 'below',
-    label: 'PERSONAL AI OS',
+    label: 'AI OS',
     sub: 'N8N',
     line: 2,
     routeName: 'Line 2 · AI Tools',
-    delay: branchDelay(1010),
-    company: 'n8n',
+    delay: branchDelay(985),
     organization: 'Personal AI Infrastructure',
     role: 'Creator & Architect',
     timeframe: 'June 2026 – Daily',
@@ -231,15 +246,14 @@ const stations: StationData[] = [
   },
   {
     id: 'job-pipeline',
-    x: 1160,
+    x: 1090,
     y: 470,
     side: 'below',
     label: 'JOB PIPELINE',
     sub: 'APIFY',
     line: 2,
     routeName: 'Line 2 · AI Tools',
-    delay: branchDelay(1160),
-    company: 'n8n',
+    delay: branchDelay(1090),
     organization: 'Automated Job Search Pipeline',
     role: 'Creator & Developer',
     timeframe: 'July 2026',
@@ -247,69 +261,348 @@ const stations: StationData[] = [
     link: '/work/job-search-automation',
     linkLabel: 'Read case study',
   },
+  {
+    id: 'jamat-agent',
+    x: 1195,
+    y: 470,
+    side: 'below',
+    label: 'RAG AGENT',
+    sub: 'CITED',
+    line: 2,
+    routeName: 'Line 2 · AI Tools',
+    delay: branchDelay(1195),
+    organization: 'Source-Grounded Research Assistant',
+    role: 'Creator & Architect',
+    timeframe: 'Aug 2026 – Present',
+    summary: 'Retrieval assistant that answers only from indexed source passages and cites each claim by document and page. If nothing relevant is retrieved the model is never called and the system refuses instead, so hallucination is prevented by the architecture rather than by the prompt.',
+    link: '/work/jamat-rag-assistant',
+    linkLabel: 'Read case study',
+  },
+
+  // ---- Line 4 · data. Row y=680, no logos, pitch 130. ----
+  {
+    id: 'moneyball',
+    x: 570,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'MONEYBALL',
+    sub: 'R + GGPLOT',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(570),
+    organization: 'Data Storytelling in R',
+    role: 'Analysis & Visualization',
+    timeframe: '2024',
+    summary: 'Decades of baseball statistics parsed in R to rerun the Oakland A\u2019s replacement problem, plus a ggplot2 rebuild of the Economist corruption against human development chart. Two datasets, one skill: turning a mess into an argument someone can act on.',
+    link: '/work/data-storytelling-r',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'bikeshare',
+    x: 700,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'BIKESHARE',
+    sub: 'REGRESSION',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(700),
+    organization: 'Bikeshare Demand Model',
+    role: 'Modelling',
+    timeframe: '2024',
+    summary: 'A linear regression on rental counts against temperature, season and hour. The model underperformed, and reading the residuals is what made it worth building. Two commuter rush hours in the scatter plot said more than the metrics did.',
+    link: '/work/bikeshare-demand-model',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'pandas',
+    x: 830,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'PANDAS',
+    sub: 'PYTHON',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(830),
+    organization: 'Pandas, Matplotlib, Seaborn',
+    role: 'Skill Build',
+    timeframe: '2025',
+    summary: 'Thirty one notebooks worked end to end. Indexing, filtering, groupby, multi indexing, joins, dates, text cleaning, then matplotlib and seaborn. Anything that has to run more than once now gets written in pandas.',
+    link: '/work/python-data-analysis',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'job-portal',
+    x: 960,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'JOB PORTAL',
+    sub: '5 PROVIDERS',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(960),
+    organization: 'Job Portal',
+    role: 'Creator & Developer',
+    timeframe: 'May 2026 – Present',
+    summary: 'Local first job search app. Apify ingestion, resume parsing, and model scored matching behind one provider interface covering Claude, Gemini, Groq, local Ollama and a stub mode. Everything stays on disk, and live calls stay gated behind flags.',
+    link: '/work/job-portal',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'aurum',
+    x: 1090,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'AURUM',
+    sub: 'FINANCE',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(1090),
+    organization: 'Aurum Finance Dashboard',
+    role: 'Creator & Developer',
+    timeframe: '2026',
+    summary: 'CSV import, category rules and take home pay modelled against 2026 Canadian brackets across four lifestyle scenarios. Runs entirely in the browser, because it is my money and it does not need an account.',
+    link: '/work/aurum-finance',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'kronos',
+    x: 1195,
+    y: DATA_ROW_Y,
+    side: 'below',
+    label: 'KRONOS',
+    sub: 'FORECASTS',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    delay: dataDelay(1195),
+    organization: 'Kronos Forecasting Research',
+    role: 'Research',
+    timeframe: '2026',
+    summary: 'Reading a financial foundation model closely enough to work out that the tokenizer is the whole trick. Fine tuning setup, architecture notes, and a much better sense of what these models can and cannot claim.',
+    link: '/work/kronos-forecasting-research',
+    linkLabel: 'Read case study',
+  },
+
+  // ---- Line 5 · earlier work. Row y=150 left of the line 3 climb, no logos, pitch 130. ----
+  {
+    id: 'early-web',
+    x: 70,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'EARLY WEB',
+    sub: 'JS + REACT',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(70),
+    organization: 'Early Web Builds',
+    role: 'Learning Reps',
+    timeframe: '2021 – 2022',
+    summary: 'A banking interface, two games, an expense tracker, a vacation tracker and a community portal in Svelte. Nobody but me ever used them. The gap between the number guessing game and the job portal is four years, and that gap is the claim.',
+    link: '/work/early-web-builds',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'research-essay',
+    x: 200,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'ESSAY',
+    sub: 'RESEARCH',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(200),
+    organization: 'Influence and Teen Decision Making',
+    role: 'Academic Writing',
+    timeframe: '2022',
+    summary: 'A research essay on how far creators move the decisions of 13 to 17 year olds, argued from work on parasocial trust rather than screen time commentary. The mechanism held up. The certainty in my own research question did not.',
+    link: '/work/youtube-influence-essay',
+    linkLabel: 'Read the write-up',
+  },
+  {
+    id: 'editorial',
+    x: 330,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'EDITORIAL',
+    sub: 'LAYOUT',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(330),
+    organization: 'Editorial Layout & Poster',
+    role: 'Design',
+    timeframe: '2022',
+    summary: 'A magazine spread and poster built around a single number, because the number was the story and everything else was context. Where I learned that nobody reads a spread, they scan it in an order you either chose or left to chance.',
+    link: '/work/editorial-layout',
+    linkLabel: 'Read the write-up',
+  },
+  {
+    id: 'juventus',
+    x: 460,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'JUVENTUS',
+    sub: 'REBRAND',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(460),
+    organization: 'Juventus Rebrand Style Guide',
+    role: 'Brand Strategy',
+    timeframe: '2023',
+    summary: 'A full brand system: history, mission, visual identity, logo construction, colour, typography and usage rules. The first time I wrote rules for other people to design against, which is what a design system is.',
+    link: '/work/juventus-rebrand',
+    linkLabel: 'Read the write-up',
+  },
+  {
+    id: 'flingblade',
+    x: 590,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'FLINGBLADE',
+    sub: 'UNITY',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(590),
+    organization: 'FLINGBLADE',
+    role: 'Game Development',
+    timeframe: '2023',
+    summary: 'A Unity project taken all the way to a WebGL build and put on the internet, which is a different job from making it run in the editor. The first thing I ever shipped that a stranger could break.',
+    link: '/work/flingblade',
+    linkLabel: 'Read the write-up',
+  },
+  {
+    id: 'visual-design',
+    x: 720,
+    y: EARLY_ROW_Y,
+    side: 'above',
+    label: 'VISUAL DESIGN',
+    sub: '3D + PRINT',
+    line: 5,
+    routeName: 'Line 5 · Earlier',
+    delay: earlyDelay(720),
+    organization: 'Visual Design & Community Materials',
+    role: 'Design',
+    timeframe: '2022 – 2025',
+    summary: 'Duty charts, QR flyers, wedding cards, a self portrait built in Illustrator and 3D coursework in Maya. Signage people follow without being told to, which is transit wayfinding at a smaller scale and a harder deadline.',
+    link: '/work/visual-design-work',
+    linkLabel: 'Read the write-up',
+  },
 ];
 
 const routeColors: Record<number, string> = {
   1: 'var(--line-1)',
   2: 'var(--line-2)',
   3: 'var(--line-3)',
+  4: 'var(--line-4)',
+  5: 'var(--line-5)',
 };
 ---
 
 <div class="route-map-container my-4">
-  <!-- Current station panel. Sits above the diagram so the update reads top-down:
-       pick a station below, the details change up here. -->
+  <!-- Unified Top Transit Board & Station Inspector: Sits directly above the timeline (Always above the fold) -->
   <div
     id="station-inspector"
-    class="station-card mb-6 transition-all"
+    class="mb-6 border-2 border-(--ink) bg-(--ground) transition-all"
     style="--route: var(--line-1)"
   >
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-      <div class="flex items-center gap-5">
-        <!-- Bare transparent logo, matching the stations on the diagram -->
-        <div id="inspector-logo" class="flex h-20 w-32 shrink-0 items-center justify-center">
-          <CompanyLogo name="sunlife" width={110} height={56} class="logo-img h-full w-full object-contain" data-logo="sunlife" />
-          <CompanyLogo name="rbc" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="rbc" />
-          <CompanyLogo name="otpp" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="otpp" />
-          <CompanyLogo name="uoft" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="uoft" />
-          <CompanyLogo name="dyedurham" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="dyedurham" />
-          <CompanyLogo name="smartsyllabus" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="smartsyllabus" />
-          <CompanyLogo name="n8n" width={110} height={56} class="logo-img h-full w-full object-contain hidden" data-logo="n8n" />
+    <!-- TTC Arrival Sign Header -->
+    <div
+      id="ttc-sign-container"
+      class="overflow-hidden border-b-2 border-(--ink) bg-[#0B0E12] px-4 py-2 text-[#F2B705] transition-all"
+    >
+      <div id="ttc-sign-track" class="flex flex-wrap items-center justify-between gap-3 ttc-slide-in">
+        <div class="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest uppercase shrink-0">
+          <span class="inline-block h-2 w-2 rounded-full bg-[#F2B705] animate-pulse"></span>
+          <span id="ttc-status-text">ARRIVED AT</span>
+        </div>
+        <div
+          id="ttc-arrival-station"
+          class="font-mono text-[13px] font-bold tracking-wider text-[#F2B705] uppercase truncate"
+        >
+          SUN LIFE (SUNADVANTAGE)
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Station Quick Info Row -->
+    <div class="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-0">
+        <!-- Logo Box -->
+        <div id="inspector-logo" class="flex h-14 w-20 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-1">
+          <CompanyLogo name="sunlife" width={80} height={40} class="logo-img h-full w-full object-contain" data-logo="sunlife" />
+          <CompanyLogo name="rbc" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="rbc" />
+          <CompanyLogo name="otpp" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="otpp" />
+          <CompanyLogo name="uoft" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="uoft" />
+          <CompanyLogo name="dyedurham" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="dyedurham" />
+          <CompanyLogo name="smartsyllabus" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="smartsyllabus" />
+          <CompanyLogo name="n8n" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="n8n" />
         </div>
 
-        <div>
+        <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span id="inspector-bullet" class="bullet bullet-1 text-[12px] font-bold">Line 1 · Strategy</span>
-            <span id="inspector-timeframe" class="label text-[14px] text-(--ink-faint)">2026 – Present</span>
-            <span class="label text-[13px] text-(--ink-faint) hidden sm:inline">· CURRENT STATION</span>
+            <span id="inspector-bullet" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Strategy</span>
+            <span id="inspector-timeframe" class="label text-[12px] text-(--ink-faint)">2026 – Present</span>
           </div>
-          <h3 id="inspector-title" class="mt-1 text-[22px] font-bold text-(--ink)">
+          <h3 id="inspector-title" class="mt-0.5 text-[17px] sm:text-[19px] font-bold text-(--ink) truncate">
             Sun Life (SunAdvantage)
           </h3>
-          <div id="inspector-role" class="label text-[15px] font-bold text-(--cobalt)">
+          <div id="inspector-role" class="label text-[13px] font-bold text-(--cobalt) truncate">
             Strategy & Operations Specialist
           </div>
-          <p id="inspector-summary" class="mt-2 max-w-[85ch] text-[15px] leading-relaxed text-(--ink-muted)">
-            Full-time strategy and operations on the SunAdvantage group benefits platform, modernizing health coverage for small and medium businesses.
-          </p>
         </div>
       </div>
 
-      <div class="shrink-0 md:self-center">
+      <!-- Action & Collapsible Details Toggle -->
+      <div class="flex items-center gap-2.5 shrink-0 self-start md:self-center">
+        <button
+          type="button"
+          id="inspector-toggle-details"
+          class="btn btn-secondary text-[11px] h-8 px-3 flex items-center gap-1.5"
+          aria-expanded="false"
+          aria-controls="inspector-summary-drawer"
+        >
+          <span id="toggle-details-text">Summary</span>
+          <Icon name="arrow-down" size={12} class="transition-transform duration-200" />
+        </button>
+
         <a
           id="inspector-link"
-          href="/work/sunlife-digital-transformation"
-          class="btn btn-secondary flex items-center gap-2 text-[13px]"
+          href="#"
+          class="btn btn-primary text-[11px] h-8 px-3 flex items-center gap-1.5"
+          style="display: none;"
         >
-          <span id="inspector-link-text">Read case study</span>
-          <Icon name="arrow-right" size={15} />
+          <span id="inspector-link-text">Case study</span>
+          <Icon name="arrow-right" size={12} />
         </a>
       </div>
+    </div>
+
+    <!-- Collapsible Summary Drawer -->
+    <div
+      id="inspector-summary-drawer"
+      class="hidden border-t-2 border-(--rule-soft) bg-(--surface) px-4 py-3"
+    >
+      <p id="inspector-summary" class="max-w-[90ch] text-[13px] sm:text-[14px] leading-relaxed text-(--ink)">
+        Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Just started, so there is nothing to write up yet.
+      </p>
     </div>
   </div>
 
   <figure class="my-0 overflow-x-auto" aria-label="Career transit route diagram">
-    <svg viewBox="0 0 1240 640" class="w-full min-w-[960px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 1240 800" class="w-full min-w-[1040px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Line 5 · earlier work. Enters from the left edge, terminates at 780. -->
+      <path
+        d={`M 0 ${EARLY_ROW_Y} H ${EARLY_END_X}`}
+        stroke="var(--line-5)" stroke-width="10" stroke-linecap="butt"
+        class="route-line"
+        style={`--len:${EARLY_LEN}; animation-delay:0ms; animation-duration:${EARLY_DUR}ms`}
+      />
+      <!-- Line 4 · data, branches down at 45 from x=150 -->
+      <path
+        d={`M ${DATA_JUNCTION_X} 310 L ${DATA_BEND_X} ${DATA_ROW_Y} H ${LINE_END_X}`}
+        stroke="var(--line-4)" stroke-width="10" stroke-linecap="butt" stroke-linejoin="miter"
+        class="route-line"
+        style={`--len:${DATA_LEN}; animation-delay:${DATA_START}ms; animation-duration:${DATA_DUR}ms`}
+      />
       <!-- Line 1 · strategy -->
       <path
         d="M 0 310 H 1240"
@@ -346,29 +639,25 @@ const routeColors: Record<number, string> = {
               role="button"
               aria-label={`Station: ${s.label}, ${s.organization}`}
             >
-              {/* Station Node on Track */}
+              {/* Station Node on Track: Black inner dot appears on the active/current station */}
               <g class="route-station" style={`animation-delay:${s.delay}ms; transform-origin:${s.x}px ${s.y}px`}>
-                {s.interchange ? (
-                  <Fragment>
-                    <circle cx={s.x} cy={s.y} r="17" fill="var(--ground)" stroke="var(--ink)" stroke-width="7" class="node-ring" />
-                    <circle cx={s.x} cy={s.y} r="5" fill="var(--ink)" />
-                  </Fragment>
-                ) : (
-                  <circle cx={s.x} cy={s.y} r="13" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="7" class="node-ring" />
-                )}
+                <circle cx={s.x} cy={s.y} r="14" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="7" class="node-ring" />
+                <circle cx={s.x} cy={s.y} r="5" fill="var(--ink)" class="node-center-dot" />
               </g>
 
-              {/* Transparent Company Logo (Centered horizontally on station x, no white box) */}
-              <image
-                href={`/images/logos/${s.company}.png`}
-                x={s.x - LOGO_W / 2}
-                y={logoY}
-                width={LOGO_W}
-                height={LOGO_H}
-                preserveAspectRatio="xMidYMid meet"
-                class="route-label pointer-events-none"
-                style={`animation-delay:${s.delay + 150}ms`}
-              />
+              {/* Company logo, employers only. Project stations skip it entirely. */}
+              {s.company && (
+                <image
+                  href={`/images/logos/${s.company}.png`}
+                  x={s.x - LOGO_W / 2}
+                  y={logoY}
+                  width={LOGO_W}
+                  height={LOGO_H}
+                  preserveAspectRatio="xMidYMid meet"
+                  class="route-label pointer-events-none"
+                  style={`animation-delay:${s.delay + 150}ms`}
+                />
+              )}
 
               {/* Station Name Label */}
               <text
@@ -405,145 +694,12 @@ const routeColors: Record<number, string> = {
           );
         })
       }
-
-      <!-- The train. One GO bi-level cab car pulling one coach, side view, nose to
-           the right, 121 units long. Three things it has to do at once: read as a
-           train at thumbnail size, sit on the track rather than above it, and say
-           which line it is currently on.
-
-           Color. The body takes the current route color and the glass takes whatever
-           holds contrast against it, exactly like a route bullet: white on cobalt
-           (7.30) and rose (4.84), ink on amber (10.64), ink on every route in dark
-           mode (6.44 to 12.40). Those pairs come straight out of DESIGN.md 3.2. The
-           body is outlined in ink so the train still separates from the line it is
-           riding, which is the same color. Both fills transition, so changing lines
-           at the junction repaints the train mid-ride.
-
-           Position. The axles run at y -3.5 with r 4.5, so the bottom of every wheel
-           sits at y +1, one unit past the centre of the 10 wide route line. The line
-           passes behind the wheels and the whole body sits above it. It reads as
-           standing on the rail instead of hovering over it.
-
-           Detail. Two window bands a car, one door, one windscreen, one headlight.
-           Every earlier version drew individual panes, five then three, and every one
-           of them read as noise at the size this actually renders. A band reads as
-           glazing at any size; a pane rhythm only reads at a size this never gets.
-
-           Local geometry, origin on the track centreline:
-             overall      x -58 to +63     roof y -39, body floor y -9
-             upper band   y -35.5 to -27.5
-             belt gap     y -27.5 to -22.5   (body color, no shape of its own)
-             lower band   y -22.5 to -12.5
-             axles        y -3.5, r 4.5
-           45 and 90 degrees only. The roof chamfers, the nose rake and the
-           windscreen all run at 45, same as the branch lines.
-
-           The script translates, rotates and mirrors this whole group, so it must
-           stay centred on 0,0 and drawn facing right. Every axle is wrapped in a
-           .wheel group; that class is what the spin animation hooks onto. -->
-      <g
-        id="route-train"
-        class="route-label pointer-events-none"
-        data-line="1"
-        style={`animation-delay:${BRANCH_START + 620}ms`}
-        transform="translate(1080 310)"
-      >
-        <!-- No roof equipment. It cost four units of headroom the station name above
-             needs, and at the size this actually renders it was texture, not detail. -->
-
-        <!-- gangway between the cars, recessed below the roof line -->
-        <rect x="-6" y="-32" width="9" height="23" fill="var(--ink)" />
-
-        <!-- rear coach -->
-        <path
-          d="M -58 -9 V -35 L -54 -39 H -7 L -3 -35 V -9 Z"
-          class="car" stroke="var(--ink)" stroke-width="3" stroke-linejoin="miter"
-        />
-        <!-- cab car: 45 degree rake from the roof down to the nose -->
-        <path
-          d="M 1 -9 V -35 L 5 -39 H 48 L 60 -27 V -9 Z"
-          class="car" stroke="var(--ink)" stroke-width="3" stroke-linejoin="miter"
-        />
-        <!-- front coupler -->
-        <rect x="59" y="-20" width="4" height="4" fill="var(--ink)" />
-
-        <!-- Glazing. One continuous band per deck rather than a row of panes. Two
-             bands separated by a strip of body color is the entire bi-level tell, and
-             it survives being 120px wide on a 1240 viewBox. Discrete windows did not:
-             at that size the pane rhythm stopped reading as windows and started
-             reading as noise. The body-colored gap between the bands is the GO belt
-             stripe, so it costs no extra shape. -->
-        <rect x="-50" y="-35.5" width="40" height="8" class="glass" />
-        <rect x="9" y="-35.5" width="25" height="8" class="glass" />
-        <rect x="-40" y="-22.5" width="31" height="10" class="glass" />
-        <rect x="18" y="-22.5" width="20" height="10" class="glass" />
-
-        <!-- one boarding door a car, two leaves, breaking the lower band -->
-        <rect x="-52" y="-22.5" width="8" height="13.5" class="glass" />
-        <rect x="-48.6" y="-22.5" width="1.2" height="13.5" fill="var(--ink)" />
-        <rect x="6" y="-22.5" width="8" height="13.5" class="glass" />
-        <rect x="9.4" y="-22.5" width="1.2" height="13.5" fill="var(--ink)" />
-
-        <!-- cab: raked windscreen on the nose, and the headlight -->
-        <polygon points="45,-36 57,-24 50,-17 38,-29" class="glass" />
-        <circle cx="54" cy="-15.5" r="3.2" class="glass" />
-
-        <!-- trucks: two axles each, four per unit -->
-        <rect x="-55" y="-10" width="18" height="5" fill="var(--ink)" />
-        <rect x="-25" y="-10" width="18" height="5" fill="var(--ink)" />
-        <rect x="4" y="-10" width="18" height="5" fill="var(--ink)" />
-        <rect x="34" y="-10" width="18" height="5" fill="var(--ink)" />
-
-        <!-- axles. One spoke each, in the page ground rather than the glass color so
-             it stays visible on amber where the glass goes dark. A crossed pair read
-             as a checker pattern at real size instead of as a turning wheel. -->
-        <g class="wheel">
-          <circle cx="-51" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="-51.9" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="-51" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="-41" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="-41.9" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="-41" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="-21" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="-21.9" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="-21" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="-11" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="-11.9" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="-11" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="8" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="7.1" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="8" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="18" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="17.1" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="18" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="38" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="37.1" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="38" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-        <g class="wheel">
-          <circle cx="48" cy="-3.5" r="4.5" fill="var(--ink)" />
-          <rect x="47.1" y="-6.9" width="1.8" height="6.8" fill="var(--ground)" />
-          <circle cx="48" cy="-3.5" r="1.4" fill="var(--ink)" />
-        </g>
-      </g>
     </svg>
   </figure>
 </div>
 
 <style>
-  /* Hover changes color and border weight only. Nothing moves. DESIGN.md section 6. */
+  /* Hover and active station node styles */
   .station-hit {
     outline: none;
   }
@@ -554,71 +710,77 @@ const routeColors: Record<number, string> = {
   .station-hit:focus-visible .node-ring {
     stroke: var(--cobalt);
   }
-  /* The current station's marker is hidden while the train stands on it. The train
-     is the marker. Leaving the ring underneath meant a cobalt arc poking out from
-     below the wheels, which read as the train hovering over the dot. */
-  .station-hit .route-station {
-    transition: opacity var(--dur-base) var(--ease);
-  }
-  .station-hit.current-station .route-station {
+
+  /* Solid black center dot inside current station ring at all times */
+  .station-hit .node-center-dot {
     opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+    transform-origin: center;
+    transform-box: fill-box;
+    transform: scale(0.4);
   }
-  /* The train wears the color of the line it is on, and the glass takes whichever
-     of white or ink holds contrast against that color. Same pairs as a route
-     bullet, DESIGN.md 3.2: white on cobalt and rose, ink on amber, and ink on
-     every route in dark mode because the dark route colors are the light ones. */
-  #route-train {
-    --body: var(--line-1);
-    --glass: #ffffff;
+  .station-hit.current-station .node-center-dot {
+    opacity: 1;
+    transform: scale(1);
   }
-  #route-train[data-line='2'] {
-    --body: var(--line-2);
-    --glass: var(--ink);
-  }
-  #route-train[data-line='3'] {
-    --body: var(--line-3);
-    --glass: #ffffff;
-  }
-  @media (prefers-color-scheme: dark) {
-    #route-train,
-    #route-train[data-line='2'],
-    #route-train[data-line='3'] {
-      --glass: #0b0e12;
-    }
-  }
-  #route-train .car {
-    fill: var(--body);
-  }
-  #route-train .glass {
-    fill: var(--glass);
-  }
-  /* Repaints as it crosses the junction onto another line. */
-  #route-train .car,
-  #route-train .glass {
-    transition: fill 320ms var(--ease);
+  .station-hit.current-station .node-ring {
+    stroke: var(--cobalt) !important;
+    stroke-width: 8px;
   }
 
-  /* The train's wheels spin while it is riding the track. */
-  #route-train .wheel {
-    transform-box: fill-box;
-    transform-origin: center;
+  /* TTC arrival sign container and sliding animations */
+  .ttc-slide-in {
+    animation: ttcSlideIn 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  #route-train.riding .wheel {
-    animation: wheelspin 620ms linear infinite;
+  .ttc-slide-out {
+    animation: ttcSlideOut 200ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
   }
-  @keyframes wheelspin {
-    to {
-      transform: rotate(360deg);
+  .ttc-slide-prep-left {
+    transform: translateX(-100%) !important;
+    opacity: 0 !important;
+    animation: none !important;
+  }
+
+  @keyframes ttcSlideIn {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ttcSlideOut {
+    0% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #route-train.riding .wheel {
-      animation: none;
+    .ttc-slide-in,
+    .ttc-slide-out {
+      animation: none !important;
+      transform: none !important;
+      opacity: 1 !important;
     }
-    #route-train .car,
-    #route-train .glass {
-      transition: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    #ttc-sign-container {
+      background: #0D1014;
+      border-color: #FFC933;
+      color: #FFC933;
+    }
+    #ttc-sign-container span,
+    #ttc-sign-container div {
+      color: #FFC933;
     }
   }
 </style>
@@ -637,18 +799,38 @@ const routeColors: Record<number, string> = {
   const elBullet = document.getElementById('inspector-bullet');
   const elLink = document.getElementById('inspector-link');
   const elLinkText = document.getElementById('inspector-link-text');
-  const train = document.getElementById('route-train');
+  const elStatusText = document.getElementById('ttc-status-text');
+  const elArrivalStation = document.getElementById('ttc-arrival-station');
+  const signTrack = document.getElementById('ttc-sign-track');
+  const btnToggle = document.getElementById('inspector-toggle-details');
+  const drawerSummary = document.getElementById('inspector-summary-drawer');
   const logoImgs = document.querySelectorAll('.logo-img');
   const nodes = document.querySelectorAll('.station-hit');
 
   let currentId = 'sunadvantage';
+  let slideTimeout = null;
+  let arrivedTimeout = null;
+
+  // Toggle summary drawer
+  if (btnToggle && drawerSummary) {
+    btnToggle.addEventListener('click', () => {
+      const isHidden = drawerSummary.classList.contains('hidden');
+      if (isHidden) {
+        drawerSummary.classList.remove('hidden');
+        btnToggle.setAttribute('aria-expanded', 'true');
+      } else {
+        drawerSummary.classList.add('hidden');
+        btnToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
 
   function updateInspector(stationId) {
     const s = dataMap[stationId];
     if (!s) return;
 
     // Update route color styling on inspector card
-    const routeVar = s.line === 1 ? 'var(--line-1)' : s.line === 2 ? 'var(--line-2)' : 'var(--line-3)';
+    const routeVar = `var(--line-${s.line})`;
     if (inspector) {
       inspector.style.setProperty('--route', routeVar);
     }
@@ -661,13 +843,15 @@ const routeColors: Record<number, string> = {
 
     // Update bullet
     if (elBullet) {
-      elBullet.className = `bullet bullet-${s.line} text-[12px] font-bold`;
+      elBullet.className = `bullet bullet-${s.line} text-[11px] font-bold`;
       elBullet.textContent = s.routeName;
     }
 
-    // Update Logo
+    // Update logo. Project stations carry no company, so the whole box goes away.
+    const logoBox = document.getElementById('inspector-logo');
+    if (logoBox) logoBox.classList.toggle('hidden', !s.company);
     logoImgs.forEach((img) => {
-      if (img.getAttribute('data-logo') === s.company) {
+      if (s.company && img.getAttribute('data-logo') === s.company) {
         img.classList.remove('hidden');
       } else {
         img.classList.add('hidden');
@@ -677,7 +861,7 @@ const routeColors: Record<number, string> = {
     // Update link
     if (elLink && elLinkText) {
       if (s.link) {
-        elLink.classList.remove('hidden');
+        elLink.style.display = 'inline-flex';
         elLink.setAttribute('href', s.link);
         if (s.link.startsWith('http')) {
           elLink.setAttribute('target', '_blank');
@@ -688,180 +872,79 @@ const routeColors: Record<number, string> = {
         }
         elLinkText.textContent = s.linkLabel || 'Read case study';
       } else {
-        elLink.classList.add('hidden');
+        elLink.style.display = 'none';
       }
     }
   }
 
-  /* ---- The train ------------------------------------------------------
-     An ink capsule that rides the track between stations. The track constants
-     mirror the SVG paths above: junction (790, 310), 45-degree bends at x=950,
-     branch rows at y=150 and y=470. The train's position is tracked so that a
-     new selection mid-ride reroutes it from wherever it is on the track. */
-  const JUNCTION_X = 790;
-  const MAIN_Y = 310;
-  const BEND_X = 950;
-  const TOP_Y = 150;
-  const BOTTOM_Y = 470;
-  /* Cruise speed, plus a floor and a ceiling on how long any one ride can take.
-     0.28 px/ms is roughly a third of the old speed. The old version tweened every
-     hop in 250ms with an ease that was fastest in the middle, which is why it
-     snapped rather than travelled. */
-  const TRAIN_SPEED = 0.28;
-  const MIN_RIDE = 850;
-  const MAX_RIDE = 2600;
-  const RAMP = 0.24; // fraction of the ride spent accelerating, and again braking
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let trainFrame = null;
-  let trainPos = { x: 1080, y: MAIN_Y };
+  function triggerArrivalTransition(newStationName) {
+    if (!signTrack || !elArrivalStation) return;
 
-  // Position the train, tilted to the segment's angle. Headings past 90 degrees
-  // mean travelling left: mirror the car instead of rotating it upside down.
-  function placeTrain(x, y, angle) {
-    trainPos = { x, y };
-    let r = angle || 0;
-    let flip = '';
-    if (Math.abs(r) > 90) {
-      r = r - Math.sign(r) * 180;
-      flip = ' scale(-1 1)';
-    }
-    train.setAttribute('transform', `translate(${x} ${y}) rotate(${r})${flip}`);
-  }
+    if (slideTimeout) clearTimeout(slideTimeout);
+    if (arrivedTimeout) clearTimeout(arrivedTimeout);
 
-  // Which part of the network a track point sits on.
-  function rowOf(y) {
-    if (y === MAIN_Y) return 'main';
-    if (y === TOP_Y) return 'top';
-    if (y === BOTTOM_Y) return 'bottom';
-    return y < MAIN_Y ? 'top-diagonal' : 'bottom-diagonal';
-  }
-
-  // Waypoints from the train's current track position to a station, routed
-  // through the junction and the bends. 45 and 90 degree legs only.
-  function waypointsTo(target) {
-    const pts = [[trainPos.x, trainPos.y]];
-    const from = rowOf(trainPos.y);
-    const to = rowOf(target.y);
-    const junction = [JUNCTION_X, MAIN_Y];
-    const bend = (row) => [BEND_X, row === 'top' ? TOP_Y : BOTTOM_Y];
-
-    if (from === 'top-diagonal' || from === 'bottom-diagonal') {
-      const branch = from === 'top-diagonal' ? 'top' : 'bottom';
-      if (to === branch) {
-        pts.push(bend(branch));
-      } else {
-        pts.push(junction);
-        if (to !== 'main') pts.push(bend(to));
-      }
-    } else if (from === 'main') {
-      if (to !== 'main') {
-        pts.push(junction, bend(to));
-      }
-    } else if (to !== from) {
-      pts.push(bend(from), junction);
-      if (to !== 'main') pts.push(bend(to));
-    }
-
-    pts.push([target.x, target.y]);
-    return pts;
-  }
-
-  function rideTrain(toId) {
-    const target = dataMap[toId];
-    if (!target) return;
-    if (trainFrame) cancelAnimationFrame(trainFrame);
-
-    if (reducedMotion.matches) {
-      train.classList.remove('riding');
-      placeTrain(target.x, target.y, 0);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      elArrivalStation.textContent = newStationName;
+      if (elStatusText) elStatusText.textContent = 'ARRIVED AT';
       return;
     }
 
-    const pts = waypointsTo(target);
-    const segs = [];
-    let total = 0;
-    for (let i = 1; i < pts.length; i++) {
-      const dx = pts[i][0] - pts[i - 1][0];
-      const dy = pts[i][1] - pts[i - 1][1];
-      const len = Math.hypot(dx, dy);
-      if (len === 0) continue;
-      segs.push({ from: pts[i - 1], dx, dy, start: total, len, angle: (Math.atan2(dy, dx) * 180) / Math.PI });
-      total += len;
-    }
-    if (total === 0) {
-      train.classList.remove('riding');
-      placeTrain(target.x, target.y, 0);
-      return;
-    }
+    // Slide out to the right
+    signTrack.classList.remove('ttc-slide-in', 'ttc-slide-prep-left');
+    signTrack.classList.add('ttc-slide-out');
 
-    const arrivalAngle = segs[segs.length - 1].angle;
-    const duration = Math.min(Math.max(total / TRAIN_SPEED, MIN_RIDE), MAX_RIDE);
-    /* Trapezoidal velocity: pull away, hold a constant speed, brake into the
-       platform. Returns distance covered as a fraction of the total. */
-    const easeInOut = (t) => {
-      const cruise = 1 - 2 * RAMP;
-      const area = RAMP + cruise;
-      if (t < RAMP) return (t * t) / (2 * RAMP) / area;
-      if (t < RAMP + cruise) return (RAMP / 2 + (t - RAMP)) / area;
-      const u = t - RAMP - cruise;
-      return (RAMP / 2 + cruise + u - (u * u) / (2 * RAMP)) / area;
-    };
-    const t0 = performance.now();
+    slideTimeout = setTimeout(() => {
+      // Set new station name while off-screen
+      elArrivalStation.textContent = newStationName;
+      if (elStatusText) elStatusText.textContent = 'ARRIVING AT';
 
-    train.classList.add('riding');
-    const step = (now) => {
-      const t = Math.min((now - t0) / duration, 1);
-      const dist = easeInOut(t) * total;
-      const seg = segs.find((sg) => dist <= sg.start + sg.len) || segs[segs.length - 1];
-      const f = Math.min(Math.max((dist - seg.start) / seg.len, 0), 1);
-      placeTrain(seg.from[0] + seg.dx * f, seg.from[1] + seg.dy * f, seg.angle);
-      if (t < 1) {
-        trainFrame = requestAnimationFrame(step);
-      } else {
-        trainFrame = null;
-        train.classList.remove('riding');
-        // Park facing the way it arrived; the last leg is always horizontal.
-        placeTrain(target.x, target.y, arrivalAngle);
-      }
-    };
-    trainFrame = requestAnimationFrame(step);
+      // Position instantly off-screen to the left
+      signTrack.classList.remove('ttc-slide-out');
+      signTrack.classList.add('ttc-slide-prep-left');
+
+      // Force layout reflow
+      void signTrack.offsetWidth;
+
+      // Slide in left to right
+      signTrack.classList.remove('ttc-slide-prep-left');
+      signTrack.classList.add('ttc-slide-in');
+
+      // Transition to 'ARRIVED AT' once arrival has completed
+      arrivedTimeout = setTimeout(() => {
+        if (elStatusText) {
+          elStatusText.textContent = 'ARRIVED AT';
+        }
+      }, 650);
+    }, 200);
   }
 
-  function setCurrent(stationId, animate) {
+  function setCurrent(stationId) {
     const s = dataMap[stationId];
     if (!s) return;
-    if (animate && stationId === currentId) return;
     currentId = stationId;
-    // Repaint on departure, so the color arrives with the train rather than after it.
-    train.dataset.line = String(s.line);
+
     nodes.forEach((n) => {
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
-    if (animate) {
-      rideTrain(stationId);
-    } else {
-      placeTrain(s.x, s.y, 0);
-    }
+
+    triggerArrivalTransition(s.organization.toUpperCase());
     updateInspector(stationId);
   }
 
-  // Click, tap, focus or Enter on a station makes it the current station. The train
-  // rides there and the panel above the diagram updates. Hover deliberately does
-  // nothing but highlight the ring: when it also sent the train, dragging a mouse
-  // across the diagram fired six rides in a row and the thing never settled.
+  // Click, tap, focus or Enter on a station makes it the current station
   nodes.forEach((n) => {
     const sid = n.getAttribute('data-station-id');
     if (!sid) return;
-    n.addEventListener('focus', () => setCurrent(sid, true));
-    n.addEventListener('click', () => setCurrent(sid, true));
+    n.addEventListener('focus', () => setCurrent(sid));
+    n.addEventListener('click', () => setCurrent(sid));
     n.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        setCurrent(sid, true);
+        setCurrent(sid);
       }
     });
   });
 
-  // Default current station: SunAdvantage. The train fades in already parked there.
-  setCurrent('sunadvantage', false);
+  // Default current station: SunAdvantage
+  setCurrent('sunadvantage');
 </script>

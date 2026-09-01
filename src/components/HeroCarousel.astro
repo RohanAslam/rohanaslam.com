@@ -1,0 +1,286 @@
+---
+/**
+ * Hero image carousel showcasing photos from internships, ventures, and research.
+ * Clean, fixed-height, minimal layout with automatic iteration.
+ */
+import CompanyLogo from './CompanyLogo.astro';
+import Icon from './Icon.astro';
+
+interface Slide {
+  id: string;
+  image: string;
+  alt: string;
+  company: 'sunlife' | 'smartsyllabus' | 'otpp' | 'dyedurham' | 'uoft';
+  org: string;
+  role: string;
+  timeframe: string;
+}
+
+const slides: Slide[] = [
+  {
+    id: 'sunlife',
+    image: '/images/carousel/sunlife-work.png',
+    alt: 'Sun Life Strategy and Operations milestone',
+    company: 'sunlife',
+    org: 'Sun Life',
+    role: 'Strategy & Operations Specialist',
+    timeframe: '2026 – Present',
+  },
+  {
+    id: 'smartsyllabus',
+    image: '/images/carousel/smartsyllabus-pitch.png',
+    alt: 'SmartSyllabus venture demo and incubation at ICUBE',
+    company: 'smartsyllabus',
+    org: 'SmartSyllabus',
+    role: 'Co-Founder',
+    timeframe: '2024 – Present',
+  },
+  {
+    id: 'otpp',
+    image: '/images/carousel/otpp-lab.png',
+    alt: 'Ontario Teachers Experience Design Lab internship',
+    company: 'otpp',
+    org: "Ontario Teachers' Pension Plan",
+    role: 'Experience Design & Innovation Intern',
+    timeframe: '2023 – 2024',
+  },
+  {
+    id: 'dyedurham',
+    image: '/images/carousel/dyedurham-team.png',
+    alt: 'Dye and Durham legal product management',
+    company: 'dyedurham',
+    org: 'Dye & Durham',
+    role: 'Product Intern',
+    timeframe: '2025',
+  },
+  {
+    id: 'uoft',
+    image: '/images/carousel/uoft-fieldwork.png',
+    alt: 'U of T Innovation Hub educator fieldwork research',
+    company: 'uoft',
+    org: 'U of T Innovation Hub',
+    role: 'Design Researcher',
+    timeframe: '2025',
+  },
+];
+---
+
+<div class="hero-carousel border-2 border-(--ink) bg-(--ground) text-(--ink) overflow-hidden flex flex-col" id="hero-carousel" tabindex="0" aria-label="Career photo gallery">
+  <!-- Image Viewport with taller fixed 4/3 aspect ratio -->
+  <div class="relative aspect-4/3 w-full overflow-hidden bg-(--surface)" id="carousel-viewport">
+    {
+      slides.map((slide, i) => (
+        <div
+          class={`carousel-slide absolute inset-0 transition-opacity duration-500 ease-in-out ${i === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+          data-slide-index={i}
+          data-org={slide.org}
+          data-role={slide.role}
+          data-time={slide.timeframe}
+        >
+          <img
+            src={slide.image}
+            alt={slide.alt}
+            width={800}
+            height={600}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            class="h-full w-full object-cover select-none"
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <!-- Minimal fixed-height footer: Logo, Role/Org, Timeline & Manual Navigation Buttons -->
+  <div class="h-[68px] border-t-2 border-(--ink) px-4 py-2 bg-(--ground) flex items-center justify-between gap-3 shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <!-- Fixed Logo Box -->
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-1.5">
+        {slides.map((s, i) => (
+          <CompanyLogo name={s.company} size={32} class={`carousel-logo logo-${i} ${i === 0 ? '' : 'hidden'}`} />
+        ))}
+      </div>
+      <div class="min-w-0">
+        <div class="text-[15px] font-bold leading-tight text-(--ink) truncate" id="carousel-org">{slides[0].org}</div>
+        <div class="label text-[12px] text-(--ink-muted) truncate" id="carousel-role">{slides[0].role}</div>
+      </div>
+    </div>
+
+    <!-- Timeline & Manual Arrow Buttons -->
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="text-right text-[13px] font-mono font-bold text-(--ink) hidden sm:block" id="carousel-time">
+        {slides[0].timeframe}
+      </div>
+      <div class="flex items-center gap-1">
+        <button
+          type="button"
+          id="carousel-prev"
+          class="flex h-7 w-7 items-center justify-center border-2 border-(--ink) bg-(--ground) text-(--ink) transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt)"
+          aria-label="Previous slide"
+        >
+          <Icon name="arrow-left" size={12} />
+        </button>
+        <button
+          type="button"
+          id="carousel-next"
+          class="flex h-7 w-7 items-center justify-center border-2 border-(--ink) bg-(--ground) text-(--ink) transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt)"
+          aria-label="Next slide"
+        >
+          <Icon name="arrow-right" size={12} />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clickable progress bar along bottom -->
+  <div class="flex h-1.5 w-full bg-(--rule-soft)">
+    {
+      slides.map((_, i) => (
+        <button
+          type="button"
+          class={`carousel-indicator h-full flex-1 transition-colors duration-300 cursor-pointer ${i === 0 ? 'bg-(--cobalt)' : 'bg-transparent hover:bg-(--ink-faint)'}`}
+          data-index={i}
+          aria-label={`Jump to photo ${i + 1}`}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const carousel = document.getElementById('hero-carousel');
+    if (!carousel) return;
+
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const logos = carousel.querySelectorAll('.carousel-logo');
+    const indicators = carousel.querySelectorAll('.carousel-indicator');
+    const btnPrev = document.getElementById('carousel-prev');
+    const btnNext = document.getElementById('carousel-next');
+    const elOrg = document.getElementById('carousel-org');
+    const elRole = document.getElementById('carousel-role');
+    const elTime = document.getElementById('carousel-time');
+
+    let currentIndex = 0;
+    const total = slides.length;
+    let autoTimer = null;
+
+    function showSlide(index) {
+      if (index < 0) index = total - 1;
+      if (index >= total) index = 0;
+      currentIndex = index;
+
+      // Update slide images
+      slides.forEach((s, i) => {
+        if (i === currentIndex) {
+          s.classList.remove('opacity-0', 'pointer-events-none', 'z-0');
+          s.classList.add('opacity-100', 'z-10');
+        } else {
+          s.classList.remove('opacity-100', 'z-10');
+          s.classList.add('opacity-0', 'pointer-events-none', 'z-0');
+        }
+      });
+
+      // Update company logos
+      logos.forEach((l, i) => {
+        if (i === currentIndex) {
+          l.classList.remove('hidden');
+        } else {
+          l.classList.add('hidden');
+        }
+      });
+
+      // Update progress indicators
+      indicators.forEach((ind, i) => {
+        if (i === currentIndex) {
+          ind.className = 'carousel-indicator h-full flex-1 transition-colors duration-300 cursor-pointer bg-(--cobalt)';
+        } else {
+          ind.className = 'carousel-indicator h-full flex-1 transition-colors duration-300 cursor-pointer bg-transparent hover:bg-(--ink-faint)';
+        }
+      });
+
+      // Update metadata text
+      const active = slides[currentIndex];
+      if (elOrg) elOrg.textContent = active.getAttribute('data-org') || '';
+      if (elRole) elRole.textContent = active.getAttribute('data-role') || '';
+      if (elTime) elTime.textContent = active.getAttribute('data-time') || '';
+    }
+
+    function nextSlide() {
+      showSlide(currentIndex + 1);
+    }
+    function prevSlide() {
+      showSlide(currentIndex - 1);
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      autoTimer = setInterval(nextSlide, 4000);
+    }
+
+    function stopAutoplay() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+    }
+
+    // Manual navigation buttons
+    if (btnNext) {
+      btnNext.addEventListener('click', (e) => {
+        e.stopPropagation();
+        nextSlide();
+        startAutoplay();
+      });
+    }
+    if (btnPrev) {
+      btnPrev.addEventListener('click', (e) => {
+        e.stopPropagation();
+        prevSlide();
+        startAutoplay();
+      });
+    }
+
+    // Clickable progress indicators
+    indicators.forEach((ind, i) => {
+      ind.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showSlide(i);
+        startAutoplay();
+      });
+    });
+
+    // Keyboard navigation (Left / Right arrow keys when carousel is focused)
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        prevSlide();
+        startAutoplay();
+      } else if (e.key === 'ArrowRight') {
+        nextSlide();
+        startAutoplay();
+      }
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    carousel.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 35) {
+        nextSlide();
+        startAutoplay();
+      } else if (touchEndX - touchStartX > 35) {
+        prevSlide();
+        startAutoplay();
+      }
+    }, { passive: true });
+
+    // Pause on hover, resume on leave
+    carousel.addEventListener('mouseenter', stopAutoplay);
+    carousel.addEventListener('mouseleave', startAutoplay);
+
+    startAutoplay();
+  })();
+</script>

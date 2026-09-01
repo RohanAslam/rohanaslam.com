@@ -1,0 +1,1201 @@
+---
+/**
+ * The network view, at /network. Linked from under the route diagram on the
+ * homepage.
+ *
+ * The route diagram answers "what did he do, in what order". This answers a
+ * different question: "what does the work have in common with itself".
+ * Projects are solids, links are shared ground, and a pair that shares enough
+ * is pulled together until the two solids intersect. Clicking the seam
+ * explains why the overlap exists.
+ *
+ * This page is deliberately standalone rather than inside Base.astro. It is a
+ * full viewport canvas with its own chrome, and the site header would fight
+ * it. Colours, type, geometry and motion all come from DESIGN.md, so it still
+ * reads as the same system. Three.js loads from a CDN, so there is no new
+ * dependency in package.json.
+ *
+ * The diagram carries no information that is not also available as text: every
+ * node and every link is reachable from the inspector panel, by keyboard.
+ */
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How the work connects &middot; Rohan Aslam</title>
+    <link rel="icon" href="/favicon.svg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style is:global>
+  :root {
+    --ground: #F4F4F2;
+    --surface: #E9E9E6;
+    --ink: #0B0E12;
+    --ink-muted: #535A63;
+    --ink-faint: #7A828C;
+    --rule-soft: #D3D3CE;
+    --line-1: #1B44D9;
+    --line-2: #F2B705;
+    --line-3: #D6246E;
+    --line-4: #00875A;
+    --line-5: #7A828C;
+    --cobalt: #1B44D9;
+    --cobalt-hover: #1739B4;
+    --on-1: #FFFFFF;
+    --on-2: #0B0E12;
+    --on-3: #FFFFFF;
+    --on-4: #FFFFFF;
+    --on-5: #FFFFFF;
+    --font-sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0D1014;
+      --surface: #1A1F26;
+      --ink: #EDEFF2;
+      --ink-muted: #9AA3AE;
+      --ink-faint: #727C88;
+      --rule-soft: #2A313A;
+      --line-1: #6E90FF;
+      --line-2: #FFC933;
+      --line-3: #FF6FA3;
+      --line-4: #3FCC94;
+      --line-5: #8B95A1;
+      --cobalt: #6E90FF;
+      --cobalt-hover: #8FA9FF;
+      --on-1: #0D1014;
+      --on-2: #0D1014;
+      --on-3: #0D1014;
+      --on-4: #0D1014;
+      --on-5: #0D1014;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0D1014;
+    --surface: #1A1F26;
+    --ink: #EDEFF2;
+    --ink-muted: #9AA3AE;
+    --ink-faint: #727C88;
+    --rule-soft: #2A313A;
+    --line-1: #6E90FF;
+    --line-2: #FFC933;
+    --line-3: #FF6FA3;
+    --line-4: #3FCC94;
+    --line-5: #8B95A1;
+    --cobalt: #6E90FF;
+    --cobalt-hover: #8FA9FF;
+    --on-1: #0D1014;
+    --on-2: #0D1014;
+    --on-3: #0D1014;
+    --on-4: #0D1014;
+    --on-5: #0D1014;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- system bar ---------- */
+  #systembar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 6px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    z-index: 40;
+  }
+  #systembar i { display: block; }
+
+  /* ---------- top chrome ---------- */
+  #chrome {
+    position: fixed;
+    top: 6px;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+    padding: 14px 20px 12px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--ground);
+  }
+
+  #chrome .titleblock {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+  }
+  #chrome h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  #coords { color: var(--ink-faint); white-space: nowrap; }
+
+  #filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .bullet {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 100ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .bullet-1 { background: var(--line-1); color: var(--on-1); }
+  .bullet-2 { background: var(--line-2); color: var(--on-2); }
+  .bullet-3 { background: var(--line-3); color: var(--on-3); }
+  .bullet-4 { background: var(--line-4); color: var(--on-4); }
+  .bullet-5 { background: var(--line-5); color: var(--on-5); }
+  .bullet-all {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+  }
+  .bullet.dim { opacity: 0.35; }
+
+  :where(button, a, .row):focus-visible {
+    outline: 3px solid var(--cobalt);
+    outline-offset: 2px;
+  }
+
+  /* ---------- canvas + labels ---------- */
+  #stage { position: fixed; inset: 0; z-index: 1; }
+  canvas { display: block; touch-action: none; cursor: grab; }
+  canvas.dragging { cursor: grabbing; }
+
+  #labels { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+  .nodelabel {
+    position: absolute;
+    transform: translate(-50%, 0);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--ground);
+    padding: 2px 5px;
+    will-change: transform, opacity;
+  }
+  .nodelabel.muted { color: var(--ink-faint); }
+
+  /* ---------- inspector ---------- */
+  #inspector {
+    position: fixed;
+    z-index: 30;
+    left: 20px;
+    bottom: 20px;
+    width: min(430px, calc(100vw - 40px));
+    max-height: min(58vh, 560px);
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--ink);
+    background: var(--ground);
+    border-radius: 0;
+  }
+
+  #insp-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--ink);
+    color: var(--ground);
+  }
+  #insp-kicker { color: var(--ground); }
+  #insp-strength { color: var(--ground); opacity: 0.75; }
+
+  #insp-body { padding: 14px 16px 16px; overflow-y: auto; }
+
+  #insp-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  #insp-title {
+    margin: 8px 0 0;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+  #insp-blurb {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-muted);
+    max-width: 62ch;
+  }
+
+  .subhead {
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 2px solid var(--ink);
+    color: var(--ink-faint);
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border: 2px solid var(--rule-soft);
+    color: var(--ink-muted);
+  }
+
+  #insp-links { margin-top: 6px; display: flex; flex-direction: column; }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 2px;
+    border: 0;
+    border-bottom: 2px solid var(--rule-soft);
+    background: none;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row:hover .rowname { color: var(--cobalt); }
+  .rowname { flex: 1; min-width: 0; }
+  .rowdot {
+    width: 12px; height: 12px; flex: 0 0 12px;
+    border-radius: 999px;
+  }
+  .rowpct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pair { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .pair .arm { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .pair .nm { font-size: 14px; font-weight: 700; }
+  .pair .join {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- footer hint ---------- */
+  #backlink {
+    color: var(--ink-muted);
+    text-decoration: none;
+    border-bottom: 2px solid var(--cobalt);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  #backlink:hover { color: var(--cobalt); }
+
+  #hint {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 20;
+    text-align: right;
+    color: var(--ink-faint);
+    pointer-events: none;
+    max-width: 40ch;
+  }
+  #hint b { color: var(--ink-muted); font-weight: 500; }
+
+  @media (max-width: 860px) {
+    #inspector { left: 12px; right: 12px; bottom: 12px; width: auto; max-height: 46vh; }
+    #backlink {
+    color: var(--ink-muted);
+    text-decoration: none;
+    border-bottom: 2px solid var(--cobalt);
+    padding-bottom: 2px;
+    white-space: nowrap;
+  }
+  #backlink:hover { color: var(--cobalt); }
+
+  #hint { display: none; }
+    #chrome { padding: 12px 14px 10px; }
+    #coords { display: none; }
+  }
+</style>
+  </head>
+  <body>
+<div id="systembar" aria-hidden="true">
+  <i style="background: var(--line-1)"></i>
+  <i style="background: var(--line-2)"></i>
+  <i style="background: var(--line-3)"></i>
+  <i style="background: var(--line-4)"></i>
+  <i style="background: var(--line-5)"></i>
+</div>
+
+<header id="chrome">
+  <div class="titleblock">
+    <a id="backlink" class="label" href="/">&larr; Rohan Aslam</a>
+    <h1>How the work connects</h1>
+    <span id="coords" class="label">43.7&deg;N 79.3&deg;W &middot; 29 NODES &middot; 38 LINKS &middot; 5 ROUTES</span>
+  </div>
+  <div id="filters" role="group" aria-label="Filter by route"></div>
+</header>
+
+<div id="stage"></div>
+<div id="labels" aria-hidden="true"></div>
+
+<section id="inspector" aria-live="polite">
+  <div id="insp-head">
+    <span id="insp-kicker" class="label">Node</span>
+    <span id="insp-strength" class="label"></span>
+  </div>
+  <div id="insp-body"></div>
+</section>
+
+<p id="hint" class="label">
+  <b>Drag</b> to orbit &middot; <b>scroll</b> to zoom<br>
+  Click a node, or click where two nodes overlap
+</p>
+
+
+<script is:inline>
+(function () {
+  'use strict';
+
+  /* =====================================================================
+     1. THE GRAPH
+     Nodes are the 29 work entries. Links are real shared ground: a stack,
+     a method, a domain, or a direct lineage where one project became the
+     next. Every link carries the reason it exists, because on this
+     diagram the link is the interesting object, not the node.
+     ===================================================================== */
+
+  var NODES = [
+    // Line 1 - strategy
+    { id: 'otpp',        route: 1, name: "Ontario Teachers'",        year: '2023-24', blurb: 'Sixteen months across research, Figma prototyping, service mapping and tooling evaluation. A component library from it is still in use.' },
+    { id: 'innovation',  route: 1, name: 'Innovation Hub',           year: '2025',    blurb: 'A summer of interviewing educators across Ontario. The problems that came back were ones nobody would have guessed at from a desk.' },
+    { id: 'dyedurham',   route: 1, name: 'Dye & Durham',             year: '2025',    blurb: 'Product on eCore, where the users are lawyers and the constraints are compliance requirements rather than preferences.' },
+    { id: 'sunlife',     route: 1, name: 'Sun Life',                 year: '2026',    blurb: 'Four months finding the manual work worth automating, then automating it. Copilot Studio agents, Power BI reporting, a pitch to business leadership.' },
+
+    // Line 2 - AI tools
+    { id: 'aios',        route: 2, name: 'Personal AI OS',           year: '2026',    blurb: 'A Telegram message in, an organized Notion page out, and no filing decisions in between. Self hosted n8n with Claude doing the classification.' },
+    { id: 'jobpipeline', route: 2, name: 'Job Search Pipeline',      year: '2026',    blurb: '18 ranked roles out of a feed that would have taken hours to read by hand. Apify scrape, model scoring, one shortlist.' },
+    { id: 'ragagent',    route: 2, name: 'Research Assistant',       year: '2026',    blurb: 'Answers only from indexed passages and cites each claim by page. If nothing relevant is retrieved the model is never called at all.' },
+    { id: 'sermonbot',   route: 2, name: 'Friday Sermon Bot',        year: '2026',    blurb: 'Scraped, narrated and posted to Discord every Friday at noon, for zero dollars a month. It has run unattended for two months.' },
+    { id: 'secondbrain', route: 2, name: 'Second Brain Wiki',        year: '2026',    blurb: 'Two folders and one rule. I drop things in and never organize them, the agent files, cross-references and synthesizes.' },
+    { id: 'khutba',      route: 2, name: 'Sermon Pipeline v1',       year: '2023',    blurb: 'The first attempt. Scrape, narrate, upload to Drive, email the link. It worked, and I stopped using it inside a month.' },
+
+    // Line 3 - startup
+    { id: 'smartsyllabus', route: 3, name: 'SmartSyllabus',          year: '2026',    blurb: 'Five syllabi, five formats, one semester. AI parsing that turns them into a structured plan. Live, and incubated at UTM ICUBE.' },
+    { id: 'smartqueue',  route: 3, name: 'SmartQueue',               year: '2025',    blurb: 'Office hours minus the chaos, plus a design system that deliberately refuses to look safe.' },
+    { id: 'skoll',       route: 3, name: 'Skoll',                    year: '2026',    blurb: 'A recruiting and roster tool for coaches, built mostly to find out where an AI scout stops being useful.' },
+    { id: 'presently',   route: 3, name: 'Presently',                year: '2026',    blurb: 'Gift buying treated as a matching problem. The intake form turned out to be the product insight, not the model.' },
+
+    // Line 4 - data
+    { id: 'moneyball',   route: 4, name: 'Data Storytelling in R',   year: '2024',    blurb: 'Decades of baseball statistics parsed in R to rerun the Oakland replacement problem, plus a ggplot2 rebuild of the Economist corruption chart.' },
+    { id: 'bikeshare',   route: 4, name: 'Bikeshare Demand Model',   year: '2024',    blurb: 'A regression on rental counts that was worth building mostly because of how clearly it failed. Two rush hours, and no straight line that fits them.' },
+    { id: 'pandas',      route: 4, name: 'Pandas & Seaborn',         year: '2025',    blurb: 'Thirty one notebooks worked end to end. Anything that has to run more than once now gets written in pandas.' },
+    { id: 'jobportal',   route: 4, name: 'Job Portal',               year: '2026',    blurb: 'Five LLM providers, one local folder, and a ranked answer to which resume fits which job. Nothing leaves the laptop unless I choose.' },
+    { id: 'aurum',       route: 4, name: 'Aurum Finance',            year: '2026',    blurb: 'Four lifestyle scenarios against 2026 Canadian brackets, to find the number that actually lands in the account.' },
+    { id: 'kronos',      route: 4, name: 'Kronos Research',          year: '2026',    blurb: 'Reading a financial foundation model closely enough to work out that the tokenizer is the whole trick.' },
+
+    // Line 5 - earlier work
+    { id: 'smartcommute', route: 5, name: 'Smart Commute',           year: '2024',    blurb: 'Interviewed student commuters and found the problem was never the route. The research that gave this whole site its language.' },
+    { id: 'intlstudent', route: 5, name: 'Intl Student Research',    year: '2025',    blurb: 'Journey maps across arrival, settling in and belonging, published as a site people could click through instead of a PDF nobody opens.' },
+    { id: 'assistive',   route: 5, name: 'Assistive Technology',     year: '2024',    blurb: 'Accessibility research that turned into a working habit rather than a checklist.' },
+    { id: 'juventus',    route: 5, name: 'Juventus Rebrand',         year: '2023',    blurb: 'Nine crests since 1905, rebuilt as a brand system. The first time I wrote rules for other people to design against.' },
+    { id: 'editorial',   route: 5, name: 'Editorial Layout',         year: '2022',    blurb: 'A magazine spread built around a single number, to learn that layout is an argument about what someone reads first.' },
+    { id: 'essay',       route: 5, name: 'Research Essay',           year: '2022',    blurb: 'How far creators move the decisions of 13 to 17 year olds, argued from parasocial trust research rather than screen time commentary.' },
+    { id: 'visualdesign',route: 5, name: 'Visual Design',            year: '2022-25', blurb: 'Duty charts, QR flyers, wedding cards, Illustrator and Maya. Signage people follow without being told to.' },
+    { id: 'flingblade',  route: 5, name: 'FLINGBLADE',               year: '2023',    blurb: 'A Unity game taken all the way to a WebGL build, mostly to find out what shipping to the browser actually costs.' },
+    { id: 'earlyweb',    route: 5, name: 'Early Web Builds',         year: '2022',    blurb: 'Six small apps nobody but me ever used. Learning reps, kept visible because the gap between them and the job portal is the claim.' }
+  ];
+
+  var LINKS = [
+    { a: 'khutba', b: 'sermonbot', s: 0.95, shared: ['scraping', 'text to speech', 'same corpus', 'python'],
+      why: 'Same scrape, same idea, three years apart. The 2023 version emailed a Drive link and died inside a month, so the rebuild drops the audio straight into a channel people already have open.' },
+    { a: 'sermonbot', b: 'ragagent', s: 0.62, shared: ['same corpus', 'python', 'retrieval'],
+      why: 'Both point at the same body of text. One narrates the weekly summary out loud, the other answers questions from the archive and refuses when the sources do not cover it.' },
+    { a: 'ragagent', b: 'secondbrain', s: 0.72, shared: ['agents', 'documents', 'synthesis'],
+      why: 'Two ways to make a pile of documents answerable. One retrieves and cites a passage, the other reads everything and keeps a rolling synthesis. The second one is allowed to be wrong, which is the whole difference.' },
+    { a: 'secondbrain', b: 'aios', s: 0.78, shared: ['agents', 'automation', 'no filing decisions'],
+      why: 'The same contract on both. Unstructured input goes in one side, structure comes out the other, and no filing decision is ever mine.' },
+    { a: 'aios', b: 'jobpipeline', s: 0.6, shared: ['n8n era', 'llm scoring', 'automation'],
+      why: 'Both are plumbing from the same month. One routes thoughts, the other routes job listings, and both let a model score things before anything reaches me.' },
+    { a: 'jobpipeline', b: 'jobportal', s: 0.95, shared: ['apify', 'llm scoring', 'job search', 'scraping'],
+      why: 'The pipeline proved the ranking was worth having. The portal is what happened when I gave it resumes, a UI, and five providers to fall back on.' },
+    { a: 'jobportal', b: 'kronos', s: 0.44, shared: ['model internals', 'transformers'],
+      why: 'Both are me reading model internals instead of calling an API and trusting what comes back. One swaps providers to compare them, the other takes a tokenizer apart.' },
+    { a: 'kronos', b: 'aurum', s: 0.5, shared: ['financial data', 'forecasting'],
+      why: 'Financial data from opposite ends of the same telescope. Kronos forecasts a market. Aurum forecasts my rent.' },
+    { a: 'aurum', b: 'pandas', s: 0.62, shared: ['csv wrangling', 'aggregation', 'charts'],
+      why: 'Aurum is the notebooks with a front end on them. Same split, aggregate and compare, except the answer has to be readable in two seconds.' },
+    { a: 'pandas', b: 'bikeshare', s: 0.72, shared: ['same skill', 'regression', 'charts'],
+      why: 'One skill in two languages. I learned it in R on rental counts and rebuilt the habit in pandas, which is why the R work still shows up in how I think about a dataframe.' },
+    { a: 'bikeshare', b: 'moneyball', s: 0.88, shared: ['r', 'ggplot2', 'regression', 'same term'],
+      why: 'Same language, same term, same library. One models the count and fails honestly, the other argues with the chart and wins.' },
+    { a: 'moneyball', b: 'aurum', s: 0.34, shared: ['csv wrangling'],
+      why: 'Both start from a CSV somebody else formatted badly, which is most of the job.' },
+    { a: 'moneyball', b: 'kronos', s: 0.3, shared: ['prediction', 'financial data'],
+      why: 'Regression on one end and a foundation model on the other, both trying to predict the same kind of thing with wildly different amounts of machinery.' },
+    { a: 'smartsyllabus', b: 'ragagent', s: 0.56, shared: ['pdf parsing', 'llm', 'fails loudly'],
+      why: 'Both read documents nobody agreed on a format for, and both are built to fail loudly rather than guess. That decision costs more than it sounds like it should.' },
+    { a: 'smartsyllabus', b: 'smartqueue', s: 0.6, shared: ['students', 'product', 'utm'],
+      why: 'Two student products out of the same building. One plans the semester, the other fixes the queue at office hours.' },
+    { a: 'smartsyllabus', b: 'skoll', s: 0.44, shared: ['gemini', 'mvp'],
+      why: 'Both are Gemini MVPs built fast to find the shape of the product before committing to it. Only one of them survived that test.' },
+    { a: 'skoll', b: 'presently', s: 0.62, shared: ['gemini', 'mvp', 'matching'],
+      why: 'Same method, weeks apart. Build the surface first, find out whether the framing lands, then decide whether the matching engine is worth writing.' },
+    { a: 'presently', b: 'jobportal', s: 0.34, shared: ['matching'],
+      why: 'The same matching problem wearing different clothes: a person to a gift, a resume to a listing. Both are easy to demo and hard to be right about.' },
+    { a: 'smartqueue', b: 'juventus', s: 0.66, shared: ['design system', 'rules for others'],
+      why: 'The two times I wrote rules for other people to design against instead of just designing the thing myself. That is the jump from making a screen to making a system.' },
+    { a: 'juventus', b: 'editorial', s: 0.72, shared: ['typography', 'indesign', 'hierarchy'],
+      why: 'InDesign, type hierarchy, and the same argument underneath: decide what someone reads first, then make every size serve that order.' },
+    { a: 'editorial', b: 'visualdesign', s: 0.6, shared: ['print', 'typography', 'craft'],
+      why: 'Print craft either side of the classroom. One was graded. The other had forty volunteers waiting on it.' },
+    { a: 'editorial', b: 'essay', s: 0.4, shared: ['same course sequence', 'argument'],
+      why: 'Same year, same course sequence. One argues in prose and one argues in type, and the prose one taught me not to overclaim.' },
+    { a: 'essay', b: 'intlstudent', s: 0.36, shared: ['research writing', 'behaviour'],
+      why: 'Both are research writing about how people actually behave rather than how they say they do.' },
+    { a: 'visualdesign', b: 'smartcommute', s: 0.52, shared: ['wayfinding', 'signage', 'transit'],
+      why: 'Signage people follow without being told to. That is the thesis this whole site runs on, and it started with duty charts and a transit study rather than with a design brief.' },
+    { a: 'smartcommute', b: 'innovation', s: 0.76, shared: ['interviews', 'journey mapping', 'synthesis'],
+      why: 'The same method a year apart. Sit with people, shut up and watch, then find the problem you would never have guessed at from a desk.' },
+    { a: 'innovation', b: 'intlstudent', s: 0.7, shared: ['interviews', 'journey mapping', 'u of t'],
+      why: 'The same research season at U of T. Interviews in, journey maps out, insights a team could actually act on.' },
+    { a: 'innovation', b: 'smartsyllabus', s: 0.46, shared: ['interviews', 'usability testing', 'students'],
+      why: 'The research habit turned on my own product. We ran a usability study in July, watched people get lost in our onboarding, and rewrote it around what confused them.' },
+    { a: 'smartcommute', b: 'otpp', s: 0.5, shared: ['design research', 'figma', 'service mapping'],
+      why: 'Design research at student scale and at pension fund scale. The method is identical. The difference is how many people have to sign off on what you found.' },
+    { a: 'otpp', b: 'assistive', s: 0.66, shared: ['accessibility', 'aoda', 'component library'],
+      why: 'Accessibility stopped being a checklist here. Sixteen months of shipping against AODA and WCAG will do that to a habit.' },
+    { a: 'assistive', b: 'smartqueue', s: 0.36, shared: ['accessibility', 'contrast', 'focus states'],
+      why: 'Contrast ratios, focus states and touch targets, applied to a product nobody had asked to be accessible.' },
+    { a: 'otpp', b: 'dyedurham', s: 0.56, shared: ['enterprise', 'product', 'compliance'],
+      why: 'Two enterprise seats where the binding constraint was compliance rather than preference. You stop asking what users want and start asking what a regulation will tolerate.' },
+    { a: 'dyedurham', b: 'sunlife', s: 0.72, shared: ['financial services', 'product', 'four months'],
+      why: 'Product, then transformation. Four months each, both inside regulated financial services, and the second one turned into the full time offer.' },
+    { a: 'sunlife', b: 'jobpipeline', s: 0.5, shared: ['automation', 'process'],
+      why: 'The Sun Life term is where automation stopped being a hobby. Find the manual work worth removing, prove the time saved, then remove it.' },
+    { a: 'sunlife', b: 'aios', s: 0.46, shared: ['automation', 'agents'],
+      why: 'Copilot Studio at work, n8n at home. Same instinct, very different budget, and the home version is where I get to be wrong cheaply.' },
+    { a: 'earlyweb', b: 'flingblade', s: 0.6, shared: ['shipping', 'browser', 'first builds'],
+      why: 'The first two things I put on the internet that a stranger could break. One was a dice game, one was a WebGL build bigger than the game inside it.' },
+    { a: 'earlyweb', b: 'smartqueue', s: 0.4, shared: ['react', 'javascript'],
+      why: 'React either side of actually learning what a component is for.' },
+    { a: 'flingblade', b: 'visualdesign', s: 0.34, shared: ['3d', 'craft outside a syllabus'],
+      why: 'Both are craft I picked up outside a syllabus and kept, which is roughly how everything on the amber line started too.' },
+    { a: 'kronos', b: 'smartsyllabus', s: 0.3, shared: ['transformers', 'llm'],
+      why: 'Reading how the model works, then shipping something that depends on it working. In that order, which is the only order that has ever helped.' }
+  ];
+
+  var ROUTE_NAMES = { 1: 'Line 1 · Strategy', 2: 'Line 2 · AI Tools', 3: 'Line 3 · Startup', 4: 'Line 4 · Data', 5: 'Line 5 · Earlier' };
+
+  var byId = {};
+  NODES.forEach(function (n, i) { n.index = i; n.degree = 0; byId[n.id] = n; });
+  LINKS = LINKS.filter(function (l) { return byId[l.a] && byId[l.b]; });
+  LINKS.forEach(function (l) { byId[l.a].degree++; byId[l.b].degree++; });
+
+  document.getElementById('coords').textContent =
+    '43.7°N 79.3°W · ' + NODES.length + ' NODES · ' + LINKS.length + ' LINKS · 5 ROUTES';
+
+  /* =====================================================================
+     2. TOKENS, read from CSS so both themes drive the 3D scene
+     ===================================================================== */
+
+  var TOKENS = {};
+  function readTokens() {
+    var cs = getComputedStyle(document.documentElement);
+    ['--ground', '--ink', '--ink-muted', '--ink-faint', '--line-1', '--line-2', '--line-3', '--line-4', '--line-5', '--cobalt']
+      .forEach(function (k) { TOKENS[k] = cs.getPropertyValue(k).trim(); });
+  }
+  readTokens();
+  function routeColor(r) { return new THREE.Color(TOKENS['--line-' + r]); }
+
+  /* =====================================================================
+     3. LAYOUT
+     A spring-electrical relaxation in three dimensions. Link rest length
+     falls as the pair gets more similar, so a strong pair is pulled in
+     until the two solids physically intersect. The overlap in this
+     diagram is not a metaphor, it is the geometry doing the arguing.
+     ===================================================================== */
+
+  var R_MIN = 9, R_MAX = 21;
+  var maxDeg = NODES.reduce(function (m, n) { return Math.max(m, n.degree); }, 1);
+  NODES.forEach(function (n) {
+    n.r = R_MIN + (R_MAX - R_MIN) * Math.pow(n.degree / maxDeg, 0.7);
+  });
+
+  var ANCHORS = {
+    1: new THREE.Vector3(0, 96, 8),
+    2: new THREE.Vector3(108, 14, 70),
+    3: new THREE.Vector3(68, -90, -48),
+    4: new THREE.Vector3(-68, -90, 46),
+    5: new THREE.Vector3(-110, 14, -66)
+  };
+
+  function restLength(link) {
+    var ra = byId[link.a].r, rb = byId[link.b].r;
+    var touch = ra + rb;
+    // s=0.3 -> comfortably apart. s=0.95 -> deep intersection.
+    var t = Math.min(1, Math.max(0, (link.s - 0.28) / 0.67));
+    return touch * (2.5 - 1.75 * t);
+  }
+  LINKS.forEach(function (l) { l.rest = restLength(l); l.overlap = l.s >= 0.58; });
+
+  // Pair strength lookup, so repulsion can stand down where two projects
+  // genuinely belong on top of each other.
+  var PAIR = {};
+  function pairKey(i, j) { return i < j ? i + ':' + j : j + ':' + i; }
+  LINKS.forEach(function (l) { PAIR[pairKey(byId[l.a].index, byId[l.b].index)] = l.s; });
+
+  // A node with a strong cross-route tie should not be held in its own lobe.
+  NODES.forEach(function (n) { n.anchorPull = 0.018; });
+  LINKS.forEach(function (l) {
+    var a = byId[l.a], b = byId[l.b];
+    if (a.route === b.route || l.s < 0.6) return;
+    var relax = 0.018 * (1 - 0.8 * l.s);
+    a.anchorPull = Math.min(a.anchorPull, relax);
+    b.anchorPull = Math.min(b.anchorPull, relax);
+  });
+
+  function layout() {
+    var i, j, n, m, d, dx, dy, dz, dist, f;
+    var rnd = 0;
+    function rand() { rnd = (rnd * 1664525 + 1013904223) % 4294967296; return rnd / 4294967296; }
+    NODES.forEach(function (nd, k) {
+      var a = ANCHORS[nd.route];
+      nd.p = new THREE.Vector3(
+        a.x + (rand() - 0.5) * 120,
+        a.y + (rand() - 0.5) * 120,
+        a.z + (rand() - 0.5) * 120
+      );
+      nd.v = new THREE.Vector3();
+      rnd += k;
+    });
+
+    var steps = 520;
+    for (var it = 0; it < steps; it++) {
+      var cool = 1 - it / steps;
+      // repulsion
+      for (i = 0; i < NODES.length; i++) {
+        n = NODES[i];
+        for (j = i + 1; j < NODES.length; j++) {
+          m = NODES[j];
+          dx = m.p.x - n.p.x; dy = m.p.y - n.p.y; dz = m.p.z - n.p.z;
+          dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01;
+          f = 30000 / (dist * dist);
+          if (f > 26) f = 26;
+          var ps = PAIR[pairKey(i, j)];
+          if (ps) f *= (1 - 0.92 * ps);
+          dx /= dist; dy /= dist; dz /= dist;
+          n.v.x -= dx * f; n.v.y -= dy * f; n.v.z -= dz * f;
+          m.v.x += dx * f; m.v.y += dy * f; m.v.z += dz * f;
+        }
+      }
+      // springs
+      for (i = 0; i < LINKS.length; i++) {
+        var l = LINKS[i];
+        n = byId[l.a]; m = byId[l.b];
+        dx = m.p.x - n.p.x; dy = m.p.y - n.p.y; dz = m.p.z - n.p.z;
+        dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01;
+        f = (dist - l.rest) * (0.05 + 0.5 * l.s * l.s);
+        dx /= dist; dy /= dist; dz /= dist;
+        n.v.x += dx * f; n.v.y += dy * f; n.v.z += dz * f;
+        m.v.x -= dx * f; m.v.y -= dy * f; m.v.z -= dz * f;
+      }
+      // route cohesion and gravity
+      for (i = 0; i < NODES.length; i++) {
+        n = NODES[i];
+        var a = ANCHORS[n.route];
+        var ap = n.anchorPull;
+        n.v.x += (a.x - n.p.x) * ap; n.v.y += (a.y - n.p.y) * ap; n.v.z += (a.z - n.p.z) * ap;
+        n.v.x -= n.p.x * 0.007; n.v.y -= n.p.y * 0.007; n.v.z -= n.p.z * 0.007;
+        n.v.multiplyScalar(0.8);
+        n.p.x += n.v.x * cool; n.p.y += n.v.y * cool; n.p.z += n.v.z * cool;
+      }
+    }
+  }
+  layout();
+
+  /* =====================================================================
+     4. SCENE
+     ===================================================================== */
+
+  var stage = document.getElementById('stage');
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 1, 4000);
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  stage.appendChild(renderer.domElement);
+
+  var world = new THREE.Group();
+  scene.add(world);
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.78));
+  var key = new THREE.DirectionalLight(0xffffff, 0.55);
+  key.position.set(0.4, 0.8, 1);
+  scene.add(key);
+
+  var coreGeo = new THREE.IcosahedronGeometry(1, 1);
+  var shellGeo = new THREE.IcosahedronGeometry(1, 1);
+  var ringGeo = new THREE.TorusGeometry(1, 0.085, 8, 48);
+
+  var nodeMeshes = [], pickTargets = [];
+
+  NODES.forEach(function (n) {
+    var c = routeColor(n.route);
+    var g = new THREE.Group();
+
+    var core = new THREE.Mesh(coreGeo, new THREE.MeshLambertMaterial({ color: c, flatShading: true, transparent: true, opacity: 1 }));
+    core.scale.setScalar(n.r * 0.74);
+
+    var shell = new THREE.Mesh(shellGeo, new THREE.MeshBasicMaterial({
+      color: c, wireframe: true, transparent: true, opacity: 0.5
+    }));
+    shell.scale.setScalar(n.r);
+
+    var hit = new THREE.Mesh(coreGeo, new THREE.MeshBasicMaterial({ visible: false }));
+    hit.scale.setScalar(n.r * 1.15);
+    hit.userData = { kind: 'node', id: n.id };
+
+    g.add(core); g.add(shell); g.add(hit);
+    g.position.copy(n.p);
+    world.add(g);
+
+    n.group = g; n.core = core; n.shell = shell;
+    nodeMeshes.push(g);
+    pickTargets.push(hit);
+  });
+
+  // links, as thin solids so weight can carry strength
+  var linkGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true);
+  var UP = new THREE.Vector3(0, 1, 0);
+
+  LINKS.forEach(function (l) {
+    var a = byId[l.a], b = byId[l.b];
+    var mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(TOKENS['--ink-faint']), transparent: true, opacity: 0.16 + 0.42 * l.s
+    });
+    var mesh = new THREE.Mesh(linkGeo, mat);
+    mesh.userData = { kind: 'link', link: l };
+    world.add(mesh);
+    l.mesh = mesh;
+    l.mat = mat;
+    l.baseOpacity = 0.16 + 0.42 * l.s;
+    l.radius = 0.5 + 2.4 * l.s;
+
+    if (l.overlap) {
+      // the lens: the volume the two solids actually share
+      var lensMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(TOKENS['--cobalt']), transparent: true, opacity: 0.85, depthWrite: false
+      });
+      var lens = new THREE.Mesh(ringGeo, lensMat);
+      lens.userData = { kind: 'link', link: l };
+      world.add(lens);
+      l.lens = lens;
+      l.lensMat = lensMat;
+      pickTargets.push(lens);
+    }
+  });
+
+  function placeLinks() {
+    LINKS.forEach(function (l) {
+      var a = byId[l.a].group.position, b = byId[l.b].group.position;
+      var mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
+      var dir = new THREE.Vector3().subVectors(b, a);
+      var len = dir.length() || 0.01;
+      l.mesh.position.copy(mid);
+      l.mesh.quaternion.setFromUnitVectors(UP, dir.clone().normalize());
+      l.mesh.scale.set(l.radius, len, l.radius);
+      if (l.lens) {
+        var ra = byId[l.a].r, rb = byId[l.b].r;
+        var pen = Math.max(0, (ra + rb) - len);
+        // the seam sits where the two solids meet, on the line between them
+        var t = len ? (len * len + ra * ra - rb * rb) / (2 * len * len) : 0.5;
+        l.lens.position.copy(a).lerp(b, THREE.MathUtils.clamp(t, 0.2, 0.8));
+        l.lens.quaternion.copy(l.mesh.quaternion);
+        l.lens.rotateX(Math.PI / 2);
+        var rad = Math.max(5.5, Math.min(ra, rb) * (0.5 + 0.52 * Math.min(1, pen / Math.min(ra, rb))));
+        l.lens.scale.setScalar(rad);
+      }
+    });
+  }
+
+  /* =====================================================================
+     5. LABELS
+     ===================================================================== */
+
+  var labelLayer = document.getElementById('labels');
+  NODES.forEach(function (n) {
+    var el = document.createElement('div');
+    el.className = 'nodelabel';
+    el.textContent = n.name;
+    labelLayer.appendChild(el);
+    n.labelEl = el;
+  });
+
+  var proj = new THREE.Vector3();
+  var camPos = new THREE.Vector3();
+  var placed = [];
+
+  function overlaps(a, b) {
+    return !(a.x2 < b.x1 - 4 || b.x2 < a.x1 - 4 || a.y2 < b.y1 - 3 || b.y2 < a.y1 - 3);
+  }
+
+  function placeLabels() {
+    var w = window.innerWidth, h = window.innerHeight;
+    camera.getWorldPosition(camPos);
+
+    var list = NODES.map(function (n) {
+      proj.copy(n.group.position).applyMatrix4(world.matrixWorld);
+      var d = proj.distanceTo(camPos);
+      proj.project(camera);
+      return { n: n, x: (proj.x * 0.5 + 0.5) * w, y: (-proj.y * 0.5 + 0.5) * h, z: proj.z, d: d };
+    }).sort(function (p, q) {
+      var pi = (p.n.id === activeId ? 2 : 0) + (p.n.neighbourOf ? 1 : 0);
+      var qi = (q.n.id === activeId ? 2 : 0) + (q.n.neighbourOf ? 1 : 0);
+      if (pi !== qi) return qi - pi;
+      return p.d - q.d;
+    });
+
+    placed.length = 0;
+
+    var ir = document.getElementById('inspector').getBoundingClientRect();
+    var panelBox = { x1: ir.left - 6, x2: ir.right + 6, y1: ir.top - 6, y2: ir.bottom + 6 };
+
+    // every node's own disc is an obstacle for everyone else's label
+    var discs = list.map(function (o) {
+      var rpx = o.n.r * (h / (2 * Math.tan((camera.fov * Math.PI / 180) / 2) * Math.max(o.d, 1))) * 0.82;
+      return { id: o.n.id, x1: o.x - rpx, x2: o.x + rpx, y1: o.y - rpx, y2: o.y + rpx };
+    });
+
+    list.forEach(function (o) {
+      var n = o.n, el = n.labelEl;
+      var important = n.id === activeId || n.neighbourOf;
+
+      if (o.z > 1 || o.x < -80 || o.x > w + 80 || o.y < 0 || o.y > h + 40) {
+        el.style.opacity = 0; return;
+      }
+
+      var halfW = el.offsetWidth / 2 || 40;
+      var rpx = discs[0] ? 0 : 0;
+      var own = null;
+      for (var d0 = 0; d0 < discs.length; d0++) { if (discs[d0].id === n.id) { own = discs[d0]; break; } }
+      var lift = own ? (own.y2 - own.y1) / 2 : n.r;
+
+      function testAt(top) {
+        var b = { x1: o.x - halfW, x2: o.x + halfW, y1: top, y2: top + 16 };
+        if (overlaps(b, panelBox)) return null;
+        for (var i = 0; i < placed.length; i++) if (overlaps(b, placed[i])) return null;
+        for (var j = 0; j < discs.length; j++) {
+          if (discs[j].id !== n.id && overlaps(b, discs[j])) return null;
+        }
+        return b;
+      }
+
+      var box = testAt(o.y + lift + 8) || testAt(o.y - lift - 24);
+      var blocked = !box;
+      if (!box) box = { x1: o.x - halfW, x2: o.x + halfW, y1: o.y + lift + 8, y2: o.y + lift + 24 };
+
+      // near-to-far ordering means the nearest label wins the space
+      var vis;
+      if (n.dimmed || blocked) vis = 0;
+      else if (important) vis = 1;
+      else vis = THREE.MathUtils.clamp(1.3 - o.d / (dist * 1.6), 0.3, 1);
+
+      if (vis > 0.02) placed.push(box);
+
+      el.style.transform = 'translate(-50%,0) translate(' + o.x.toFixed(1) + 'px,' + box.y1.toFixed(1) + 'px)';
+      el.style.opacity = vis.toFixed(3);
+      el.classList.toggle('muted', !important && vis < 0.6);
+    });
+  }
+
+  /* =====================================================================
+     6. CAMERA CONTROL
+     ===================================================================== */
+
+  var yaw = 0.5, pitch = -0.18, dist = 620, targetDist = 620, fitDist = 620;
+
+  // Frame the whole cloud, then shift the frustum so the inspector panel
+  // sits over empty ground instead of over the graph.
+  function computeFit() {
+    var extent = 0;
+    NODES.forEach(function (n) { extent = Math.max(extent, n.p.length() + n.r + 8); });
+    var half = Math.tan((camera.fov * Math.PI / 180) / 2);
+    fitDist = Math.max(extent / half, extent / (half * camera.aspect)) * 0.95;
+    fitDist = Math.max(240, fitDist);
+  }
+  function applyViewShift() {
+    if (window.innerWidth < 900) return;
+    var visH = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * dist;
+    var visW = visH * camera.aspect;
+    camera.translateX(-visW * 0.025);
+  }
+  var dragging = false, lastX = 0, lastY = 0, autoSpin = true;
+  var cv = renderer.domElement;
+
+  cv.addEventListener('pointerdown', function (e) {
+    dragging = true; autoSpin = false; lastX = e.clientX; lastY = e.clientY;
+    cv.classList.add('dragging'); cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    yaw -= (e.clientX - lastX) * 0.005;
+    pitch -= (e.clientY - lastY) * 0.005;
+    pitch = Math.max(-1.35, Math.min(1.35, pitch));
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  function endDrag(e) {
+    dragging = false; cv.classList.remove('dragging');
+    if (e && e.pointerId !== undefined && cv.hasPointerCapture(e.pointerId)) cv.releasePointerCapture(e.pointerId);
+  }
+  cv.addEventListener('pointerup', endDrag);
+  cv.addEventListener('pointercancel', endDrag);
+  cv.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    targetDist = Math.max(fitDist * 0.35, Math.min(fitDist * 2.1, targetDist + e.deltaY * 0.6));
+  }, { passive: false });
+
+  /* =====================================================================
+     7. PICKING
+     ===================================================================== */
+
+  var raycaster = new THREE.Raycaster();
+  var pointer = new THREE.Vector2();
+  var hoverId = null, activeId = null, activeLink = null;
+  var downX = 0, downY = 0;
+
+  cv.addEventListener('pointerdown', function (e) { downX = e.clientX; downY = e.clientY; });
+
+  cv.addEventListener('pointermove', function (e) {
+    pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  cv.addEventListener('click', function (e) {
+    if (Math.abs(e.clientX - downX) > 4 || Math.abs(e.clientY - downY) > 4) return;
+    var hit = pick();
+    if (!hit) return;
+    if (hit.kind === 'node') selectNode(hit.id);
+    else selectLink(hit.link);
+  });
+
+  function pick() {
+    raycaster.setFromCamera(pointer, camera);
+    var hits = raycaster.intersectObjects(pickTargets, false);
+    for (var i = 0; i < hits.length; i++) {
+      var ud = hits[i].object.userData;
+      if (ud.kind === 'node' && byId[ud.id].dimmed) continue;
+      return ud;
+    }
+    return null;
+  }
+
+  /* =====================================================================
+     8. INSPECTOR
+     ===================================================================== */
+
+  var kicker = document.getElementById('insp-kicker');
+  var strengthEl = document.getElementById('insp-strength');
+  var bodyEl = document.getElementById('insp-body');
+
+  function dot(route) {
+    return '<span class="rowdot" style="background: var(--line-' + route + ')"></span>';
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function linksFor(id) {
+    return LINKS.filter(function (l) { return l.a === id || l.b === id; })
+      .sort(function (p, q) { return q.s - p.s; });
+  }
+
+  function selectNode(id) {
+    activeId = id; activeLink = null;
+    var n = byId[id];
+    var mine = linksFor(id);
+
+    kicker.textContent = ROUTE_NAMES[n.route];
+    strengthEl.textContent = n.year;
+
+    var rows = mine.map(function (l) {
+      var other = byId[l.a === id ? l.b : l.a];
+      return '<button class="row" data-link="' + LINKS.indexOf(l) + '">' +
+        dot(other.route) +
+        '<span class="rowname">' + esc(other.name) + '</span>' +
+        '<span class="rowpct">' + Math.round(l.s * 100) + '%</span>' +
+        '</button>';
+    }).join('');
+
+    bodyEl.innerHTML =
+      '<h2 id="insp-title">' + esc(n.name) + '</h2>' +
+      '<p id="insp-blurb">' + esc(n.blurb) + '</p>' +
+      '<div class="subhead label">Overlaps with ' + mine.length + '</div>' +
+      '<div id="insp-links">' + rows + '</div>';
+
+    wireRows();
+    applyEmphasis();
+  }
+
+  function selectLink(l) {
+    activeLink = l; activeId = null;
+    var a = byId[l.a], b = byId[l.b];
+
+    kicker.textContent = 'Why these overlap';
+    strengthEl.textContent = Math.round(l.s * 100) + '% shared';
+
+    bodyEl.innerHTML =
+      '<div class="pair">' +
+        '<span class="arm">' + dot(a.route) + '<span class="nm">' + esc(a.name) + '</span></span>' +
+        '<span class="join">/</span>' +
+        '<span class="arm">' + dot(b.route) + '<span class="nm">' + esc(b.name) + '</span></span>' +
+      '</div>' +
+      '<p id="insp-blurb">' + esc(l.why) + '</p>' +
+      '<div class="subhead label">Shared ground</div>' +
+      '<div class="chips">' + l.shared.map(function (s) { return '<span class="chip">' + esc(s) + '</span>'; }).join('') + '</div>' +
+      '<div class="subhead label">Jump to</div>' +
+      '<div id="insp-links">' +
+        '<button class="row" data-node="' + a.id + '">' + dot(a.route) + '<span class="rowname">' + esc(a.name) + '</span><span class="rowpct">' + esc(a.year) + '</span></button>' +
+        '<button class="row" data-node="' + b.id + '">' + dot(b.route) + '<span class="rowname">' + esc(b.name) + '</span><span class="rowpct">' + esc(b.year) + '</span></button>' +
+      '</div>';
+
+    wireRows();
+    applyEmphasis();
+  }
+
+  function wireRows() {
+    Array.prototype.forEach.call(bodyEl.querySelectorAll('.row'), function (btn) {
+      btn.addEventListener('click', function () {
+        if (btn.dataset.link !== undefined) selectLink(LINKS[+btn.dataset.link]);
+        else selectNode(btn.dataset.node);
+      });
+    });
+  }
+
+  /* =====================================================================
+     9. EMPHASIS AND FILTERING
+     ===================================================================== */
+
+  var routeFilter = 0;
+
+  function applyEmphasis() {
+    var neighbours = {};
+    if (activeId) {
+      linksFor(activeId).forEach(function (l) {
+        neighbours[l.a] = true; neighbours[l.b] = true;
+      });
+    } else if (activeLink) {
+      neighbours[activeLink.a] = true; neighbours[activeLink.b] = true;
+    }
+
+    NODES.forEach(function (n) {
+      var offRoute = routeFilter && n.route !== routeFilter;
+      n.dimmed = offRoute;
+      n.neighbourOf = !!neighbours[n.id];
+
+      var focus = 1;
+      if (offRoute) focus = 0.12;
+      else if ((activeId || activeLink) && !neighbours[n.id]) focus = 0.55;
+
+      n.core.material.opacity = focus;
+      n.shell.material.opacity = 0.55 * focus;
+      var s = n.id === activeId ? 1.16 : 1;
+      n.group.scale.setScalar(s);
+    });
+
+    LINKS.forEach(function (l) {
+      var offRoute = routeFilter && (byId[l.a].route !== routeFilter && byId[l.b].route !== routeFilter);
+      var involved = activeLink === l || (activeId && (l.a === activeId || l.b === activeId));
+      var k = 1;
+      if (offRoute) k = 0.08;
+      else if ((activeId || activeLink) && !involved) k = 0.45;
+      else if (involved) k = 1.55;
+      l.mat.opacity = Math.min(0.95, l.baseOpacity * k);
+      l.mat.color.set(involved ? TOKENS['--cobalt'] : TOKENS['--ink-faint']);
+      if (l.lensMat) l.lensMat.opacity = Math.min(1, 0.85 * Math.min(k, 1.15));
+    });
+  }
+
+  var filtersEl = document.getElementById('filters');
+  var allBtn = document.createElement('button');
+  allBtn.className = 'bullet bullet-all';
+  allBtn.textContent = 'All routes';
+  filtersEl.appendChild(allBtn);
+  allBtn.addEventListener('click', function () { setFilter(0); });
+
+  [1, 2, 3, 4, 5].forEach(function (r) {
+    var b = document.createElement('button');
+    b.className = 'bullet bullet-' + r + ' dim';
+    b.textContent = ROUTE_NAMES[r];
+    b.addEventListener('click', function () { setFilter(routeFilter === r ? 0 : r); });
+    filtersEl.appendChild(b);
+    b.dataset.route = String(r);
+  });
+
+  function setFilter(r) {
+    routeFilter = r;
+    Array.prototype.forEach.call(filtersEl.querySelectorAll('.bullet'), function (b) {
+      if (!b.dataset.route) b.classList.toggle('dim', r !== 0);
+      else b.classList.toggle('dim', r !== 0 && +b.dataset.route !== r);
+    });
+    applyEmphasis();
+  }
+
+  /* =====================================================================
+     10. INTRO AND LOOP
+     The one orchestrated moment. Nodes arrive from the centre along their
+     final vectors, staggered by route, and settle. It runs once.
+     ===================================================================== */
+
+  var t0 = performance.now();
+  var INTRO = reduceMotion ? 0 : 2000;
+
+  function easeOutBack(x) {
+    var c1 = 1.24, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  }
+
+  function frame(now) {
+    var t = now - t0;
+
+    var p = INTRO ? Math.min(1, t / INTRO) : 1;
+    NODES.forEach(function (n) {
+      var stagger = (n.route - 1) * 0.07;
+      var local = THREE.MathUtils.clamp((p - stagger) / (1 - stagger || 1), 0, 1);
+      var e = INTRO ? easeOutBack(local) : 1;
+      n.group.position.copy(n.p).multiplyScalar(e);
+      n.group.visible = local > 0.001;
+    });
+
+    if (autoSpin && !dragging) yaw += 0.00085;
+    dist += (targetDist - dist) * 0.09;
+
+    camera.position.set(
+      dist * Math.cos(pitch) * Math.sin(yaw),
+      dist * Math.sin(pitch),
+      dist * Math.cos(pitch) * Math.cos(yaw)
+    );
+    camera.lookAt(0, 0, 0);
+    applyViewShift();
+
+    placeLinks();
+    world.updateMatrixWorld();
+    placeLabels();
+
+    // hover
+    var hit = dragging ? null : pick();
+    var newHover = hit && hit.kind === 'node' ? hit.id : null;
+    if (newHover !== hoverId) {
+      hoverId = newHover;
+      cv.style.cursor = hit ? 'pointer' : (dragging ? 'grabbing' : 'grab');
+      NODES.forEach(function (n) {
+        n.shell.material.color.set(n.id === hoverId ? TOKENS['--cobalt'] : TOKENS['--line-' + n.route]);
+      });
+    }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+
+  function resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    var before = fitDist;
+    computeFit();
+    targetDist *= fitDist / before;
+    dist = targetDist;
+  }
+  window.addEventListener('resize', resize);
+
+  function repaintTheme() {
+    readTokens();
+    renderer.setClearColor(new THREE.Color(TOKENS['--ground']), 1);
+    NODES.forEach(function (n) {
+      var c = routeColor(n.route);
+      n.core.material.color.copy(c);
+      n.shell.material.color.copy(n.id === hoverId ? new THREE.Color(TOKENS['--cobalt']) : c);
+    });
+    LINKS.forEach(function (l) {
+      l.mat.color.set(TOKENS['--ink-faint']);
+      if (l.lensMat) l.lensMat.color.set(TOKENS['--cobalt']);
+    });
+  }
+  repaintTheme();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', repaintTheme);
+  new MutationObserver(repaintTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  function showOverview() {
+    activeId = null; activeLink = null;
+    kicker.textContent = 'How to read this';
+    strengthEl.textContent = NODES.length + ' nodes';
+    bodyEl.innerHTML =
+      '<h2 id="insp-title">The work as a network</h2>' +
+      '<p id="insp-blurb">Every project is a solid, coloured by its route. Two projects are pulled together by how much they actually share, so the closest pairs end up intersecting. A cobalt ring marks the seam where that happens.</p>' +
+      '<div class="subhead label">Start anywhere</div>' +
+      '<div id="insp-links">' +
+        '<button class="row" data-node="jobportal">' + dot(4) + '<span class="rowname">Job Portal, and the pipeline it came from</span><span class="rowpct">95%</span></button>' +
+        '<button class="row" data-node="khutba">' + dot(2) + '<span class="rowname">A tool I rebuilt three years later</span><span class="rowpct">95%</span></button>' +
+        '<button class="row" data-node="smartcommute">' + dot(5) + '<span class="rowname">Where the transit language came from</span><span class="rowpct">76%</span></button>' +
+      '</div>';
+    wireRows();
+    applyEmphasis();
+  }
+
+  computeFit();
+  dist = targetDist = fitDist;
+  showOverview();
+  setFilter(0);
+  requestAnimationFrame(frame);
+})();
+</script>
+  </body>
+</html>

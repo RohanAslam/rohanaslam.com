@@ -1,0 +1,17 @@
+---
+title: "Friday Sermon Bot"
+date: 2026-07-20
+summary: "Scraped, narrated and posted to Discord every Friday at noon, for zero dollars a month."
+tags: ["ai-tools"]
+stack: ["Python", "BeautifulSoup", "Edge Neural TTS", "Discord webhooks", "launchd"]
+status: "shipped"
+featured: false
+---
+
+Zero dollars a month, forever. That was the constraint I set before writing a line, and it shaped every choice in the thing.
+
+It scrapes the weekly sermon summary, expands the abbreviations and citations so they read naturally out loud, runs the text through free neural voices, and posts the recap plus a playable MP3 into a private Discord channel. The Mac scheduler fires it every Friday at noon. No paid API, no hosting bill, no server to forget I am paying for.
+
+The fiddly part was the text expansion. Reading honorifics aloud as individual letters makes the audio unlistenable, so the script carries a dictionary of Islamic honorifics and Quranic citation formats and rewrites them before the voice ever sees them.
+
+It has run unattended for a couple of months. The one thing it cannot do is tell me when the site changes its markup, so the first sign of a break will be a very quiet Friday.

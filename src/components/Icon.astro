@@ -1,6 +1,6 @@
 ---
 interface Props {
-  name: 'linkedin' | 'github' | 'mail' | 'external' | 'arrow-right';
+  name: 'linkedin' | 'github' | 'mail' | 'external' | 'arrow-right' | 'arrow-left' | 'arrow-down';
   class?: string;
   size?: number;
 }
@@ -95,6 +95,47 @@ const { name, class: className = '', size = 16 } = Astro.props;
     >
       <line x1="5" y1="12" x2="19" y2="12" />
       <polyline points="12 5 19 12 12 19" />
+    </svg>
+  )
+}
+
+{
+  name === 'arrow-left' && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+      class={className}
+      aria-hidden="true"
+    >
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  )
+}
+
+{
+  name === 'arrow-down' && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+      class={className}
+      aria-hidden="true"
+    >
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   )
 }

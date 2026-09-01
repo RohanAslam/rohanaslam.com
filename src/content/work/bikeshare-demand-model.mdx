@@ -1,0 +1,19 @@
+---
+title: "Bikeshare Demand Model"
+date: 2024-09-01
+summary: "A regression on rental counts that was worth building mostly because of how clearly it failed."
+tags: ["data", "earlier-work"]
+stack: ["R", "ggplot2", "caTools", "Linear regression"]
+status: "shipped"
+featured: false
+links:
+  repo: "https://github.com/RohanAslam/ML-Linear-Regression-Project"
+---
+
+Two rush hours. That is the whole story the scatter plot tells, and it is the reason a straight line was never going to model bike rentals properly.
+
+I took a bikeshare dataset, pulled the hour out of every timestamp, and plotted rental count against hour for working days only. Commuters show up at 8am and again at 5pm. Weekends flatten into one lazy hump in the afternoon. Temperature correlates with rentals right up until it gets too hot, which a linear model has no way of knowing.
+
+I fit the regression anyway, on temperature, humidity, windspeed, season and hour, and then spent most of the time on why it underperformed. Season and hour are categorical variables wearing numeric clothes. Feeding month 12 and month 1 to a linear model tells it December and January sit eleven units apart when they are next door to each other.
+
+The model is not good. Reading the residuals is what made the exercise worth it, and it is the first time a chart told me the model was wrong before the metrics did.

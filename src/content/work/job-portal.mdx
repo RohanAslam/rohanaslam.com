@@ -1,0 +1,17 @@
+---
+title: "Job Portal"
+date: 2026-05-13
+summary: "Five LLM providers, one local folder, and a ranked answer to which of my resumes actually fits which job."
+tags: ["data", "ai-tools"]
+stack: ["Next.js 16", "TypeScript", "Apify", "Claude", "Gemini", "Groq", "Ollama"]
+status: "in-progress"
+featured: false
+---
+
+Seven versions of my resume sitting in a folder, and no way to tell which one to send.
+
+The job portal is the fix. It pulls real listings through Apify, parses every resume I have into text, and asks a model which resume fits a given listing, what to change for it, and why. Everything lives on disk in a dot folder in my home directory. No database, no account, nothing leaves the laptop except the API calls I choose to make.
+
+The decision I am happiest with is the provider layer. Gemini, Claude, Groq, local Ollama and a stub mode all sit behind one interface with a settings page to switch between them at runtime, so day to day development runs on a local Llama for free and only the real matching burns credits. Live calls stay gated behind environment flags for the same reason. Stub mode announces itself in a banner on every page that could call out, because a disabled control that lies about what it is doing is worse than no control at all.
+
+Phase five is a spend cap. The honest limit right now is that the model's view on which resume is stronger is still an opinion, and I have not built anything that checks it against whether the interview actually happened.

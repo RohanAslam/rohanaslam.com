@@ -1,0 +1,17 @@
+---
+title: "Sermon Summary Pipeline (2023)"
+date: 2023-12-22
+summary: "The first attempt: scrape, narrate, upload to Drive, email the link. Three years later I rebuilt it properly."
+tags: ["ai-tools", "earlier-work"]
+stack: ["Python", "BeautifulSoup", "pyttsx3", "Google Drive API", "SMTP"]
+status: "shipped"
+featured: false
+---
+
+One MP3, dated 22 December 2023, still sitting in the project folder.
+
+This was the first version. Python scraped the sermon summary, pyttsx3 read it into an MP3, the Google Drive API uploaded the file, and an SMTP script emailed out the share link. It worked, and it was held together with three separate auth flows and a pickle file full of tokens.
+
+The lesson was distribution, not code. An email with a Drive link means opening two apps to listen to one thing, and I stopped using it inside a month.
+
+The 2026 rebuild drops a playable file straight into a Discord channel and swaps the robot voice for a neural one. Same scrape, same idea. The only real change was where it lands.

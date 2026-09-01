@@ -1,0 +1,17 @@
+---
+title: "Aurum: Personal Finance Dashboard"
+date: 2026-04-01
+summary: "Four lifestyle scenarios against 2026 Canadian tax brackets, to find the number that actually lands in the account."
+tags: ["data"]
+stack: ["React", "TypeScript", "Zustand", "Recharts", "PapaParse"]
+status: "in-progress"
+featured: false
+---
+
+Forty percent. That is roughly what a charitable donation credit gives back in Ontario, not the majority I had assumed, and finding that out is what started this.
+
+Aurum is a local budgeting dashboard. It imports a CSV of transactions, categorizes them, and models take home pay against 2026 federal and provincial brackets across four lifestyle scenarios, so the question stops being what I earn and becomes what lands in the account after tax, rent, and the giving I have already committed to.
+
+The build is deliberately boring. React and Zustand for state, Recharts for the charts, PapaParse for the import, everything in the browser and nothing on a server. It is my money. It does not need an account.
+
+Scenario modelling is the part that works. The category rules are still hand written, and the first month I ran it the categorizer filed every grocery run under travel, which was accurate for that month and wrong in general.
