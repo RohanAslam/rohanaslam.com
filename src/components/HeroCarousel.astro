@@ -14,17 +14,19 @@ interface Slide {
   org: string;
   role: string;
   timeframe: string;
+  objectPosition?: string;
 }
 
 const slides: Slide[] = [
   {
     id: 'sunlife',
-    image: '/images/carousel/sunlife-work.png',
-    alt: 'Sun Life Strategy and Operations milestone',
+    image: '/images/carousel/sunlife.jpg',
+    alt: 'Sun Life team with Rohan Aslam',
     company: 'sunlife',
     org: 'Sun Life',
     role: 'Strategy & Operations Specialist',
     timeframe: '2026 – Present',
+    objectPosition: 'center center',
   },
   {
     id: 'smartsyllabus',
@@ -46,21 +48,23 @@ const slides: Slide[] = [
   },
   {
     id: 'dyedurham',
-    image: '/images/carousel/dyedurham-team.png',
-    alt: 'Dye and Durham legal product management',
+    image: '/images/carousel/dyedurham.jpg',
+    alt: 'Dye and Durham team event',
     company: 'dyedurham',
     org: 'Dye & Durham',
     role: 'Product Intern',
     timeframe: '2025',
+    objectPosition: 'center center',
   },
   {
     id: 'uoft',
-    image: '/images/carousel/uoft-fieldwork.png',
+    image: '/images/carousel/innovationHub.JPG',
     alt: 'U of T Innovation Hub educator fieldwork research',
     company: 'uoft',
     org: 'U of T Innovation Hub',
     role: 'Design Researcher',
     timeframe: '2025',
+    objectPosition: 'center 75%',
   },
 ];
 ---
@@ -84,6 +88,7 @@ const slides: Slide[] = [
             height={600}
             loading={i === 0 ? 'eager' : 'lazy'}
             class="h-full w-full object-cover select-none"
+            style={slide.objectPosition ? `object-position: ${slide.objectPosition};` : undefined}
           />
         </div>
       ))

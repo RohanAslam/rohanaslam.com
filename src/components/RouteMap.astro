@@ -509,25 +509,17 @@ const routeColors: Record<number, string> = {
       id="ttc-sign-container"
       class="overflow-hidden border-b-2 border-(--ink) bg-[#0B0E12] px-4 py-2 text-[#F2B705] transition-all"
     >
-      <div id="ttc-sign-track" class="flex flex-wrap items-center justify-between gap-3 ttc-slide-in">
-        <div class="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest uppercase shrink-0">
-          <span class="inline-block h-2 w-2 rounded-full bg-[#F2B705] animate-pulse"></span>
-          <span id="ttc-status-text">ARRIVED AT</span>
-        </div>
-        <div
-          id="ttc-arrival-station"
-          class="font-mono text-[13px] font-bold tracking-wider text-[#F2B705] uppercase truncate"
-        >
-          SUN LIFE (SUNADVANTAGE)
-        </div>
+      <div id="ttc-sign-track" class="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest uppercase ttc-slide-in">
+        <span class="inline-block h-2 w-2 rounded-full bg-[#F2B705] animate-pulse"></span>
+        <span id="ttc-status-text">ARRIVED AT</span>
       </div>
     </div>
 
     <!-- Active Station Quick Info Row -->
     <div class="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div class="flex items-center gap-4 min-w-0">
-        <!-- Logo Box -->
-        <div id="inspector-logo" class="flex h-14 w-20 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-1">
+        <!-- Logo Box: Transparent background, no border, clean alignment -->
+        <div id="inspector-logo" class="flex h-14 w-20 shrink-0 items-center justify-center">
           <CompanyLogo name="sunlife" width={80} height={40} class="logo-img h-full w-full object-contain" data-logo="sunlife" />
           <CompanyLogo name="rbc" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="rbc" />
           <CompanyLogo name="otpp" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="otpp" />
@@ -800,7 +792,6 @@ const routeColors: Record<number, string> = {
   const elLink = document.getElementById('inspector-link');
   const elLinkText = document.getElementById('inspector-link-text');
   const elStatusText = document.getElementById('ttc-status-text');
-  const elArrivalStation = document.getElementById('ttc-arrival-station');
   const signTrack = document.getElementById('ttc-sign-track');
   const btnToggle = document.getElementById('inspector-toggle-details');
   const drawerSummary = document.getElementById('inspector-summary-drawer');
@@ -877,14 +868,13 @@ const routeColors: Record<number, string> = {
     }
   }
 
-  function triggerArrivalTransition(newStationName) {
-    if (!signTrack || !elArrivalStation) return;
+  function triggerArrivalTransition() {
+    if (!signTrack) return;
 
     if (slideTimeout) clearTimeout(slideTimeout);
     if (arrivedTimeout) clearTimeout(arrivedTimeout);
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      elArrivalStation.textContent = newStationName;
       if (elStatusText) elStatusText.textContent = 'ARRIVED AT';
       return;
     }
@@ -894,8 +884,6 @@ const routeColors: Record<number, string> = {
     signTrack.classList.add('ttc-slide-out');
 
     slideTimeout = setTimeout(() => {
-      // Set new station name while off-screen
-      elArrivalStation.textContent = newStationName;
       if (elStatusText) elStatusText.textContent = 'ARRIVING AT';
 
       // Position instantly off-screen to the left
@@ -927,7 +915,7 @@ const routeColors: Record<number, string> = {
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
 
-    triggerArrivalTransition(s.organization.toUpperCase());
+    triggerArrivalTransition();
     updateInspector(stationId);
   }
 
