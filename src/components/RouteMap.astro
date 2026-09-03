@@ -8,23 +8,15 @@
  *   Line 4: Data (Green)
  *   Line 5: Writing (Purple)
  *
- * Dynamic Cross-Line Connections:
- * Hovering or clicking any station draws smooth SVG transit connectors
- * across lines. Hovering over a connection line reveals the relationship
- * and allows reading more about both sides of the work.
- *
- * Mobile:
- * On smaller viewports, provides an advisory note to view on desktop for the full
- * animated visualization, alongside a streamlined mobile station directory
- * and interactive cross-line relationship explorer.
+ * In-place interactive contextual popover:
+ * Hovering or clicking any station or connection displays an in-place tooltip
+ * right where the user is looking. No bulky top inspector, no scrolling away,
+ * and no layout thrashing.
  */
 
 const TRACK_START_X = 60;
 const TRACK_END_X = 1200;
 const TRACK_LEN = TRACK_END_X - TRACK_START_X;
-
-const LOGO_W = 100;
-const LOGO_H = 44;
 
 interface StationData {
   id: string;
@@ -34,7 +26,7 @@ interface StationData {
   sub: string;
   line: number;
   routeName: string;
-  company?: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus';
+  company?: string;
   role: string;
   organization: string;
   timeframe: string;
@@ -46,7 +38,6 @@ interface StationData {
 const stations: StationData[] = [
   // ==========================================
   // Line 1 · Corporate & Strategy (y = 90)
-  // (Pure corporate roles only)
   // ==========================================
   {
     id: 'rbc',
@@ -56,7 +47,6 @@ const stations: StationData[] = [
     sub: '2022',
     line: 1,
     routeName: 'Line 1 · Corporate',
-    company: 'rbc',
     organization: 'Royal Bank of Canada',
     role: 'Web Developer Intern',
     timeframe: 'May 2022 – Aug 2022',
@@ -70,7 +60,6 @@ const stations: StationData[] = [
     sub: '2024',
     line: 1,
     routeName: 'Line 1 · Corporate',
-    company: 'uoft',
     organization: 'U of T Innovation Hub',
     role: 'Design Researcher',
     timeframe: 'May 2024 – Aug 2024',
@@ -86,7 +75,6 @@ const stations: StationData[] = [
     sub: '2023–24',
     line: 1,
     routeName: 'Line 1 · Corporate',
-    company: 'otpp',
     organization: "Ontario Teachers' Pension Plan",
     role: 'Experience Design & Innovation Intern',
     timeframe: 'May 2023 – Aug 2024 (16 Mos)',
@@ -102,7 +90,6 @@ const stations: StationData[] = [
     sub: '2025',
     line: 1,
     routeName: 'Line 1 · Corporate',
-    company: 'dyedurham',
     organization: 'Dye & Durham',
     role: 'Product Intern',
     timeframe: 'Sep 2025 – Dec 2025',
@@ -118,7 +105,6 @@ const stations: StationData[] = [
     sub: 'SUNADVANTAGE',
     line: 1,
     routeName: 'Line 1 · Corporate',
-    company: 'sunlife',
     organization: 'Sun Life (SunAdvantage)',
     role: 'Strategy & Operations Specialist',
     timeframe: 'Sep 2026 – Present (Full Time)',
@@ -129,7 +115,6 @@ const stations: StationData[] = [
 
   // ==========================================
   // Line 2 · Business Ventures (y = 260)
-  // (Flingblade 2023, Skoll 2025, Presently 2026, SmartQueue 2026, SmartSyllabus / ICUBE furthest right)
   // ==========================================
   {
     id: 'flingblade',
@@ -199,7 +184,6 @@ const stations: StationData[] = [
     sub: 'ICUBE',
     line: 2,
     routeName: 'Line 2 · Business Ventures',
-    company: 'smartsyllabus',
     organization: 'SmartSyllabus / ICUBE',
     role: 'Co-Founder',
     timeframe: 'Jan 2026 – Present',
@@ -210,7 +194,6 @@ const stations: StationData[] = [
 
   // ==========================================
   // Line 3 · AI Tools (y = 430)
-  // (Sermon Pipeline 2023 -> Sermon Bot 2024 -> RAG 2024 -> Second Brain 2024 -> AI OS 2025 -> Job Pipeline 2026)
   // ==========================================
   {
     id: 'khutba',
@@ -384,7 +367,6 @@ const stations: StationData[] = [
 
   // ==========================================
   // Line 5 · Writing (y = 770)
-  // (Published research essays, critiques, and reflections)
   // ==========================================
   {
     id: 'repairability',
@@ -511,7 +493,7 @@ const lineTracks = [
 ];
 ---
 
-<div class="route-map-container my-4">
+<div id="route-map-wrapper" class="relative my-4">
   <!-- Mobile Advisory Notice (Only displayed on mobile viewports) -->
   <aside class="block md:hidden mb-4 border-2 border-(--ink) bg-(--surface) p-3" aria-label="Viewing recommendation">
     <div class="flex items-start gap-2.5">
@@ -523,93 +505,52 @@ const lineTracks = [
     </div>
   </aside>
 
-  <!-- Unified Top Inspector Card -->
+  <!-- Floating In-Place Station & Connection Popover (Desktop / Tablet) -->
   <div
-    id="station-inspector"
-    class="mb-6 border-2 border-(--ink) bg-(--ground) transition-all"
-    style="--route: var(--line-1)"
+    id="route-popover"
+    class="pointer-events-none absolute z-40 opacity-0 transition-opacity duration-150 border-2 border-(--ink) bg-(--ground) p-4 max-w-[340px] sm:max-w-[380px]"
+    style="top: 0; left: 0;"
+    role="tooltip"
+    aria-hidden="true"
   >
-    <!-- Header status line -->
-    <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-(--ink) bg-(--surface) px-4 py-2.5">
-      <div class="flex items-center gap-2">
-        <span id="inspector-bullet" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Corporate</span>
-        <span id="inspector-timeframe" class="font-mono text-[12px] text-(--ink-faint)">Sep 2026 – Present (Full Time)</span>
-      </div>
-
-      <!-- Action buttons: Primary link, dual secondary link for connections, and return button -->
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          id="inspector-btn-back"
-          class="hidden items-center gap-1 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--ink) hover:text-(--ground)"
-        >
-          ← Back
-        </button>
-
-        <a
-          id="inspector-link"
-          href="/work/sunlife-digital-transformation"
-          class="inline-flex items-center gap-1.5 px-3 py-1 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
-        >
-          <span id="inspector-link-text">Read case study</span>
-          <span>→</span>
-        </a>
-
-        <a
-          id="inspector-link-secondary"
-          href="#"
-          class="hidden items-center gap-1.5 px-3 py-1 border border-(--ink) bg-(--ground) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt)"
-        >
-          <span id="inspector-link-secondary-text">Read target case study</span>
-          <span>→</span>
-        </a>
-      </div>
+    <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-(--ink-faint)/20">
+      <span id="popover-badge" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Corporate</span>
+      <span id="popover-timeframe" class="font-mono text-[11px] text-(--ink-faint)">2026</span>
     </div>
 
-    <!-- Inspector Content Body -->
-    <div class="p-4 sm:p-5">
-      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div class="min-w-0 flex-1">
-          <h3 id="inspector-title" class="font-mono text-[18px] sm:text-[21px] font-bold text-(--ink) tracking-tight">
-            Sun Life (SunAdvantage)
-          </h3>
-          <p id="inspector-role" class="text-[14px] font-medium text-(--ink-muted) mt-0.5">
-            Strategy & Operations Specialist
-          </p>
-        </div>
+    <h4 id="popover-title" class="font-mono text-[16px] font-bold text-(--ink) leading-snug">Sun Life</h4>
+    <p id="popover-role" class="text-[12px] font-medium text-(--ink-muted) mt-0.5">Strategy & Operations Specialist</p>
 
-        <!-- Optional Employer Logo -->
-        <div id="inspector-logo" class="h-10 w-24 border border-(--ink-faint)/30 bg-(--surface) flex items-center justify-center p-1 shrink-0">
-          <img src="/images/logos/sunlife.png" alt="Sun Life" class="logo-img max-h-full max-w-full object-contain" data-logo="sunlife" />
-          <img src="/images/logos/otpp.png" alt="OTPP" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="otpp" />
-          <img src="/images/logos/dyedurham.png" alt="Dye & Durham" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="dyedurham" />
-          <img src="/images/logos/uoft.png" alt="U of T" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="uoft" />
-          <img src="/images/logos/rbc.png" alt="RBC" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="rbc" />
-          <img src="/images/logos/smartsyllabus.png" alt="SmartSyllabus" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="smartsyllabus" />
-        </div>
-      </div>
+    <p id="popover-summary" class="text-[13px] leading-relaxed text-(--ink) mt-2.5">
+      Full time strategy and operations on the SunAdvantage group benefits platform.
+    </p>
 
-      <!-- Detailed Summary or Connection Explanation -->
-      <div class="mt-3 pt-3 border-t border-(--ink-faint)/20">
-        <p id="inspector-summary" class="text-[14px] leading-relaxed text-(--ink-muted) max-w-[85ch]">
-          Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Automated reporting, process discovery, and business transformation.
-        </p>
+    <div id="popover-actions" class="mt-3 pt-2.5 border-t border-(--ink-faint)/20 flex flex-wrap items-center gap-2">
+      <a
+        id="popover-link-primary"
+        href="#"
+        class="inline-flex items-center gap-1.5 px-3 py-1 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
+      >
+        <span id="popover-link-text">Read case study</span>
+        <span>→</span>
+      </a>
+      <a
+        id="popover-link-secondary"
+        href="#"
+        class="hidden items-center gap-1.5 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground)"
+      >
+        <span id="popover-link-secondary-text">Read target</span>
+        <span>→</span>
+      </a>
+    </div>
 
-        <!-- Interactive Cross-Line Connection Pills -->
-        <div id="inspector-transfers" class="mt-4 pt-3 border-t border-(--ink-faint)/20">
-          <div class="label text-[11px] font-bold text-(--ink) mb-2 flex items-center gap-1.5">
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-(--cobalt)"></span>
-            <span>CROSS-LINE CONNECTIONS · TAP TO EXPLORE RELATION:</span>
-          </div>
-          <div id="inspector-transfers-list" class="flex flex-wrap gap-2">
-            <!-- Populated dynamically via JS -->
-          </div>
-        </div>
-      </div>
+    <div id="popover-conns" class="mt-2.5 pt-2 border-t border-(--ink-faint)/20">
+      <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5">⇄ Connected Stations:</div>
+      <div id="popover-conns-list" class="flex flex-wrap gap-1.5"></div>
     </div>
   </div>
 
-  <!-- Mobile View Switcher: Line Directory vs Track Map -->
+  <!-- Mobile View Switcher: Station Directory vs Track Map -->
   <div class="block md:hidden mb-4">
     <div class="flex items-center justify-between gap-3 border-2 border-(--ink) bg-(--ground) p-2 mb-2.5">
       <div class="label text-[11px] font-bold text-(--ink) flex items-center gap-1.5">
@@ -633,37 +574,12 @@ const lineTracks = [
         </button>
       </div>
     </div>
-
-    <!-- Mobile quick jump pills -->
-    <div id="mobile-quick-stations" class="overflow-x-auto pb-1 flex items-center gap-2 text-[12px]">
-      <span class="label text-[11px] text-(--ink-faint) shrink-0 uppercase">Jump:</span>
-      {
-        [
-          { id: 'sunadvantage', name: 'Sun Life' },
-          { id: 'smartsyllabus', name: 'SmartSyllabus' },
-          { id: 'flingblade', name: 'Flingblade' },
-          { id: 'personal-ai-os', name: 'AI OS' },
-          { id: 'job-portal', name: 'Job Portal' },
-          { id: 'dear-go-train', name: 'Dear GO Train' },
-          { id: 'otpp', name: 'OTPP' },
-          { id: 'uoft', name: 'U of T' },
-        ].map((s) => (
-          <button
-            type="button"
-            class="mobile-station-chip shrink-0 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) text-[11px] font-mono font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt)"
-            data-target-station={s.id}
-          >
-            {s.name}
-          </button>
-        ))
-      }
-    </div>
   </div>
 
-  <!-- Mobile Vertical Station Directory View (Default on mobile for maximum readability) -->
+  <!-- Mobile Vertical Station Directory View (Default on mobile) -->
   <div id="mobile-station-list-view" class="block md:hidden border-2 border-(--ink) bg-(--ground) mb-6">
     <div class="bg-[#0B0E12] px-3.5 py-2 text-[#F2B705] font-mono text-[11px] font-bold tracking-wider uppercase flex items-center justify-between">
-      <span>ROUTE DIRECTORY · TAP STATION TO INSPECT</span>
+      <span>STATION DIRECTORY · TAP TO READ & CONNECT</span>
       <span>5 ROUTES</span>
     </div>
     <div class="divide-y-2 divide-(--ink)">
@@ -681,21 +597,39 @@ const lineTracks = [
                 </span>
                 <span class="label text-[11px] text-(--ink-faint)">{lineStations.length} stops</span>
               </div>
-              <div class="grid grid-cols-1 gap-1.5 pl-2 border-l-2" style={`border-color: ${routeColors[lineNum]}`}>
+              <div class="grid grid-cols-1 gap-2 pl-2 border-l-2" style={`border-color: ${routeColors[lineNum]}`}>
                 {lineStations.map((s) => (
-                  <button
-                    type="button"
-                    class="mobile-list-station-btn text-left p-2.5 border border-transparent transition-colors hover:bg-(--surface) flex items-center justify-between gap-3"
-                    data-station-id={s.id}
-                  >
-                    <div class="min-w-0">
-                      <div class="font-mono text-[13px] font-bold text-(--ink) truncate flex items-center gap-1.5">
-                        <span>{s.label}</span>
+                  <div class="mobile-station-accordion border border-(--ink-faint)/30 bg-(--surface)" data-accordion-id={s.id}>
+                    <button
+                      type="button"
+                      class="mobile-station-toggle w-full text-left p-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-(--ground)"
+                      data-station-id={s.id}
+                    >
+                      <div class="min-w-0">
+                        <div class="font-mono text-[13px] font-bold text-(--ink) truncate">{s.label}</div>
+                        <div class="text-[12px] text-(--ink-muted) truncate">{s.role}</div>
                       </div>
-                      <div class="text-[12px] text-(--ink-muted) truncate">{s.organization}</div>
+                      <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.sub}</div>
+                    </button>
+                    <div class="mobile-station-drawer hidden p-3 pt-0 border-t border-(--ink-faint)/20">
+                      <p class="text-[13px] text-(--ink) leading-relaxed mt-2">{s.summary}</p>
+                      {s.link && (
+                        <div class="mt-3">
+                          <a
+                            href={s.link}
+                            class="inline-flex items-center gap-1.5 px-3 py-1 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
+                          >
+                            <span>{s.linkLabel || 'Read case study'}</span>
+                            <span>→</span>
+                          </a>
+                        </div>
+                      )}
+                      <div class="mobile-station-conns mt-3 pt-2 border-t border-(--ink-faint)/20">
+                        <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5">⇄ Cross-Line Connections:</div>
+                        <div class="mobile-conns-list flex flex-wrap gap-1.5" data-source-id={s.id}></div>
+                      </div>
                     </div>
-                    <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.sub}</div>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -731,7 +665,7 @@ const lineTracks = [
       {/* Dynamic Cross-Line Connections Layer */}
       <g id="cross-connections-layer"></g>
 
-      {/* Stations: node on the line, clean logo, name, and year */}
+      {/* Stations: node on the line, clean name, and year (Logos removed for maximum clarity) */}
       {
         stations.map((s) => {
           return (
@@ -752,7 +686,7 @@ const lineTracks = [
               {/* Station Name Label */}
               <text
                 x={s.x}
-                y={s.y - 38}
+                y={s.y - 34}
                 class="route-label pointer-events-none"
                 text-anchor="middle"
                 fill="var(--ink)"
@@ -767,7 +701,7 @@ const lineTracks = [
               {/* Station Sub / Year Label */}
               <text
                 x={s.x}
-                y={s.y - 20}
+                y={s.y - 18}
                 class="route-label pointer-events-none"
                 text-anchor="middle"
                 fill="var(--ink-faint)"
@@ -778,19 +712,6 @@ const lineTracks = [
               >
                 {s.sub}
               </text>
-
-              {/* Company logo (if present, placed below track) */}
-              {s.company && (
-                <image
-                  href={`/images/logos/${s.company}.png`}
-                  x={s.x - LOGO_W / 2}
-                  y={s.y + 16}
-                  width={LOGO_W}
-                  height={LOGO_H}
-                  preserveAspectRatio="xMidYMid meet"
-                  class="route-label pointer-events-none"
-                />
-              )}
             </g>
           );
         })
@@ -871,12 +792,6 @@ const lineTracks = [
     color: var(--ground);
     border-color: var(--ink);
   }
-
-  /* Active station row highlight in mobile directory */
-  :global(.mobile-list-station-btn.current-list-station) {
-    background: var(--surface) !important;
-    border-color: var(--ink) !important;
-  }
 </style>
 
 <script is:inline define:vars={{ stations, routeColors, lineNames }}>
@@ -885,12 +800,12 @@ const lineTracks = [
     dataMap[s.id] = s;
   });
 
-  // Cross-line curated connections graph linking craft, tech, and writing
+  // Cross-line curated connections graph
   const CONNECTIONS = {
     'flingblade': [
       {
         target: 'fifa-soccer',
-        reason: 'Game design theory & sports simulation architecture',
+        reason: 'Game design theory & simulation architecture',
         why: 'Taking game development from mechanics code into critical writing: sword physics in Unity on one side, EA Sports simulation history on the other.'
       },
       {
@@ -1228,33 +1143,32 @@ const lineTracks = [
     ]
   };
 
-  const inspector = document.getElementById('station-inspector');
-  const elTitle = document.getElementById('inspector-title');
-  const elRole = document.getElementById('inspector-role');
-  const elSummary = document.getElementById('inspector-summary');
-  const elTimeframe = document.getElementById('inspector-timeframe');
-  const elBullet = document.getElementById('inspector-bullet');
-  const elLink = document.getElementById('inspector-link');
-  const elLinkText = document.getElementById('inspector-link-text');
-  const elLinkSecondary = document.getElementById('inspector-link-secondary');
-  const elLinkSecondaryText = document.getElementById('inspector-link-secondary-text');
-  const btnBack = document.getElementById('inspector-btn-back');
-  const transfersContainer = document.getElementById('inspector-transfers');
-  const transfersList = document.getElementById('inspector-transfers-list');
-  const logoBox = document.getElementById('inspector-logo');
-  const logoImgs = document.querySelectorAll('.logo-img');
+  const wrapper = document.getElementById('route-map-wrapper');
+  const popover = document.getElementById('route-popover');
+  const popBadge = document.getElementById('popover-badge');
+  const popTimeframe = document.getElementById('popover-timeframe');
+  const popTitle = document.getElementById('popover-title');
+  const popRole = document.getElementById('popover-role');
+  const popSummary = document.getElementById('popover-summary');
+  const popLinkPrimary = document.getElementById('popover-link-primary');
+  const popLinkText = document.getElementById('popover-link-text');
+  const popLinkSecondary = document.getElementById('popover-link-secondary');
+  const popLinkSecondaryText = document.getElementById('popover-link-secondary-text');
+  const popConnsSection = document.getElementById('popover-conns');
+  const popConnsList = document.getElementById('popover-conns-list');
+
   const nodes = document.querySelectorAll('.station-hit');
-  const listButtons = document.querySelectorAll('.mobile-list-station-btn');
   const connectionsLayer = document.getElementById('cross-connections-layer');
 
-  let currentId = 'sunadvantage';
-  let isInspectingConnection = false;
+  let activeStationId = null;
+  let isPinned = false;
+  let hideTimer = null;
 
   // Render cross-line connection paths in SVG
   function drawConnections(stationId) {
     if (!connectionsLayer) return;
     connectionsLayer.innerHTML = '';
-    document.querySelectorAll('.station-hit').forEach((el) => el.classList.remove('connected-target'));
+    nodes.forEach((el) => el.classList.remove('connected-target'));
 
     const conns = CONNECTIONS[stationId] || [];
     const sourceStation = dataMap[stationId];
@@ -1281,7 +1195,6 @@ const lineTracks = [
         pathD = `M ${sX} ${sY} C ${sX} ${midY}, ${tX} ${midY}, ${tX} ${tY}`;
       }
 
-      // Group containing hit path and visible dashed path
       const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       group.setAttribute('class', 'connection-group cursor-pointer');
 
@@ -1289,7 +1202,7 @@ const lineTracks = [
       const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       hitPath.setAttribute('d', pathD);
       hitPath.setAttribute('stroke', 'transparent');
-      hitPath.setAttribute('stroke-width', '18');
+      hitPath.setAttribute('stroke-width', '20');
       hitPath.setAttribute('fill', 'none');
 
       // Visible dashed animated connector
@@ -1304,23 +1217,25 @@ const lineTracks = [
       group.appendChild(hitPath);
       group.appendChild(visPath);
 
-      // Hover or tap on connection line displays relationship & allows reading both sides
+      // Hover / Click on connection line
       group.addEventListener('mouseenter', () => {
-        showConnectionDetails(sourceStation, targetStation, c);
+        clearTimeout(hideTimer);
         group.classList.add('active-connection');
+        const midPoint = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
+        showConnectionPopover(sourceStation, targetStation, c, midPoint);
       });
 
       group.addEventListener('mouseleave', () => {
         group.classList.remove('active-connection');
-        showStationDetails(currentId);
+        scheduleHide();
       });
 
       group.addEventListener('click', (e) => {
         e.stopPropagation();
-        showConnectionDetails(sourceStation, targetStation, c);
-        if (inspector) {
-          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+        isPinned = true;
+        group.classList.add('active-connection');
+        const midPoint = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
+        showConnectionPopover(sourceStation, targetStation, c, midPoint);
       });
 
       connectionsLayer.appendChild(group);
@@ -1332,225 +1247,237 @@ const lineTracks = [
     });
   }
 
-  // Populate connection view in top inspector
-  function showConnectionDetails(source, target, conn) {
-    isInspectingConnection = true;
+  function positionPopover(svgX, svgY) {
+    if (!wrapper || !popover) return;
+    const svg = wrapper.querySelector('svg');
+    if (!svg) return;
 
-    if (inspector) {
-      inspector.style.setProperty('--route', 'var(--cobalt)');
+    const svgRect = svg.getBoundingClientRect();
+    const wrapRect = wrapper.getBoundingClientRect();
+    const scale = svgRect.width / 1260;
+
+    const posX = (svgRect.left - wrapRect.left) + (svgX * scale);
+    const posY = (svgRect.top - wrapRect.top) + (svgY * scale);
+
+    const popW = Math.min(360, wrapRect.width - 24);
+    let left = posX - (popW / 2);
+    left = Math.max(12, Math.min(left, wrapRect.width - popW - 12));
+
+    let top;
+    if (svgY < 350) {
+      // Lines 1 & 2: show popover below station
+      top = posY + 32;
+    } else {
+      // Lines 3, 4, 5: show popover above station
+      top = Math.max(12, posY - 240);
     }
 
-    if (elBullet) {
-      elBullet.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white';
-      elBullet.textContent = '⇄ Cross-Line Connection';
-    }
-
-    if (elTimeframe) {
-      elTimeframe.textContent = `${source.label} (${source.routeName}) ⇄ ${target.label} (${target.routeName})`;
-    }
-
-    if (elTitle) {
-      elTitle.textContent = `${source.organization} ⇄ ${target.organization}`;
-    }
-
-    if (elRole) {
-      elRole.textContent = `Shared Context: ${conn.reason}`;
-    }
-
-    if (elSummary) {
-      elSummary.textContent = conn.why;
-    }
-
-    if (logoBox) {
-      logoBox.classList.add('hidden');
-    }
-
-    if (btnBack) {
-      btnBack.classList.remove('hidden');
-      btnBack.style.display = 'inline-flex';
-    }
-
-    // Configure Dual Action Links
-    if (elLink && elLinkText) {
-      if (source.link) {
-        elLink.style.display = 'inline-flex';
-        elLink.setAttribute('href', source.link);
-        elLinkText.textContent = `Read ${source.label}`;
-      } else {
-        elLink.style.display = 'none';
-      }
-    }
-
-    if (elLinkSecondary && elLinkSecondaryText) {
-      if (target.link) {
-        elLinkSecondary.classList.remove('hidden');
-        elLinkSecondary.style.display = 'inline-flex';
-        elLinkSecondary.setAttribute('href', target.link);
-        elLinkSecondaryText.textContent = `Read ${target.label}`;
-      } else {
-        elLinkSecondary.style.display = 'none';
-      }
-    }
+    popover.style.width = `${popW}px`;
+    popover.style.left = `${left}px`;
+    popover.style.top = `${top}px`;
+    popover.classList.remove('pointer-events-none', 'opacity-0');
+    popover.classList.add('pointer-events-auto', 'opacity-100');
+    popover.setAttribute('aria-hidden', 'false');
   }
 
-  // Populate standard station view in top inspector
-  function showStationDetails(stationId) {
-    isInspectingConnection = false;
+  function showStationPopover(stationId) {
+    clearTimeout(hideTimer);
     const s = dataMap[stationId];
-    if (!s) return;
+    if (!s || !popover) return;
 
-    if (inspector) {
-      inspector.style.setProperty('--route', routeColors[s.line]);
+    activeStationId = stationId;
+
+    if (popBadge) {
+      popBadge.className = `bullet bullet-${s.line} text-[11px] font-bold`;
+      popBadge.textContent = s.routeName;
     }
+    if (popTimeframe) popTimeframe.textContent = s.timeframe;
+    if (popTitle) popTitle.textContent = s.label;
+    if (popRole) popRole.textContent = `${s.organization} · ${s.role}`;
+    if (popSummary) popSummary.textContent = s.summary;
 
-    if (btnBack) {
-      btnBack.style.display = 'none';
-    }
-
-    if (elBullet) {
-      elBullet.className = `bullet bullet-${s.line} text-[11px] font-bold`;
-      elBullet.textContent = s.routeName;
-    }
-
-    if (elTimeframe) {
-      elTimeframe.textContent = s.timeframe;
-    }
-
-    if (elTitle) {
-      elTitle.textContent = s.organization;
-    }
-
-    if (elRole) {
-      elRole.textContent = s.role;
-    }
-
-    if (elSummary) {
-      elSummary.textContent = s.summary;
-    }
-
-    if (logoBox) {
-      logoBox.classList.toggle('hidden', !s.company);
-      logoImgs.forEach((img) => {
-        if (s.company && img.getAttribute('data-logo') === s.company) {
-          img.classList.remove('hidden');
-        } else {
-          img.classList.add('hidden');
-        }
-      });
-    }
-
-    if (elLink && elLinkText) {
+    if (popLinkPrimary && popLinkText) {
       if (s.link) {
-        elLink.style.display = 'inline-flex';
-        elLink.setAttribute('href', s.link);
-        elLinkText.textContent = s.linkLabel || 'Read case study';
+        popLinkPrimary.style.display = 'inline-flex';
+        popLinkPrimary.setAttribute('href', s.link);
+        popLinkText.textContent = s.linkLabel || 'Read case study';
       } else {
-        elLink.style.display = 'none';
+        popLinkPrimary.style.display = 'none';
       }
     }
 
-    if (elLinkSecondary) {
-      elLinkSecondary.style.display = 'none';
-    }
+    if (popLinkSecondary) popLinkSecondary.style.display = 'none';
 
-    // Render interactive connection pills
+    // Populate connected stations pills
     const conns = CONNECTIONS[stationId] || [];
-    if (transfersContainer && transfersList) {
+    if (popConnsSection && popConnsList) {
       if (conns.length > 0) {
-        transfersContainer.classList.remove('hidden');
-        transfersList.innerHTML = '';
+        popConnsSection.style.display = 'block';
+        popConnsList.innerHTML = '';
         conns.forEach((c) => {
           const target = dataMap[c.target];
           if (!target) return;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'conn-pill px-3 py-1.5 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt) flex items-center gap-2';
-          btn.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}: ${c.reason}</span>`;
-          
-          btn.addEventListener('mouseenter', () => {
-            showConnectionDetails(s, target, c);
-          });
-          btn.addEventListener('mouseleave', () => {
-            showStationDetails(currentId);
-          });
+          btn.className = 'px-2 py-0.5 border border-(--ink) font-mono text-[10px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
+          btn.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}</span>`;
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            showConnectionDetails(s, target, c);
-            if (inspector) {
-              inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
+            showStationPopover(target.id);
+            drawConnections(target.id);
           });
-          transfersList.appendChild(btn);
+          popConnsList.appendChild(btn);
         });
       } else {
-        transfersContainer.classList.add('hidden');
+        popConnsSection.style.display = 'none';
       }
     }
-  }
-
-  function setCurrent(stationId) {
-    const s = dataMap[stationId];
-    if (!s) return;
-    currentId = stationId;
 
     nodes.forEach((n) => {
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
 
-    listButtons.forEach((btn) => {
-      btn.classList.toggle('current-list-station', btn.getAttribute('data-station-id') === stationId);
-    });
+    drawConnections(stationId);
+    positionPopover(s.x, s.y);
+  }
 
-    const figure = document.getElementById('route-map-figure');
-    if (figure && window.innerWidth < 768) {
-      const scale = figure.scrollWidth / 1260;
-      const targetScrollLeft = (s.x * scale) - (figure.clientWidth / 2);
-      figure.scrollTo({ left: Math.max(0, targetScrollLeft), behavior: 'smooth' });
+  function showConnectionPopover(source, target, conn, midPoint) {
+    clearTimeout(hideTimer);
+    if (!popover) return;
+
+    if (popBadge) {
+      popBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white';
+      popBadge.textContent = '⇄ Cross-Line Connection';
+    }
+    if (popTimeframe) popTimeframe.textContent = `${source.label} ⇄ ${target.label}`;
+    if (popTitle) popTitle.textContent = `${source.label} ⇄ ${target.label}`;
+    if (popRole) popRole.textContent = `Shared Context: ${conn.reason}`;
+    if (popSummary) popSummary.textContent = conn.why;
+
+    if (popLinkPrimary && popLinkText) {
+      if (source.link) {
+        popLinkPrimary.style.display = 'inline-flex';
+        popLinkPrimary.setAttribute('href', source.link);
+        popLinkText.textContent = `Read ${source.label}`;
+      } else {
+        popLinkPrimary.style.display = 'none';
+      }
     }
 
-    drawConnections(stationId);
-    showStationDetails(stationId);
+    if (popLinkSecondary && popLinkSecondaryText) {
+      if (target.link) {
+        popLinkSecondary.classList.remove('hidden');
+        popLinkSecondary.style.display = 'inline-flex';
+        popLinkSecondary.setAttribute('href', target.link);
+        popLinkSecondaryText.textContent = `Read ${target.label}`;
+      } else {
+        popLinkSecondary.style.display = 'none';
+      }
+    }
+
+    if (popConnsSection) popConnsSection.style.display = 'none';
+
+    positionPopover(midPoint.x, midPoint.y);
   }
 
-  if (btnBack) {
-    btnBack.addEventListener('click', () => {
-      showStationDetails(currentId);
-    });
+  function scheduleHide() {
+    if (isPinned) return;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (!isPinned && popover) {
+        popover.classList.add('opacity-0', 'pointer-events-none');
+        popover.classList.remove('pointer-events-auto', 'opacity-100');
+        popover.setAttribute('aria-hidden', 'true');
+        if (connectionsLayer) connectionsLayer.innerHTML = '';
+        nodes.forEach((n) => {
+          n.classList.remove('current-station', 'connected-target');
+        });
+      }
+    }, 250);
   }
 
-  // Hover & selection listeners on desktop station nodes
+  if (popover) {
+    popover.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+    popover.addEventListener('mouseleave', scheduleHide);
+  }
+
+  // Station node event listeners
   nodes.forEach((n) => {
     const sid = n.getAttribute('data-station-id');
     if (!sid) return;
 
     n.addEventListener('mouseenter', () => {
-      drawConnections(sid);
-      showStationDetails(sid);
+      if (!isPinned) showStationPopover(sid);
     });
 
-    n.addEventListener('mouseleave', () => {
-      if (!isInspectingConnection) {
-        drawConnections(currentId);
-        showStationDetails(currentId);
-      }
+    n.addEventListener('mouseleave', scheduleHide);
+
+    n.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isPinned = true;
+      showStationPopover(sid);
     });
 
-    n.addEventListener('focus', () => setCurrent(sid));
-    n.addEventListener('click', () => setCurrent(sid));
     n.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        setCurrent(sid);
+        isPinned = true;
+        showStationPopover(sid);
       }
     });
   });
 
-  // Mobile View Switcher (List Directory vs Map)
+  // Clicking outside dismisses pinned popover
+  document.addEventListener('click', (e) => {
+    if (popover && !popover.contains(e.target) && !e.target.closest('.station-hit')) {
+      isPinned = false;
+      scheduleHide();
+    }
+  });
+
+  // Mobile Accordion Directory handling
+  document.querySelectorAll('.mobile-station-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const parent = btn.closest('.mobile-station-accordion');
+      const drawer = parent ? parent.querySelector('.mobile-station-drawer') : null;
+      if (!drawer) return;
+
+      const isExpanded = !drawer.classList.contains('hidden');
+
+      // Close all other drawers
+      document.querySelectorAll('.mobile-station-drawer').forEach((d) => d.classList.add('hidden'));
+
+      if (!isExpanded) {
+        drawer.classList.remove('hidden');
+        const sid = btn.getAttribute('data-station-id');
+        const connsContainer = drawer.querySelector('.mobile-conns-list');
+        if (connsContainer && sid) {
+          const conns = CONNECTIONS[sid] || [];
+          connsContainer.innerHTML = '';
+          if (conns.length === 0) {
+            drawer.querySelector('.mobile-station-conns').style.display = 'none';
+          } else {
+            drawer.querySelector('.mobile-station-conns').style.display = 'block';
+            conns.forEach((c) => {
+              const target = dataMap[c.target];
+              if (!target) return;
+              const pill = document.createElement('a');
+              pill.href = target.link || '#';
+              pill.className = 'px-2 py-1 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
+              pill.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}: ${c.reason}</span>`;
+              connsContainer.appendChild(pill);
+            });
+          }
+        }
+      }
+    });
+  });
+
+  // Mobile View Switcher (List vs Map)
   const btnMap = document.getElementById('mobile-view-map');
   const btnList = document.getElementById('mobile-view-list');
   const mapView = document.getElementById('route-map-figure');
   const listView = document.getElementById('mobile-station-list-view');
-  const quickStations = document.getElementById('mobile-quick-stations');
   const panHint = document.getElementById('mobile-pan-hint');
 
   if (btnMap && btnList && mapView && listView) {
@@ -1558,7 +1485,6 @@ const lineTracks = [
       btnMap.classList.add('active');
       btnList.classList.remove('active');
       mapView.classList.remove('hidden');
-      if (quickStations) quickStations.classList.remove('hidden');
       if (panHint) panHint.classList.remove('hidden');
       listView.classList.add('hidden');
     });
@@ -1567,37 +1493,8 @@ const lineTracks = [
       btnList.classList.add('active');
       btnMap.classList.remove('active');
       mapView.classList.add('hidden');
-      if (quickStations) quickStations.classList.add('hidden');
       if (panHint) panHint.classList.add('hidden');
       listView.classList.remove('hidden');
     });
   }
-
-  // Mobile quick chips & mobile list buttons
-  document.querySelectorAll('[data-target-station]').forEach((chip) => {
-    chip.addEventListener('click', () => {
-      const sid = chip.getAttribute('data-target-station');
-      if (sid) {
-        setCurrent(sid);
-        if (inspector) {
-          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }
-    });
-  });
-
-  document.querySelectorAll('.mobile-list-station-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const sid = btn.getAttribute('data-station-id');
-      if (sid) {
-        setCurrent(sid);
-        if (inspector) {
-          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      }
-    });
-  });
-
-  // Default current station: SunAdvantage
-  setCurrent('sunadvantage');
 </script>
