@@ -495,6 +495,14 @@ const routeColors: Record<number, string> = {
   4: 'var(--line-4)',
   5: 'var(--line-5)',
 };
+
+const lineNames: Record<number, string> = {
+  1: 'Line 1 · Strategy',
+  2: 'Line 2 · AI Tools',
+  3: 'Line 3 · Startup',
+  4: 'Line 4 · Data',
+  5: 'Line 5 · Earlier',
+};
 ---
 
 <div class="route-map-container my-4">
@@ -579,7 +587,101 @@ const routeColors: Record<number, string> = {
     </div>
   </div>
 
-  <figure class="my-0 overflow-x-auto" aria-label="Career transit route diagram">
+  <!-- Mobile View Switcher: Map View vs Station List View -->
+  <div class="block md:hidden mb-4">
+    <div class="flex items-center justify-between gap-3 border-2 border-(--ink) bg-(--ground) p-2 mb-2.5">
+      <div class="label text-[11px] font-bold text-(--ink) flex items-center gap-1.5">
+        <span class="inline-block h-2 w-2 rounded-full bg-(--cobalt)"></span>
+        <span>TRANSIT VIEW</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <button
+          type="button"
+          id="mobile-view-map"
+          class="mobile-view-tab active px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
+        >
+          Track Map
+        </button>
+        <button
+          type="button"
+          id="mobile-view-list"
+          class="mobile-view-tab px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
+        >
+          Station List
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile quick jump pills (Map Mode) -->
+    <div id="mobile-quick-stations" class="overflow-x-auto pb-1 flex items-center gap-2 text-[12px]">
+      <span class="label text-[11px] text-(--ink-faint) shrink-0 uppercase">Jump:</span>
+      {
+        [
+          { id: 'sunadvantage', name: 'Sun Life' },
+          { id: 'smartsyllabus', name: 'SmartSyllabus' },
+          { id: 'otpp', name: 'OTPP' },
+          { id: 'dyedurham', name: 'Dye & Durham' },
+          { id: 'uoft', name: 'U of T' },
+          { id: 'personal-ai-os', name: 'AI OS' },
+          { id: 'bikeshare', name: 'Bikeshare' },
+        ].map((s) => (
+          <button
+            type="button"
+            class="mobile-station-chip shrink-0 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) text-[11px] font-mono font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt)"
+            data-target-station={s.id}
+          >
+            {s.name}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Mobile Vertical Station List View -->
+  <div id="mobile-station-list-view" class="hidden md:hidden border-2 border-(--ink) bg-(--ground) mb-6">
+    <div class="bg-[#0B0E12] px-3.5 py-2 text-[#F2B705] font-mono text-[11px] font-bold tracking-wider uppercase flex items-center justify-between">
+      <span>STATION DIRECTORY · TAP TO INSPECT</span>
+      <span>5 ROUTES</span>
+    </div>
+    <div class="divide-y-2 divide-(--ink)">
+      {
+        [1, 2, 3, 4, 5].map((lineNum) => {
+          const lineStations = stations.filter((s) => s.line === lineNum);
+          return (
+            <div class="p-3">
+              <div class="flex items-center gap-2 mb-2">
+                <span class={`bullet bullet-${lineNum} text-[11px] font-bold`}>
+                  {lineNames[lineNum]}
+                </span>
+                <span class="label text-[11px] text-(--ink-faint)">{lineStations.length} stops</span>
+              </div>
+              <div class="grid grid-cols-1 gap-1.5 pl-2 border-l-2" style={`border-color: ${routeColors[lineNum]}`}>
+                {lineStations.map((s) => (
+                  <button
+                    type="button"
+                    class="mobile-list-station-btn text-left p-2 transition-colors hover:bg-(--surface) flex items-center justify-between gap-3"
+                    data-station-id={s.id}
+                  >
+                    <div class="min-w-0">
+                      <div class="font-mono text-[13px] font-bold text-(--ink) truncate">{s.label}</div>
+                      <div class="text-[12px] text-(--ink-muted) truncate">{s.organization}</div>
+                    </div>
+                    <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.timeframe.split('–')[0].trim()}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+
+  <div id="mobile-pan-hint" class="block md:hidden text-center py-2 bg-(--surface) border-t-2 border-b-2 border-(--ink) font-mono text-[11px] font-bold text-(--ink) uppercase tracking-wide mb-2">
+    ⇄ Pan track horizontally to explore stations
+  </div>
+
+  <figure id="route-map-figure" class="my-0 overflow-x-auto" aria-label="Career transit route diagram">
     <svg viewBox="0 0 1240 800" class="w-full min-w-[1040px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Line 5 · earlier work. Enters from the left edge, terminates at 780. -->
       <path
@@ -631,8 +733,9 @@ const routeColors: Record<number, string> = {
               role="button"
               aria-label={`Station: ${s.label}, ${s.organization}`}
             >
-              {/* Station Node on Track: Black inner dot appears on the active/current station */}
+              {/* Station Node on Track: Enlarge touch target + node ring + center dot */}
               <g class="route-station" style={`animation-delay:${s.delay}ms; transform-origin:${s.x}px ${s.y}px`}>
+                <circle cx={s.x} cy={s.y} r="28" fill="transparent" class="node-hit-pad" />
                 <circle cx={s.x} cy={s.y} r="14" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="7" class="node-ring" />
                 <circle cx={s.x} cy={s.y} r="5" fill="var(--ink)" class="node-center-dot" />
               </g>
@@ -775,6 +878,20 @@ const routeColors: Record<number, string> = {
       color: #FFC933;
     }
   }
+
+  .mobile-view-tab {
+    border: 2px solid var(--ink);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .mobile-view-tab.active {
+    background: var(--ink);
+    color: var(--ground);
+  }
+  .mobile-list-station-btn:focus-visible {
+    outline: 3px solid var(--cobalt);
+    outline-offset: 2px;
+  }
 </style>
 
 <script is:inline define:vars={{ stations }}>
@@ -915,6 +1032,14 @@ const routeColors: Record<number, string> = {
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
 
+    // Auto center station on mobile in figure if in map view
+    const figure = document.getElementById('route-map-figure');
+    if (figure && window.innerWidth < 768) {
+      const scale = figure.scrollWidth / 1240;
+      const targetScrollLeft = (s.x * scale) - (figure.clientWidth / 2);
+      figure.scrollTo({ left: Math.max(0, targetScrollLeft), behavior: 'smooth' });
+    }
+
     triggerArrivalTransition();
     updateInspector(stationId);
   }
@@ -929,6 +1054,54 @@ const routeColors: Record<number, string> = {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         setCurrent(sid);
+      }
+    });
+  });
+
+  // Mobile View Switcher (Map vs List)
+  const btnMap = document.getElementById('mobile-view-map');
+  const btnList = document.getElementById('mobile-view-list');
+  const mapView = document.getElementById('route-map-figure');
+  const listView = document.getElementById('mobile-station-list-view');
+  const quickStations = document.getElementById('mobile-quick-stations');
+  const panHint = document.getElementById('mobile-pan-hint');
+
+  if (btnMap && btnList && mapView && listView) {
+    btnMap.addEventListener('click', () => {
+      btnMap.classList.add('active');
+      btnList.classList.remove('active');
+      mapView.classList.remove('hidden');
+      if (quickStations) quickStations.classList.remove('hidden');
+      if (panHint) panHint.classList.remove('hidden');
+      listView.classList.add('hidden');
+    });
+
+    btnList.addEventListener('click', () => {
+      btnList.classList.add('active');
+      btnMap.classList.remove('active');
+      mapView.classList.add('hidden');
+      if (quickStations) quickStations.classList.add('hidden');
+      if (panHint) panHint.classList.add('hidden');
+      listView.classList.remove('hidden');
+    });
+  }
+
+  // Mobile quick chips & mobile list buttons
+  document.querySelectorAll('[data-target-station]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      const sid = chip.getAttribute('data-target-station');
+      if (sid) setCurrent(sid);
+    });
+  });
+
+  document.querySelectorAll('.mobile-list-station-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sid = btn.getAttribute('data-station-id');
+      if (sid) {
+        setCurrent(sid);
+        if (inspector) {
+          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
     });
   });

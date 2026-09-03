@@ -300,6 +300,22 @@
     border: 2px solid var(--ink);
     background: var(--ground);
     border-radius: 0;
+    transition: max-height 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #inspector.collapsed {
+    max-height: 44px !important;
+  }
+  #inspector.collapsed #insp-body {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    #inspector {
+      left: 12px;
+      bottom: 12px;
+      width: calc(100vw - 24px);
+      max-height: 52vh;
+    }
   }
 
   #insp-head {
@@ -310,6 +326,30 @@
     padding: 8px 12px;
     background: var(--ink);
     color: var(--ground);
+    cursor: pointer;
+    user-select: none;
+  }
+  .insp-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 1px solid var(--ground);
+    background: transparent;
+    color: var(--ground);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 2px 8px;
+    line-height: 1.4;
+    transition: background 120ms ease, color 120ms ease;
+  }
+  .insp-toggle-btn:hover {
+    background: var(--ground);
+    color: var(--ink);
   }
   #insp-kicker { color: var(--ground); }
   #insp-strength { color: var(--ground); opacity: 0.75; }
@@ -454,8 +494,19 @@
 
 <section id="inspector" aria-live="polite">
   <div id="insp-head">
-    <span id="insp-kicker" class="label">Node</span>
-    <span id="insp-strength" class="label"></span>
+    <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+      <span id="insp-kicker" class="label">Node</span>
+      <span id="insp-strength" class="label"></span>
+    </div>
+    <button
+      type="button"
+      id="insp-toggle"
+      class="insp-toggle-btn"
+      aria-expanded="true"
+      aria-label="Toggle inspector details"
+    >
+      <span id="insp-toggle-label">Hide</span>
+    </button>
   </div>
   <div id="insp-body"></div>
 </section>
@@ -1014,6 +1065,38 @@
   var kicker = document.getElementById('insp-kicker');
   var strengthEl = document.getElementById('insp-strength');
   var bodyEl = document.getElementById('insp-body');
+  var inspectorEl = document.getElementById('inspector');
+  var inspToggleBtn = document.getElementById('insp-toggle');
+  var inspToggleLabel = document.getElementById('insp-toggle-label');
+  var inspHead = document.getElementById('insp-head');
+
+  function toggleInspector(forceOpen) {
+    if (!inspectorEl) return;
+    var willOpen = forceOpen !== undefined ? forceOpen : inspectorEl.classList.contains('collapsed');
+    if (willOpen) {
+      inspectorEl.classList.remove('collapsed');
+      if (inspToggleBtn) inspToggleBtn.setAttribute('aria-expanded', 'true');
+      if (inspToggleLabel) inspToggleLabel.textContent = 'Hide';
+    } else {
+      inspectorEl.classList.add('collapsed');
+      if (inspToggleBtn) inspToggleBtn.setAttribute('aria-expanded', 'false');
+      if (inspToggleLabel) inspToggleLabel.textContent = 'Open';
+    }
+  }
+
+  if (inspToggleBtn) {
+    inspToggleBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      toggleInspector();
+    });
+  }
+  if (inspHead) {
+    inspHead.addEventListener('click', function (e) {
+      if (e.target !== inspToggleBtn && !inspToggleBtn.contains(e.target)) {
+        toggleInspector();
+      }
+    });
+  }
 
   function dot(route) {
     return '<span class="rowdot" style="background: var(--line-' + route + ')"></span>';
@@ -1028,6 +1111,7 @@
   }
 
   function selectNode(id) {
+    toggleInspector(true);
     activeId = id; activeLink = null;
     var n = byId[id];
     var mine = linksFor(id);
@@ -1055,6 +1139,7 @@
   }
 
   function selectLink(l) {
+    toggleInspector(true);
     activeLink = l; activeId = null;
     var a = byId[l.a], b = byId[l.b];
 
@@ -1246,6 +1331,9 @@
     activeId = null; activeLink = null;
     kicker.textContent = 'How to read this';
     strengthEl.textContent = NODES.length + ' nodes';
+    if (window.innerWidth <= 640) {
+      toggleInspector(false);
+    }
     bodyEl.innerHTML =
       '<h2 id="insp-title">The work as a network</h2>' +
       '<p id="insp-blurb">Every project is a solid, coloured by its route. Two projects are pulled together by how much they actually share, so the closest pairs end up intersecting. A cobalt ring marks the seam where that happens.</p>' +
