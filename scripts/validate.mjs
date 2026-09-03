@@ -19,13 +19,13 @@ const APPROVED_HEX = new Set(
     // light
     'F4F4F2', 'E9E9E6', '0B0E12', '535A63', '7A828C', 'D3D3CE',
     // routes, light
-    '1B44D9', 'F2B705', 'D6246E', '00875A',
+    '1B44D9', 'F2B705', 'D6246E', '00875A', '7A3EB0',
     // text-safe route variants
     '1739B4', '6B5000', 'B81A5B', '006B47',
     // dark
     '0D1014', '1A1F26', 'EDEFF2', '9AA3AE', '727C88', '2A313A',
     // routes, dark
-    '6E90FF', 'FFC933', 'FF6FA3', '3FCC94', '8B95A1', '8FA9FF',
+    '6E90FF', 'FFC933', 'FF6FA3', '3FCC94', '8B95A1', '8FA9FF', 'B77BE8',
     // neutral
     'FFFFFF', 'FFF', '000000', '000',
   ].map((h) => h.toUpperCase()),

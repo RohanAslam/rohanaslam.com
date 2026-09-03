@@ -430,7 +430,7 @@ Number opener. Contractions. Plain statement of the work. A concrete admission t
   --line-2: #F2B705;  /* ai-tools     */
   --line-3: #D6246E;  /* startup      */
   --line-4: #00875A;  /* data         */
-  --line-5: #7A828C;  /* earlier-work */
+  --line-5: #7A3EB0;  /* earlier-work and writing */
 
   /* Text-safe route variants, for the rare case a route name must be text */
   --line-1-text: #1739B4;
@@ -479,7 +479,7 @@ Number opener. Contractions. Plain statement of the work. A concrete admission t
     --line-2: #FFC933;
     --line-3: #FF6FA3;
     --line-4: #3FCC94;
-    --line-5: #8B95A1;
+    --line-5: #B77BE8;
 
     --cobalt: #6E90FF;
     --cobalt-hover: #8FA9FF;

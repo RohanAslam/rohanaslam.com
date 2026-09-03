@@ -64,7 +64,7 @@ Fixed tag to route mapping. A project's route comes from its **first tag**, and 
 | `ai-tools` | Line 2 | `--line-2` | amber |
 | `startup` | Line 3 | `--line-3` | rose |
 | `data` | Line 4 | `--line-4` | green |
-| `earlier-work` | Line 5 | `--line-5` | grey |
+| `earlier-work` | Line 5 | `--line-5` | purple |
 
 Full spec, including every contrast ratio, is in DESIGN.md.
 

@@ -11,9 +11,7 @@ const groups = [
           'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own job downtown.',
         date: 'December 2025',
         file: 'dear-go-train.pdf',
-        logo: '/images/writing/go-transit.png',
-        route: 'var(--line-4)',
-        bulletClass: 'bullet-4',
+        image: '/images/writing/go-train.png',
         category: 'Transit & Place',
       },
     ],
@@ -27,9 +25,7 @@ const groups = [
           "Why a game with a $100,000 budget deserves classic status, argued through what it started rather than how it played.",
         date: 'April 2026',
         file: 'fifa-international-soccer.pdf',
-        logo: '/images/writing/ea-fifa.png',
-        route: 'var(--line-1)',
-        bulletClass: 'bullet-1',
+        image: '/images/writing/soccer-ball.png',
         category: 'Game Design',
       },
       {
@@ -38,9 +34,7 @@ const groups = [
           'How copyright law and weak open access policy let publishers profit from research the public already paid for, plus the reforms that would fix it.',
         date: 'March 2026',
         file: 'intellectual-property-rights.pdf',
-        logo: '/images/writing/open-access.png',
-        route: 'var(--line-3)',
-        bulletClass: 'bullet-3',
+        image: '/images/writing/canada-map.png',
         category: 'Policy & Law',
       },
       {
@@ -49,9 +43,7 @@ const groups = [
           'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable phone have in common.',
         date: 'August 2025',
         file: 'repairability-and-politics-of-infrastructure.pdf',
-        logo: '/images/writing/repair-infra.png',
-        route: 'var(--line-2)',
-        bulletClass: 'bullet-2',
+        image: '/images/writing/ttc-tracks.png',
         category: 'Infrastructure',
       },
       {
@@ -60,9 +52,7 @@ const groups = [
           "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it doesn't.",
         date: 'August 2025',
         file: 'chinese-room-argument.pdf',
-        logo: '/images/writing/chinese-room.png',
-        route: 'var(--line-1)',
-        bulletClass: 'bullet-1',
+        image: '/images/writing/chinese-room.png',
         category: 'Philosophy of AI',
       },
     ],
@@ -76,9 +66,7 @@ const groups = [
           'Zoom and Slack sold freedom from the office. What they actually built was a circuit that never turns off.',
         date: 'October 2025',
         file: 'work-collaboration-software.pdf',
-        logo: '/images/writing/slack-zoom.png',
-        route: 'var(--line-2)',
-        bulletClass: 'bullet-2',
+        image: '/images/writing/slack.png',
         category: 'Workplace Tech',
       },
       {
@@ -87,9 +75,7 @@ const groups = [
           'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built community that online play never could.',
         date: 'November 2025',
         file: 'close-playing-analysis.pdf',
-        logo: '/images/writing/halo-splitscreen.png',
-        route: 'var(--line-3)',
-        bulletClass: 'bullet-3',
+        image: '/images/writing/halo-chief.png',
         category: 'Game Culture',
       },
     ],
@@ -122,24 +108,29 @@ const groups = [
                 target="_blank"
                 rel="noopener noreferrer"
                 class="station-card group transition-all"
-                style={`--route: ${item.route};`}
+                style="--route: var(--line-5);"
               >
-                <div class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5">
-                  <div class="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-2">
-                    <img src={item.logo} alt="" width={64} height={64} class="h-full w-full object-contain" />
-                  </div>
+                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="label flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
-                      <span class={`bullet ${item.bulletClass} text-[11px] font-bold`}>{item.category}</span>
+                      <span class="bullet bullet-5 text-[11px] font-bold">{item.category}</span>
                       <span class="tag text-[11px] font-bold">PDF</span>
                       <span class="text-(--ink-faint)">{item.date}</span>
                     </div>
                     <h3 class="mt-2 text-[20px] sm:text-[22px] font-bold leading-snug text-(--ink) transition-colors group-hover:text-(--cobalt)">
                       {item.title}
                     </h3>
-                    <p class="mt-2 max-w-[85ch] text-[15px] leading-relaxed text-(--ink-muted)">
+                    <p class="mt-2 max-w-[75ch] text-[15px] leading-relaxed text-(--ink-muted)">
                       {item.blurb}
                     </p>
+                  </div>
+                  <div class="flex shrink-0 items-center justify-center sm:self-center">
+                    <img
+                      src={item.image}
+                      alt=""
+                      class="h-16 w-16 sm:h-20 sm:w-20 object-contain transition-transform duration-200 group-hover:scale-105"
+                      loading="lazy"
+                    />
                   </div>
                 </div>
               </a>
