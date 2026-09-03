@@ -12,6 +12,11 @@
  * Hovering or clicking any station draws smooth SVG transit connectors
  * across lines. Hovering over a connection line reveals the relationship
  * and allows reading more about both sides of the work.
+ *
+ * Mobile:
+ * On smaller viewports, provides an advisory note to view on desktop for the full
+ * animated visualization, alongside a streamlined mobile station directory
+ * and interactive cross-line relationship explorer.
  */
 
 const TRACK_START_X = 60;
@@ -473,6 +478,17 @@ const lineTracks = [
 ---
 
 <div class="route-map-container my-4">
+  <!-- Mobile Advisory Notice (Only displayed on mobile viewports) -->
+  <aside class="block md:hidden mb-4 border-2 border-(--ink) bg-(--surface) p-3" aria-label="Viewing recommendation">
+    <div class="flex items-start gap-2.5">
+      <span class="font-mono text-[13px] font-bold text-(--cobalt) shrink-0 mt-0.5">ℹ</span>
+      <div class="font-mono text-[11px] leading-relaxed text-(--ink)">
+        <span class="font-bold uppercase tracking-wider block mb-0.5">Desktop Recommended</span>
+        For the best viewing experience of this interactive visualization and animated cross-line tracks, please view on desktop.
+      </div>
+    </div>
+  </aside>
+
   <!-- Unified Top Inspector Card -->
   <div
     id="station-inspector"
@@ -486,8 +502,16 @@ const lineTracks = [
         <span id="inspector-timeframe" class="font-mono text-[12px] text-(--ink-faint)">Sep 2026 – Present (Full Time)</span>
       </div>
 
-      <!-- Action buttons: Primary link and dual secondary link for connections -->
+      <!-- Action buttons: Primary link, dual secondary link for connections, and return button -->
       <div class="flex items-center gap-2">
+        <button
+          type="button"
+          id="inspector-btn-back"
+          class="hidden items-center gap-1 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--ink) hover:text-(--ground)"
+        >
+          ← Back
+        </button>
+
         <a
           id="inspector-link"
           href="/work/sunlife-digital-transformation"
@@ -541,7 +565,7 @@ const lineTracks = [
         <div id="inspector-transfers" class="mt-4 pt-3 border-t border-(--ink-faint)/20">
           <div class="label text-[11px] font-bold text-(--ink) mb-2 flex items-center gap-1.5">
             <span class="inline-block h-1.5 w-1.5 rounded-full bg-(--cobalt)"></span>
-            <span>CROSS-LINE CONNECTIONS · HOVER OR CLICK TO EXPLORE RELATION:</span>
+            <span>CROSS-LINE CONNECTIONS · TAP TO EXPLORE RELATION:</span>
           </div>
           <div id="inspector-transfers-list" class="flex flex-wrap gap-2">
             <!-- Populated dynamically via JS -->
@@ -551,32 +575,32 @@ const lineTracks = [
     </div>
   </div>
 
-  <!-- Mobile View Switcher: Map View vs Station List View -->
+  <!-- Mobile View Switcher: Line Directory vs Track Map -->
   <div class="block md:hidden mb-4">
     <div class="flex items-center justify-between gap-3 border-2 border-(--ink) bg-(--ground) p-2 mb-2.5">
       <div class="label text-[11px] font-bold text-(--ink) flex items-center gap-1.5">
         <span class="inline-block h-2 w-2 rounded-full bg-(--cobalt)"></span>
-        <span>TRANSIT VIEW</span>
+        <span>MOBILE VIEW</span>
       </div>
       <div class="flex items-center gap-1">
         <button
           type="button"
-          id="mobile-view-map"
+          id="mobile-view-list"
           class="mobile-view-tab active px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
         >
-          Track Map
+          Station Directory
         </button>
         <button
           type="button"
-          id="mobile-view-list"
+          id="mobile-view-map"
           class="mobile-view-tab px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
         >
-          Station List
+          Pan Track Map
         </button>
       </div>
     </div>
 
-    <!-- Mobile quick jump pills (Map Mode) -->
+    <!-- Mobile quick jump pills -->
     <div id="mobile-quick-stations" class="overflow-x-auto pb-1 flex items-center gap-2 text-[12px]">
       <span class="label text-[11px] text-(--ink-faint) shrink-0 uppercase">Jump:</span>
       {
@@ -601,10 +625,10 @@ const lineTracks = [
     </div>
   </div>
 
-  <!-- Mobile Vertical Station List View -->
-  <div id="mobile-station-list-view" class="hidden md:hidden border-2 border-(--ink) bg-(--ground) mb-6">
+  <!-- Mobile Vertical Station Directory View (Default on mobile for maximum readability) -->
+  <div id="mobile-station-list-view" class="block md:hidden border-2 border-(--ink) bg-(--ground) mb-6">
     <div class="bg-[#0B0E12] px-3.5 py-2 text-[#F2B705] font-mono text-[11px] font-bold tracking-wider uppercase flex items-center justify-between">
-      <span>STATION DIRECTORY · TAP TO INSPECT</span>
+      <span>ROUTE DIRECTORY · TAP STATION TO INSPECT</span>
       <span>5 ROUTES</span>
     </div>
     <div class="divide-y-2 divide-(--ink)">
@@ -613,7 +637,7 @@ const lineTracks = [
           const lineStations = stations.filter((s) => s.line === lineNum);
           return (
             <div class="p-3">
-              <div class="flex items-center gap-2 mb-2">
+              <div class="flex items-center justify-between gap-2 mb-2">
                 <span
                   class="font-mono text-[11px] font-bold px-2 py-0.5"
                   style={`background: ${routeColors[lineNum]}; color: ${routeTextColors[lineNum]}`}
@@ -626,14 +650,16 @@ const lineTracks = [
                 {lineStations.map((s) => (
                   <button
                     type="button"
-                    class="mobile-list-station-btn text-left p-2 transition-colors hover:bg-(--surface) flex items-center justify-between gap-3"
+                    class="mobile-list-station-btn text-left p-2.5 border border-transparent transition-colors hover:bg-(--surface) flex items-center justify-between gap-3"
                     data-station-id={s.id}
                   >
                     <div class="min-w-0">
-                      <div class="font-mono text-[13px] font-bold text-(--ink) truncate">{s.label}</div>
+                      <div class="font-mono text-[13px] font-bold text-(--ink) truncate flex items-center gap-1.5">
+                        <span>{s.label}</span>
+                      </div>
                       <div class="text-[12px] text-(--ink-muted) truncate">{s.organization}</div>
                     </div>
-                    <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.timeframe.split('–')[0].trim()}</div>
+                    <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.sub}</div>
                   </button>
                 ))}
               </div>
@@ -644,12 +670,12 @@ const lineTracks = [
     </div>
   </div>
 
-  <div id="mobile-pan-hint" class="block md:hidden text-center py-2 bg-(--surface) border-t-2 border-b-2 border-(--ink) font-mono text-[11px] font-bold text-(--ink) uppercase tracking-wide mb-2">
+  <div id="mobile-pan-hint" class="hidden text-center py-2 bg-(--surface) border-t-2 border-b-2 border-(--ink) font-mono text-[11px] font-bold text-(--ink) uppercase tracking-wide mb-2">
     ⇄ Pan track horizontally to explore stations
   </div>
 
-  <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections -->
-  <figure id="route-map-figure" class="my-0 overflow-x-auto" aria-label="Career transit route diagram">
+  <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections (Desktop default) -->
+  <figure id="route-map-figure" class="my-0 overflow-x-auto hidden md:block" aria-label="Career transit route diagram">
     <svg viewBox="0 0 1260 870" class="w-full min-w-[1060px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* 5 Isolated Horizontal Routes (Clean unbadged tracks spanning from 60 to 1200) */}
       {
@@ -809,6 +835,12 @@ const lineTracks = [
     background: var(--ink);
     color: var(--ground);
     border-color: var(--ink);
+  }
+
+  /* Active station row highlight in mobile directory */
+  :global(.mobile-list-station-btn.current-list-station) {
+    background: var(--surface) !important;
+    border-color: var(--ink) !important;
   }
 </style>
 
@@ -1187,11 +1219,13 @@ const lineTracks = [
   const elLinkText = document.getElementById('inspector-link-text');
   const elLinkSecondary = document.getElementById('inspector-link-secondary');
   const elLinkSecondaryText = document.getElementById('inspector-link-secondary-text');
+  const btnBack = document.getElementById('inspector-btn-back');
   const transfersContainer = document.getElementById('inspector-transfers');
   const transfersList = document.getElementById('inspector-transfers-list');
   const logoBox = document.getElementById('inspector-logo');
   const logoImgs = document.querySelectorAll('.logo-img');
   const nodes = document.querySelectorAll('.station-hit');
+  const listButtons = document.querySelectorAll('.mobile-list-station-btn');
   const connectionsLayer = document.getElementById('cross-connections-layer');
 
   let currentId = 'sunadvantage';
@@ -1251,7 +1285,7 @@ const lineTracks = [
       group.appendChild(hitPath);
       group.appendChild(visPath);
 
-      // Hover on connection line displays the relationship & allows reading both sides!
+      // Hover or tap on connection line displays relationship & allows reading both sides
       group.addEventListener('mouseenter', () => {
         showConnectionDetails(sourceStation, targetStation, c);
         group.classList.add('active-connection');
@@ -1260,6 +1294,14 @@ const lineTracks = [
       group.addEventListener('mouseleave', () => {
         group.classList.remove('active-connection');
         showStationDetails(currentId);
+      });
+
+      group.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showConnectionDetails(sourceStation, targetStation, c);
+        if (inspector) {
+          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       });
 
       connectionsLayer.appendChild(group);
@@ -1304,6 +1346,11 @@ const lineTracks = [
       logoBox.classList.add('hidden');
     }
 
+    if (btnBack) {
+      btnBack.classList.remove('hidden');
+      btnBack.style.display = 'inline-flex';
+    }
+
     // Configure Dual Action Links
     if (elLink && elLinkText) {
       if (source.link) {
@@ -1335,6 +1382,10 @@ const lineTracks = [
 
     if (inspector) {
       inspector.style.setProperty('--route', routeColors[s.line]);
+    }
+
+    if (btnBack) {
+      btnBack.style.display = 'none';
     }
 
     if (elBullet) {
@@ -1394,7 +1445,7 @@ const lineTracks = [
           if (!target) return;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'conn-pill px-2.5 py-1 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt) flex items-center gap-1.5';
+          btn.className = 'conn-pill px-3 py-1.5 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) hover:border-(--cobalt) flex items-center gap-2';
           btn.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}: ${c.reason}</span>`;
           
           btn.addEventListener('mouseenter', () => {
@@ -1405,7 +1456,10 @@ const lineTracks = [
           });
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            setCurrent(target.id);
+            showConnectionDetails(s, target, c);
+            if (inspector) {
+              inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
           });
           transfersList.appendChild(btn);
         });
@@ -1424,6 +1478,10 @@ const lineTracks = [
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
 
+    listButtons.forEach((btn) => {
+      btn.classList.toggle('current-list-station', btn.getAttribute('data-station-id') === stationId);
+    });
+
     const figure = document.getElementById('route-map-figure');
     if (figure && window.innerWidth < 768) {
       const scale = figure.scrollWidth / 1260;
@@ -1435,7 +1493,13 @@ const lineTracks = [
     showStationDetails(stationId);
   }
 
-  // Hover & selection listeners on station nodes
+  if (btnBack) {
+    btnBack.addEventListener('click', () => {
+      showStationDetails(currentId);
+    });
+  }
+
+  // Hover & selection listeners on desktop station nodes
   nodes.forEach((n) => {
     const sid = n.getAttribute('data-station-id');
     if (!sid) return;
@@ -1462,7 +1526,7 @@ const lineTracks = [
     });
   });
 
-  // Mobile View Switcher (Map vs List)
+  // Mobile View Switcher (List Directory vs Map)
   const btnMap = document.getElementById('mobile-view-map');
   const btnList = document.getElementById('mobile-view-list');
   const mapView = document.getElementById('route-map-figure');
@@ -1494,7 +1558,12 @@ const lineTracks = [
   document.querySelectorAll('[data-target-station]').forEach((chip) => {
     chip.addEventListener('click', () => {
       const sid = chip.getAttribute('data-target-station');
-      if (sid) setCurrent(sid);
+      if (sid) {
+        setCurrent(sid);
+        if (inspector) {
+          inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
     });
   });
 
