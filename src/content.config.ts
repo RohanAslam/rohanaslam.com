@@ -11,6 +11,9 @@ const work = defineCollection({
     stack: z.array(z.string()).default([]),
     status: z.enum(['shipped', 'in-progress', 'experiment']).default('shipped'),
     featured: z.boolean().default(false),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
+    imageCaption: z.string().optional(),
     links: z
       .object({
         repo: z.string().optional(),
