@@ -1,17 +1,40 @@
 ---
 title: "SmartQueue"
 date: 2026-01-20
-summary: "Office hours minus the chaos, plus a design system that deliberately refuses to look safe."
+summary: "A real-time office hours queue management system researched, designed, and evaluated using HCI methodologies at U of T."
 tags: ["startup", "earlier-work"]
-stack: ["React", "Vite", "Tailwind", "Design systems"]
-status: "experiment"
+stack: ["React", "TypeScript", "Firebase", "DBSCAN", "SBERT"]
+status: "shipped"
 featured: false
+links:
+  live: "https://smartqueuecsc318.netlify.app/"
+  repo: "https://github.com/mushroomcarbon/SmartQueue"
 ---
 
-Six studio presentations, three group documents, and one complaint that came back every single time: nobody knows when it is their turn at office hours.
+Office hours are one of the most critical touchpoints for student learning, but in large university courses they often break down into unstructured chaos. Students wait without knowing when or if they will be seen, teaching assistants spend their hours answering the exact same question repeatedly, and quieter students get drowned out.
 
-SmartQueue is the answer to that. Students join a queue, see their position, and get called. The TA sees who is waiting and what they are stuck on. Straightforward product, and most of the work was in the parts that are not the queue.
+SmartQueue was built as a semester-long project at the University of Toronto for CSC318 (The Design of Interactive Computational Media). Our five-person team took the problem through a complete user-centered design lifecycle, from initial contextual inquiry and interviews through heuristic evaluations to a functional high-fidelity prototype and summative usability testing.
 
-The design system is the piece I would still defend. I wrote it as Kinetic Editorial: neo brutalism crossed with the spacing logic of a fashion magazine, Space Grotesk throughout, emerald and yellow at full saturation, and a rule banning grey hairline borders in favour of background colour shifts. It is the opposite of the wayfinding system this site runs on, which is the point. I wanted to know whether I could hold one strong opinion consistently across a whole product rather than just pick a palette.
+### What We Built
 
-It never got past the studio. The design system outlived the app, and a good half of what I learned writing it ended up in the one behind this site.
+We designed SmartQueue around five core requirements identified directly from student and TA interviews:
+
+1. **Dynamic Wait-Time Estimation**: Gives students real-time queue depth, average interaction time, and estimated wait times so they can make informed decisions before heading to office hours.
+2. **Structured Question Intake**: A submission flow requiring topic tags, assignment numbers, a concise description, and interaction type (Quick Check vs. Deep Dive), giving TAs immediate context before each conversation starts.
+3. **Thematic Clustering & Aggregation**: Question clustering using DBSCAN with SBERT sentence embeddings, grouping similar tickets so TAs can batch common conceptual blockers together.
+4. **Public Active Question Visibility**: Students waiting in line can see the topics and questions currently being addressed, enabling passive learning while in queue.
+5. **Hybrid Queue Management**: Unifies both in-person and remote students into a single coherent, fair queue.
+
+### Process & Usability Evaluation
+
+We began by researching office hours dynamics and modeling student and TA behaviors through personas and job stories. We then developed three distinct design alternatives (a unified ticket queue, topic-based rooms, and an asynchronous triage system) before converging on the single-ticket queue model. After paper prototyping and expert heuristic walkthroughs surfaced ambiguities around queue status terminology, we iterated on the interaction model and built the full high-fidelity application in React, TypeScript, and Firebase.
+
+We conducted a summative usability evaluation with 11 participants across four representative task scenarios. SmartQueue achieved an average System Usability Scale (SUS) score of **89.6 (Grade A / Excellent)**, with a 100% task completion rate on the structured ticket intake flow.
+
+### Team & Links
+
+SmartQueue was a collaborative build with Andrew Goh, Sean Jackson, Matthew DeMarinis, Samil Dhawan, and myself. My contributions centered on front-end prototype development, interface refinement, and bug fixing.
+
+- [Case Study & Project Site](https://smartqueuecsc318.netlify.app/): Full design documentation, user research, personas, and evaluation findings.
+- [GitHub Repository](https://github.com/mushroomcarbon/SmartQueue): React, TypeScript, and Firebase codebase with DBSCAN and SBERT clustering.
+- [Live Interactive Demo](https://smartqueue-demo.netlify.app/): Interactive prototype with demo student and TA accounts (`student1:root1234` through `student4:root1234`, `admin:root1234`).
