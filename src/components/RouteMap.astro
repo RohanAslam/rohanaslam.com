@@ -6,7 +6,7 @@
  *   Line 2: Business Ventures (Rose)
  *   Line 3: AI Tools (Amber)
  *   Line 4: Data (Green)
- *   Line 5: Passion Projects (Purple)
+ *   Line 5: Writing (Purple)
  *
  * Dynamic Cross-Line Connections:
  * Hovering or clicking any station draws smooth SVG transit connectors
@@ -46,6 +46,7 @@ interface StationData {
 const stations: StationData[] = [
   // ==========================================
   // Line 1 · Corporate & Strategy (y = 90)
+  // (Pure corporate roles only)
   // ==========================================
   {
     id: 'rbc',
@@ -62,23 +63,8 @@ const stations: StationData[] = [
     summary: 'Front end work, testing and documentation on an internal tool for wealth management advisors. First industry internship, and mostly a lesson in inheriting a codebase somebody else wrote.',
   },
   {
-    id: 'assistive',
-    x: 320,
-    y: 90,
-    label: 'ASSISTIVE TECH',
-    sub: '2023',
-    line: 1,
-    routeName: 'Line 1 · Corporate',
-    organization: 'Assistive Technology Design',
-    role: 'Design Lead',
-    timeframe: '2023',
-    summary: 'Accessibility research and device prototyping with end users. The term where accessibility stopped being an afterthought and became a primary design constraint.',
-    link: '/work/assistive-technology-design',
-    linkLabel: 'Read case study',
-  },
-  {
     id: 'uoft',
-    x: 520,
+    x: 380,
     y: 90,
     label: 'INNOVATION HUB',
     sub: '2024',
@@ -94,7 +80,7 @@ const stations: StationData[] = [
   },
   {
     id: 'otpp',
-    x: 730,
+    x: 640,
     y: 90,
     label: 'OTPP',
     sub: '2023–24',
@@ -110,7 +96,7 @@ const stations: StationData[] = [
   },
   {
     id: 'dyedurham',
-    x: 940,
+    x: 900,
     y: 90,
     label: 'DYE & DURHAM',
     sub: '2025',
@@ -143,25 +129,71 @@ const stations: StationData[] = [
 
   // ==========================================
   // Line 2 · Business Ventures (y = 260)
+  // (Flingblade 2023, Skoll 2025, Presently 2026, SmartQueue 2026, SmartSyllabus / ICUBE furthest right)
   // ==========================================
   {
+    id: 'flingblade',
+    x: 120,
+    y: 260,
+    label: 'FLINGBLADE',
+    sub: '2023',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'FLINGBLADE (Unity WebGL)',
+    role: 'Creator & Developer',
+    timeframe: '2023',
+    summary: 'A Unity project taken all the way to a WebGL build and put on the internet. Sword mechanics, physics constraints, and browser performance budgets connecting directly to game design theory.',
+    link: '/work/flingblade',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'skoll',
+    x: 380,
+    y: 260,
+    label: 'SKOLL',
+    sub: '2025',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'Skoll',
+    role: 'Co-Founder & Developer',
+    timeframe: '2025',
+    summary: 'An AI-powered recruiting and athletic roster planner built for coaches to evaluate player fits, depth charts, and eligibility timelines under rapid iteration.',
+    link: '/work/skoll',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'presently',
+    x: 640,
+    y: 260,
+    label: 'PRESENTLY',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'Presently',
+    role: 'Product Lead & Developer',
+    timeframe: '2026',
+    summary: 'Gift giving treated as a structured preference matching problem. Testing the product surface and user onboarding before committing to heavyweight backend logic.',
+    link: '/work/presently',
+    linkLabel: 'Read case study',
+  },
+  {
     id: 'smartqueue',
-    x: 200,
+    x: 900,
     y: 260,
     label: 'SMARTQUEUE',
-    sub: '2024',
+    sub: '2026',
     line: 2,
     routeName: 'Line 2 · Business Ventures',
     organization: 'SmartQueue',
     role: 'Co-Founder & Tech Lead',
-    timeframe: '2024',
+    timeframe: '2026',
     summary: 'Real-time office hours queuing system built to solve bottlenecks in large university courses. Real-time WebSockets, algorithmic student routing, and zero-drop reliability under heavy load.',
     link: '/work/smartqueue',
     linkLabel: 'Read case study',
   },
   {
     id: 'smartsyllabus',
-    x: 520,
+    x: 1150,
     y: 260,
     label: 'SMARTSYLLABUS',
     sub: 'ICUBE',
@@ -175,58 +207,44 @@ const stations: StationData[] = [
     link: '/work/smartsyllabus',
     linkLabel: 'Read case study',
   },
-  {
-    id: 'skoll',
-    x: 840,
-    y: 260,
-    label: 'SKOLL',
-    sub: '2026',
-    line: 2,
-    routeName: 'Line 2 · Business Ventures',
-    organization: 'Skoll',
-    role: 'Co-Founder & Developer',
-    timeframe: '2026',
-    summary: 'An AI-powered recruiting and athletic roster planner built for coaches to evaluate player fits, depth charts, and eligibility timelines under rapid iteration.',
-    link: '/work/skoll',
-    linkLabel: 'Read case study',
-  },
-  {
-    id: 'presently',
-    x: 1150,
-    y: 260,
-    label: 'PRESENTLY',
-    sub: '2026',
-    line: 2,
-    routeName: 'Line 2 · Business Ventures',
-    organization: 'Presently',
-    role: 'Product Lead & Developer',
-    timeframe: '2026',
-    summary: 'Gift giving treated as a structured preference matching problem. Testing the product surface and user onboarding before committing to heavyweight backend logic.',
-    link: '/work/presently',
-    linkLabel: 'Read case study',
-  },
 
   // ==========================================
   // Line 3 · AI Tools (y = 430)
+  // (Sermon Pipeline 2023 -> Sermon Bot 2024 -> RAG 2024 -> Second Brain 2024 -> AI OS 2025 -> Job Pipeline 2026)
   // ==========================================
   {
+    id: 'khutba',
+    x: 120,
+    y: 430,
+    label: 'SERMON PIPELINE',
+    sub: '2023',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Sermon Summary Pipeline (2023)',
+    role: 'Creator & Developer',
+    timeframe: 'Dec 2023',
+    summary: 'The first attempt: scrape, narrate with pyttsx3, upload to Google Drive, and email the link. Taught the hard lesson that an email with a Drive link dies inside a month.',
+    link: '/work/khutba-summary-pipeline',
+    linkLabel: 'Read case study',
+  },
+  {
     id: 'friday-sermon',
-    x: 150,
+    x: 320,
     y: 430,
     label: 'SERMON BOT',
-    sub: '2023',
+    sub: '2024',
     line: 3,
     routeName: 'Line 3 · AI Tools',
     organization: 'Friday Sermon Audio Pipeline',
     role: 'Creator & Developer',
-    timeframe: '2023',
-    summary: 'An automated weekly extraction and text-to-speech pipeline scraping institutional publications and delivering instant summaries to community members.',
+    timeframe: '2024 – Present',
+    summary: 'The rebuild: drops a playable neural audio file straight into Discord where people already are. Scraping weekly publications and delivering automated audio summaries to the community.',
     link: '/work/friday-sermon-bot',
     linkLabel: 'Read case study',
   },
   {
     id: 'rag-assistant',
-    x: 400,
+    x: 520,
     y: 430,
     label: 'RAG AGENT',
     sub: '2024',
@@ -241,7 +259,7 @@ const stations: StationData[] = [
   },
   {
     id: 'second-brain',
-    x: 650,
+    x: 730,
     y: 430,
     label: 'SECOND BRAIN',
     sub: '2024',
@@ -256,7 +274,7 @@ const stations: StationData[] = [
   },
   {
     id: 'personal-ai-os',
-    x: 900,
+    x: 940,
     y: 430,
     label: 'AI OS',
     sub: '2025',
@@ -290,7 +308,7 @@ const stations: StationData[] = [
   // ==========================================
   {
     id: 'moneyball',
-    x: 150,
+    x: 120,
     y: 600,
     label: 'DATA STORY',
     sub: '2024',
@@ -305,7 +323,7 @@ const stations: StationData[] = [
   },
   {
     id: 'bikeshare',
-    x: 400,
+    x: 380,
     y: 600,
     label: 'BIKESHARE',
     sub: '2024',
@@ -320,7 +338,7 @@ const stations: StationData[] = [
   },
   {
     id: 'job-portal',
-    x: 650,
+    x: 640,
     y: 600,
     label: 'JOB PORTAL',
     sub: '2026',
@@ -365,82 +383,98 @@ const stations: StationData[] = [
   },
 
   // ==========================================
-  // Line 5 · Passion Projects (y = 770)
+  // Line 5 · Writing (y = 770)
+  // (Published research essays, critiques, and reflections)
   // ==========================================
   {
-    id: 'early-web',
-    x: 150,
+    id: 'repairability',
+    x: 120,
     y: 770,
-    label: 'EARLY WEB',
-    sub: '2021–22',
+    label: 'INFRASTRUCTURE',
+    sub: '2025',
     line: 5,
-    routeName: 'Line 5 · Passion Projects',
-    organization: 'Early Web Builds',
-    role: 'Learning Reps',
-    timeframe: '2021 – 2022',
-    summary: 'A banking interface, two games, an expense tracker, a vacation tracker and a community portal in Svelte. Nobody but me ever used them. The gap between the number guessing game and the job portal is four years, and that gap is the claim.',
-    link: '/work/early-web-builds',
-    linkLabel: 'Read case study',
+    routeName: 'Line 5 · Writing',
+    organization: 'The Repairability & Politics of Infrastructure',
+    role: 'Essay (Infrastructure & Policy)',
+    timeframe: 'August 2025',
+    summary: 'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable smartphone have in common. A critique of planned obsolescence and public utility stewardship.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
   },
   {
-    id: 'editorial',
-    x: 400,
+    id: 'chinese-room',
+    x: 320,
     y: 770,
-    label: 'EDITORIAL',
-    sub: '2022',
+    label: 'CHINESE ROOM',
+    sub: '2025',
     line: 5,
-    routeName: 'Line 5 · Passion Projects',
-    organization: 'Editorial Layout & Poster',
-    role: 'Design',
-    timeframe: '2022',
-    summary: 'A magazine spread and poster built around a single number, because the number was the story and everything else was context. Where I learned that nobody reads a spread, they scan it in an order you either chose or left to chance.',
-    link: '/work/editorial-layout',
-    linkLabel: 'Read case study',
+    routeName: 'Line 5 · Writing',
+    organization: "Searle's Chinese Room & Functionalism",
+    role: 'Essay (Philosophy of AI)',
+    timeframe: 'August 2025',
+    summary: "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it does not. The boundary between syntactic symbol manipulation and semantic comprehension.",
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
   },
   {
-    id: 'juventus',
-    x: 650,
+    id: 'halo-analysis',
+    x: 520,
     y: 770,
-    label: 'JUVENTUS',
-    sub: '2023',
+    label: 'HALO SPLIT-SCREEN',
+    sub: '2025',
     line: 5,
-    routeName: 'Line 5 · Passion Projects',
-    organization: 'Juventus Rebrand Style Guide',
-    role: 'Brand Strategy',
-    timeframe: '2023',
-    summary: 'A full brand system: history, mission, visual identity, logo construction, colour, typography and usage rules. The first time I wrote rules for other people to design against, which is what a design system is.',
-    link: '/work/juventus-rebrand',
-    linkLabel: 'Read case study',
+    routeName: 'Line 5 · Writing',
+    organization: 'Close Playing Analysis: Split-Screen in Halo',
+    role: 'Critique (Game Culture)',
+    timeframe: 'November 2025',
+    summary: 'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built social community that online matchmaking never could replicate.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
   },
   {
-    id: 'flingblade',
-    x: 900,
+    id: 'dear-go-train',
+    x: 730,
     y: 770,
-    label: 'FLINGBLADE',
-    sub: '2023',
+    label: 'DEAR GO TRAIN',
+    sub: '2025',
     line: 5,
-    routeName: 'Line 5 · Passion Projects',
-    organization: 'FLINGBLADE (Unity WebGL)',
-    role: 'Game Developer',
-    timeframe: '2023',
-    summary: 'A Unity project taken all the way to a WebGL build and put on the internet. Sword mechanics, physics constraints, and browser performance budgets connecting directly to game design theory.',
-    link: '/work/flingblade',
-    linkLabel: 'Read case study',
+    routeName: 'Line 5 · Writing',
+    organization: 'Dear GO Train',
+    role: 'Reflection (Transit & Place)',
+    timeframe: 'December 2025',
+    summary: 'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own corporate job downtown. The quiet rhythm of regional transit and shared public life.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
   },
   {
-    id: 'visual-design',
+    id: 'ip-rights',
+    x: 940,
+    y: 770,
+    label: 'IP RIGHTS',
+    sub: '2026',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'Intellectual Property Rights in Canada',
+    role: 'Research Paper (Policy & Law)',
+    timeframe: 'March 2026',
+    summary: 'How copyright law and weak open access policy let corporate publishers profit from research the public already paid for, plus the systemic reforms required to restore open scholarship.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+  },
+  {
+    id: 'fifa-soccer',
     x: 1150,
     y: 770,
-    label: 'VISUAL DESIGN',
-    sub: '2022–25',
+    label: 'FIFA 1993',
+    sub: '2026',
     line: 5,
-    routeName: 'Line 5 · Passion Projects',
-    organization: 'Visual Design & Community Materials',
-    role: 'Design',
-    timeframe: '2022 – 2025',
-    summary: 'Duty charts, QR flyers, wedding cards, a self portrait built in Illustrator and 3D coursework in Maya. Signage people follow without being told to, which is transit wayfinding at a smaller scale and a harder deadline.',
-    link: '/work/visual-design-work',
-    linkLabel: 'Read case study',
+    routeName: 'Line 5 · Writing',
+    organization: 'Rethinking FIFA International Soccer (1993)',
+    role: 'Essay (Game Design)',
+    timeframe: 'April 2026',
+    summary: 'Why a game with a $100,000 budget deserves classic status, argued through what it started in sports simulation architecture rather than how it played.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
   },
 ];
 
@@ -449,7 +483,7 @@ const routeColors: Record<number, string> = {
   2: 'var(--line-3)', // Rose for Business Ventures
   3: 'var(--line-2)', // Amber for AI Tools
   4: 'var(--line-4)', // Green for Data
-  5: 'var(--line-5)', // Purple for Passion Projects
+  5: 'var(--line-5)', // Purple for Writing
 };
 
 const routeTextColors: Record<number, string> = {
@@ -465,7 +499,7 @@ const lineNames: Record<number, string> = {
   2: 'Line 2 · Business Ventures',
   3: 'Line 3 · AI Tools',
   4: 'Line 4 · Data',
-  5: 'Line 5 · Passion Projects',
+  5: 'Line 5 · Writing',
 };
 
 const lineTracks = [
@@ -610,6 +644,7 @@ const lineTracks = [
           { id: 'flingblade', name: 'Flingblade' },
           { id: 'personal-ai-os', name: 'AI OS' },
           { id: 'job-portal', name: 'Job Portal' },
+          { id: 'dear-go-train', name: 'Dear GO Train' },
           { id: 'otpp', name: 'OTPP' },
           { id: 'uoft', name: 'U of T' },
         ].map((s) => (
@@ -801,7 +836,7 @@ const lineTracks = [
     stroke-width: 7px !important;
   }
 
-  /* Cross-Line Connection SVG Path: Animated Dash Flow (Kept as user requested!) */
+  /* Cross-Line Connection SVG Path: Animated Dash Flow */
   :global(.connection-line-path) {
     animation: connectionDashFlow 1s linear infinite;
     opacity: 0.85;
@@ -850,70 +885,65 @@ const lineTracks = [
     dataMap[s.id] = s;
   });
 
-  // Cross-line curated connections graph with full context & explanation
+  // Cross-line curated connections graph linking craft, tech, and writing
   const CONNECTIONS = {
     'flingblade': [
       {
-        target: 'early-web',
-        reason: 'First browser builds',
-        why: 'The first two things I put on the internet that a stranger could break. One was a dice game in Svelte, one was a Unity WebGL build bigger than the game inside it.'
+        target: 'fifa-soccer',
+        reason: 'Game design theory & sports simulation architecture',
+        why: 'Taking game development from mechanics code into critical writing: sword physics in Unity on one side, EA Sports simulation history on the other.'
+      },
+      {
+        target: 'halo-analysis',
+        reason: 'Local multiplayer mechanics & couch co-op',
+        why: 'Both center on physical gaming constraints: client-side latency in browser WebGL, split-screen memory management in Halo.'
       },
       {
         target: 'smartqueue',
-        reason: 'Interactive constraints',
-        why: 'Both pushed the limits of browser runtime performance: WebGL asset budgets on one side, real-time WebSockets queues on the other.'
-      },
-      {
-        target: 'visual-design',
-        reason: '3D mechanics & craft',
-        why: 'Both are craft picked up outside a syllabus and kept: 3D modeling in Maya, game physics in Unity, and spatial intuition.'
+        reason: 'Interactive client runtime performance',
+        why: 'Pushed the performance envelope in the browser: WebGL shader limits on one side, real-time WebSocket state on the other.'
       }
     ],
     'smartsyllabus': [
       {
         target: 'uoft',
         reason: 'Born out of U of T student research',
-        why: 'The research habit turned on my own product. We ran a usability study in July, watched people get lost in onboarding, and rewrote it around what confused them.'
+        why: 'The qualitative research habit turned on my own product. We ran student usability testing, saw where onboarding failed, and re-architected it.'
       },
       {
         target: 'rag-assistant',
-        reason: 'Document parsing & retrieval',
-        why: 'Both read complex unstructured documents that nobody agreed on a format for, and both are built to fail loudly rather than guess.'
+        reason: 'Document parsing & retrieval systems',
+        why: 'Both parse unstructured course documents nobody agreed on a format for, built strictly to fail loudly rather than hallucinate dates.'
       },
       {
-        target: 'smartqueue',
-        reason: 'Student campus workflows',
-        why: 'Two student products out of the same building. One plans the semester, the other fixes the queue at office hours.'
+        target: 'ip-rights',
+        reason: 'Open access & student syllabus ownership',
+        why: 'The legal argument against knowledge profitization directly motivated building open syllabus tools that put the schedule back in students hands.'
       },
       {
         target: 'kronos',
         reason: 'Transformer architectures',
-        why: 'Reading how foundation models work under the hood, then shipping something that depends on it working in that exact order.'
+        why: 'Reading how foundation model tokenizers work, then shipping applications that depend on token parsing in production.'
       }
     ],
     'sunadvantage': [
       {
         target: 'job-search',
         reason: 'Process automation & scripts',
-        why: 'The Sun Life term is where automation stopped being a hobby. Find the manual work worth removing, prove the time saved, then remove it.'
+        why: 'The Sun Life term is where automation stopped being a hobby. Find the manual work worth removing, prove the time saved, then build the tooling.'
       },
       {
         target: 'dyedurham',
-        reason: 'Regulated enterprise product',
-        why: 'Product, then digital transformation. Four months each inside regulated financial services, and the second turned into the full time offer.'
+        reason: 'Regulated enterprise products',
+        why: 'Product management, then digital transformation. Four months each inside Canadian financial services, leading to the full time offer.'
       },
       {
-        target: 'otpp',
-        reason: 'Institutional financial systems',
-        why: 'Two enterprise seats where design and operations meet heavy governance and institutional scale.'
+        target: 'repairability',
+        reason: 'Infrastructure stewardship & maintenance',
+        why: 'Both examine what keeps complex human systems running: group benefit operations in corporate practice, infrastructure politics in theory.'
       }
     ],
     'otpp': [
-      {
-        target: 'assistive',
-        reason: 'AODA & WCAG accessibility systems',
-        why: 'Accessibility stopped being a checklist here. Sixteen months of shipping against AODA and WCAG turned into permanent product habit.'
-      },
       {
         target: 'dyedurham',
         reason: 'Enterprise compliance constraints',
@@ -921,83 +951,116 @@ const lineTracks = [
       },
       {
         target: 'uoft',
-        reason: 'Design research & service mapping',
+        reason: 'Design research & service journey mapping',
         why: 'Design research at student scale and pension fund scale. The method is identical; the difference is the number of stakeholders signing off.'
       }
     ],
-    'job-portal': [
+    'skoll': [
       {
-        target: 'job-search',
-        reason: 'Ingestion pipeline to local UI',
-        why: 'The pipeline proved the ranking was worth having. The portal is what happened when I gave it resumes, a UI, and five providers to fall back on.'
+        target: 'presently',
+        reason: 'Gemini MVP surface testing',
+        why: 'Building fast prototype surfaces to evaluate user onboarding and product demand before writing heavyweight backend matching logic.'
       },
       {
-        target: 'kronos',
-        reason: 'Local LLM benchmark scoring',
-        why: 'Both are me reading model internals instead of calling an API and trusting what comes back. One swaps providers, the other analyzes tokenizers.'
-      },
-      {
-        target: 'aurum',
-        reason: 'Local-first desktop architecture',
-        why: 'Both run completely on disk and in the browser. Zero cloud dependencies, zero accounts required, absolute user sovereignty.'
+        target: 'job-portal',
+        reason: 'Candidate evaluation & ranking engines',
+        why: 'Ranking athletic recruits to roster slots or candidates to job listings: structured feature matching tested against real-world ambiguity.'
       }
     ],
-    'aurum': [
+    'presently': [
       {
-        target: 'bikeshare',
-        reason: 'Tabular aggregation & modeling',
-        why: 'One models commuter rental counts, the other models tax brackets and cash flows. Both turn raw tabular datasets into answers someone can act on.'
+        target: 'skoll',
+        reason: 'Product surface testing',
+        why: 'Testing product hypotheses quickly with streamlined intake forms and prototype feedback.'
       },
       {
-        target: 'kronos',
-        reason: 'Financial modeling',
-        why: 'Financial data from opposite ends of the telescope. Kronos forecasts a market; Aurum forecasts my rent.'
+        target: 'job-portal',
+        reason: 'Matching algorithms',
+        why: 'The same matching problem wearing different clothes: a person to a gift, a resume to a listing.'
+      }
+    ],
+    'smartqueue': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Campus student productivity',
+        why: 'Direct tools addressing real university pain points: queue congestion at office hours and semester syllabus overwhelm.'
       },
       {
-        target: 'moneyball',
-        reason: 'Data visualization',
-        why: 'Both start from CSVs formatted badly by others, cleaning and aggregating until the insight is legible in two seconds.'
+        target: 'flingblade',
+        reason: 'Interactive browser runtimes',
+        why: 'Early builds where client-side responsiveness determined whether users engaged or dropped off.'
+      }
+    ],
+    'khutba': [
+      {
+        target: 'friday-sermon',
+        reason: 'Evolution of scraping pipeline',
+        why: 'Same scrape, same idea, three years apart. The 2023 version emailed a Drive link and died inside a month; the rebuild drops neural audio straight into Discord.'
+      }
+    ],
+    'friday-sermon': [
+      {
+        target: 'rag-assistant',
+        reason: 'Corpus scraping & retrieval',
+        why: 'Both point at the same weekly publication archive: one narrates audio summaries, the other answers grounded questions.'
+      },
+      {
+        target: 'khutba',
+        reason: 'Predecessor prototype',
+        why: 'From a brittle script with pickle files to an automated Discord audio bot.'
+      }
+    ],
+    'rag-assistant': [
+      {
+        target: 'chinese-room',
+        reason: 'Symbol manipulation vs semantic understanding',
+        why: 'Building a RAG agent forced confronting the Chinese Room directly: retrieval is syntactic matching, but strict citation keeps it grounded.'
+      },
+      {
+        target: 'second-brain',
+        reason: 'Document synthesis',
+        why: 'Two ways to make documents answerable: cited passage retrieval on one side, rolling knowledge synthesis on the other.'
+      },
+      {
+        target: 'smartsyllabus',
+        reason: 'Document RAG',
+        why: 'Extracting calendar events and citations directly from unstructured course documents.'
+      }
+    ],
+    'second-brain': [
+      {
+        target: 'personal-ai-os',
+        reason: 'Automated personal systems',
+        why: 'Unstructured input enters one side, structured synthesis emerges, and no filing decision is ever manual.'
+      },
+      {
+        target: 'rag-assistant',
+        reason: 'Information retrieval',
+        why: 'Organizing knowledge representations for rapid cross-document discovery.'
       }
     ],
     'personal-ai-os': [
       {
-        target: 'second-brain',
-        reason: 'Automated cognitive synthesis',
-        why: 'The same contract on both: unstructured thoughts enter one side, clean structured notes emerge, and no filing decision is ever manual.'
-      },
-      {
         target: 'job-search',
         reason: 'n8n workflow pipelines',
-        why: 'Plumbing from the same season: one routes personal notes and tasks, the other routes job postings and scoring.'
+        why: 'Plumbing from the same season: one routes personal notes, the other routes job postings and scoring.'
       },
       {
         target: 'sunadvantage',
         reason: 'Enterprise to personal automations',
-        why: 'Copilot Studio at work, n8n at home. Same instinct, very different budget, and the home version is where I get to be wrong cheaply.'
+        why: 'Copilot Studio at work, n8n at home. Same instinct, very different budget.'
       }
     ],
-    'juventus': [
+    'job-search': [
       {
-        target: 'editorial',
-        reason: 'Typography & layout rules',
-        why: 'InDesign, type hierarchy, and the same underlying rule: decide what someone reads first, then make every font size serve that order.'
+        target: 'job-portal',
+        reason: 'Plumbing to full desktop app',
+        why: 'The pipeline proved the ranking was worth having; the portal is what happened when I gave it resumes, a UI, and five provider fallbacks.'
       },
       {
-        target: 'smartqueue',
-        reason: 'Design system rulebooks',
-        why: 'The two times I wrote rules for other people to design against instead of just designing the screens myself.'
-      }
-    ],
-    'editorial': [
-      {
-        target: 'visual-design',
-        reason: 'Print craft & hierarchy',
-        why: 'Print craft either side of the classroom. One was graded for school; the other had forty community volunteers waiting on it.'
-      },
-      {
-        target: 'juventus',
-        reason: 'Brand & visual rules',
-        why: 'Magazine spreads and brand identity manuals built around strong focal points and strict typographic grids.'
+        target: 'sunadvantage',
+        reason: 'Operational workflow automation',
+        why: 'Finding high-friction manual work worth automating and building reliable tools to replace it.'
       }
     ],
     'moneyball': [
@@ -1014,6 +1077,11 @@ const lineTracks = [
     ],
     'bikeshare': [
       {
+        target: 'dear-go-train',
+        reason: 'Transit mobility & commuter rhythms',
+        why: 'Bikeshare models commuter traffic quantitatively in R; Dear GO Train reflects on the lived human experience of regional transit.'
+      },
+      {
         target: 'moneyball',
         reason: 'Statistical storytelling',
         why: 'R modeling and ggplot2 visualizations uncovering hidden dynamics in commuter and baseball datasets.'
@@ -1021,48 +1089,115 @@ const lineTracks = [
       {
         target: 'aurum',
         reason: 'Residual modeling',
-        why: 'Finding the patterns in residuals and expense categories that simple linear predictions completely overlook.'
+        why: 'Finding patterns in residuals and expense categories that simple linear models miss.'
       }
     ],
-    'smartqueue': [
+    'job-portal': [
       {
-        target: 'juventus',
-        reason: 'Design system rulebooks',
-        why: 'Design tokens, strict spacing scales, and reusable components built for team collaboration.'
+        target: 'job-search',
+        reason: 'Ingestion pipeline to local UI',
+        why: 'The pipeline proved the ranking was worth having; the portal added multi-provider evaluation and a desktop interface.'
       },
+      {
+        target: 'kronos',
+        reason: 'Local LLM benchmark scoring',
+        why: 'Reading model internals instead of trusting API defaults: one swaps providers, the other analyzes tokenizers.'
+      },
+      {
+        target: 'aurum',
+        reason: 'Local-first desktop architecture',
+        why: 'Both run completely on disk and in the browser. Zero cloud dependencies, zero accounts required, absolute user sovereignty.'
+      }
+    ],
+    'aurum': [
+      {
+        target: 'bikeshare',
+        reason: 'Tabular aggregation & modeling',
+        why: 'One models commuter rental counts, the other models tax brackets and cash flows. Both turn raw tabular datasets into actionable answers.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Financial modeling',
+        why: 'Financial data from opposite ends of the telescope. Kronos forecasts a market; Aurum forecasts my rent.'
+      }
+    ],
+    'kronos': [
       {
         target: 'smartsyllabus',
-        reason: 'Student productivity',
-        why: 'Direct tools addressing real university pain points: queue congestion and semester syllabus overwhelm.'
+        reason: 'Transformer architectures',
+        why: 'Dissecting foundation model tokenization and applying transformer extraction to multi-page syllabus PDFs.'
       },
       {
-        target: 'flingblade',
-        reason: 'First interactive shipping',
-        why: 'First interactive web builds where latency and client-side performance determined whether the product lived or died.'
+        target: 'chinese-room',
+        reason: 'Model understanding vs prediction',
+        why: 'Evaluating whether foundation models genuinely comprehend financial time-series or simply predict token frequencies.'
       }
     ],
-    'assistive': [
-      {
-        target: 'otpp',
-        reason: 'Enterprise accessibility',
-        why: 'Translating accessible design research directly into enterprise design systems with strict WCAG compliance.'
-      },
-      {
-        target: 'smartqueue',
-        reason: 'Accessible UI standards',
-        why: 'Contrast ratios, focus states, and tap targets applied to software that nobody explicitly asked to be accessible.'
-      }
-    ],
-    'dyedurham': [
+    'repairability': [
       {
         target: 'sunadvantage',
-        reason: 'Financial enterprise products',
-        why: 'Product management and operations inside regulated Canadian enterprise software.'
+        reason: 'Infrastructure stewardship',
+        why: 'Connecting the philosophy of repairable public infrastructure with the operational maintenance of enterprise platforms.'
       },
       {
-        target: 'otpp',
-        reason: 'Regulated workflows',
-        why: 'Building experiences where compliance rules dictate technical architecture and UI workflows.'
+        target: 'dear-go-train',
+        reason: 'Transit systems & urban politics',
+        why: 'From political theory on transit closures to personal reflections on riding the regional rails.'
+      }
+    ],
+    'chinese-room': [
+      {
+        target: 'rag-assistant',
+        reason: 'Information retrieval philosophy',
+        why: 'Why retrieval-grounded generation is the practical answer to Searle: ground every symbol in a cited source.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Foundation model internals',
+        why: 'The philosophical dividing line between transformer token probabilities and genuine cognitive comprehension.'
+      }
+    ],
+    'halo-analysis': [
+      {
+        target: 'flingblade',
+        reason: 'Game design craft',
+        why: 'Critiquing split-screen mechanics in Halo while coding physics and camera controllers in Unity.'
+      },
+      {
+        target: 'fifa-soccer',
+        reason: 'Game culture & simulation history',
+        why: 'Two critical analyses of defining video game franchises: social couch multiplayer in Halo, simulation architecture in FIFA.'
+      }
+    ],
+    'dear-go-train': [
+      {
+        target: 'bikeshare',
+        reason: 'Transit flow & urban mobility',
+        why: 'Quantitative regression on commuter bike rentals paired with qualitative reflections on riding the GO train.'
+      },
+      {
+        target: 'uoft',
+        reason: 'Wayfinding & transit research',
+        why: 'Exploring transit navigation both as an everyday commuter and as a design researcher at U of T.'
+      }
+    ],
+    'ip-rights': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Open academic knowledge',
+        why: 'Challenging publisher gatekeeping in policy writing while building open tools for university students.'
+      }
+    ],
+    'fifa-soccer': [
+      {
+        target: 'flingblade',
+        reason: 'Sports simulation & game design',
+        why: 'Arguing why early game engines deserve classic status while building browser game prototypes in Unity.'
+      },
+      {
+        target: 'halo-analysis',
+        reason: 'Game design theory',
+        why: 'Analyzing foundational game design decisions that defined console and PC gaming eras.'
       }
     ],
     'uoft': [
@@ -1077,134 +1212,18 @@ const lineTracks = [
         why: 'Synthesizing messy user interviews into clear journey maps that product teams can execute against.'
       }
     ],
-    'early-web': [
-      {
-        target: 'flingblade',
-        reason: 'Browser WebGL deployment',
-        why: 'Early experiments with browser runtimes, client rendering, and shipping small apps to the public.'
-      },
-      {
-        target: 'smartqueue',
-        reason: 'Early React reps',
-        why: 'The progression from learning basic component state to building high-concurrency production applications.'
-      }
-    ],
-    'kronos': [
-      {
-        target: 'smartsyllabus',
-        reason: 'Transformer models',
-        why: 'Dissecting foundation model tokenization and applying transformer extraction to multi-page syllabus PDFs.'
-      },
-      {
-        target: 'aurum',
-        reason: 'Financial data',
-        why: 'Market-level foundation forecasting on one side, personal cash-flow modeling on the other.'
-      },
-      {
-        target: 'job-portal',
-        reason: 'Model internals',
-        why: 'Rigorous benchmark evaluation of LLM capabilities without blind reliance on API defaults.'
-      }
-    ],
-    'rag-assistant': [
-      {
-        target: 'friday-sermon',
-        reason: 'Corpus text & audio',
-        why: 'Extracting and transforming community archival publications into accessible digital formats.'
-      },
-      {
-        target: 'smartsyllabus',
-        reason: 'Document RAG',
-        why: 'Extracting precise calendar events and citations directly from unstructured course documents.'
-      },
-      {
-        target: 'second-brain',
-        reason: 'Document synthesis',
-        why: 'Two approaches to making text answerable: cited retrieval on one side, rolling knowledge synthesis on the other.'
-      }
-    ],
-    'friday-sermon': [
-      {
-        target: 'rag-assistant',
-        reason: 'Corpus scraping',
-        why: 'Automated ingestion pipelines pulling weekly publications for community distribution.'
-      }
-    ],
-    'second-brain': [
-      {
-        target: 'personal-ai-os',
-        reason: 'Automated personal systems',
-        why: 'Automated personal capture pipelines routing thoughts and reference materials into an active knowledge wiki.'
-      },
-      {
-        target: 'rag-assistant',
-        reason: 'Information retrieval',
-        why: 'Structured knowledge representation enabling fast retrieval and cross-note synthesis.'
-      }
-    ],
-    'job-search': [
-      {
-        target: 'job-portal',
-        reason: 'Plumbing to product',
-        why: 'Automated job search scoring that graduated from a headless script into a fully local web application.'
-      },
-      {
-        target: 'personal-ai-os',
-        reason: 'n8n pipelines',
-        why: 'Orchestrating AI agents with n8n and webhooks to eliminate repetitive administrative work.'
-      },
-      {
-        target: 'sunadvantage',
-        reason: 'Workflow automation',
-        why: 'Finding the high-friction manual work worth automating and building permanent tooling to replace it.'
-      }
-    ],
-    'skoll': [
-      {
-        target: 'smartsyllabus',
-        reason: 'Gemini prototype',
-        why: 'Fast iterative Gemini prototyping to test user demand and product-market fit before heavy engineering.'
-      },
-      {
-        target: 'presently',
-        reason: 'Matching problem',
-        why: 'Building UI surfaces and onboarding funnels to test whether matching algorithms solve real human needs.'
-      }
-    ],
-    'presently': [
-      {
-        target: 'skoll',
-        reason: 'Product surface testing',
-        why: 'Validating product hypotheses quickly with streamlined intake forms and prototype feedback.'
-      },
-      {
-        target: 'job-portal',
-        reason: 'Matching logic',
-        why: 'Ranking candidates to jobs or gifts to recipients: the core problem is structured feature matching.'
-      }
-    ],
-    'visual-design': [
-      {
-        target: 'editorial',
-        reason: 'Print craft & signage',
-        why: 'Layout rules and visual hierarchies designed to guide user attention without explicit instructions.'
-      },
-      {
-        target: 'flingblade',
-        reason: '3D spatial design',
-        why: '3D modeling coursework in Maya connecting directly into Unity game environments and assets.'
-      }
-    ],
     'rbc': [
-      {
-        target: 'early-web',
-        reason: 'First frontend reps',
-        why: 'Learning standard enterprise web stacks alongside early personal web experiments.'
-      },
       {
         target: 'otpp',
         reason: 'Institutional engineering',
         why: 'Understanding software development standards and governance inside major Canadian financial institutions.'
+      }
+    ],
+    'dyedurham': [
+      {
+        target: 'sunadvantage',
+        reason: 'Financial enterprise products',
+        why: 'Product management and operations inside regulated Canadian enterprise software.'
       }
     ]
   };
@@ -1356,7 +1375,7 @@ const lineTracks = [
       if (source.link) {
         elLink.style.display = 'inline-flex';
         elLink.setAttribute('href', source.link);
-        elLinkText.textContent = `Read ${source.label} Case Study`;
+        elLinkText.textContent = `Read ${source.label}`;
       } else {
         elLink.style.display = 'none';
       }
@@ -1367,7 +1386,7 @@ const lineTracks = [
         elLinkSecondary.classList.remove('hidden');
         elLinkSecondary.style.display = 'inline-flex';
         elLinkSecondary.setAttribute('href', target.link);
-        elLinkSecondaryText.textContent = `Read ${target.label} Case Study`;
+        elLinkSecondaryText.textContent = `Read ${target.label}`;
       } else {
         elLinkSecondary.style.display = 'none';
       }
