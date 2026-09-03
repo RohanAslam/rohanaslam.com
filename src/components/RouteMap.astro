@@ -545,7 +545,14 @@ const lineTracks = [
     </div>
 
     <div id="popover-conns" class="mt-2.5 pt-2 border-t border-(--ink-faint)/20">
-      <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5">⇄ Connected Stations:</div>
+      <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 16l-4-4 4-4"></path>
+          <path d="M3 12h18"></path>
+          <path d="M17 8l4 4-4 4"></path>
+        </svg>
+        <span>TRANSFERS:</span>
+      </div>
       <div id="popover-conns-list" class="flex flex-wrap gap-1.5"></div>
     </div>
   </div>
@@ -625,7 +632,14 @@ const lineTracks = [
                         </div>
                       )}
                       <div class="mobile-station-conns mt-3 pt-2 border-t border-(--ink-faint)/20">
-                        <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5">⇄ Cross-Line Connections:</div>
+                        <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
+                          <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M7 16l-4-4 4-4"></path>
+                            <path d="M3 12h18"></path>
+                            <path d="M17 8l4 4-4 4"></path>
+                          </svg>
+                          <span>TRANSFERS:</span>
+                        </div>
                         <div class="mobile-conns-list flex flex-wrap gap-1.5" data-source-id={s.id}></div>
                       </div>
                     </div>
@@ -1293,7 +1307,11 @@ const lineTracks = [
     }
     if (popTimeframe) popTimeframe.textContent = s.timeframe;
     if (popTitle) popTitle.textContent = s.label;
-    if (popRole) popRole.textContent = `${s.organization} · ${s.role}`;
+    if (popRole) {
+      const orgClean = s.organization.replace(/\(.*?\)/g, '').trim().toLowerCase();
+      const lblClean = s.label.toLowerCase();
+      popRole.textContent = orgClean === lblClean ? s.role : `${s.organization} · ${s.role}`;
+    }
     if (popSummary) popSummary.textContent = s.summary;
 
     if (popLinkPrimary && popLinkText) {
@@ -1346,13 +1364,31 @@ const lineTracks = [
     if (!popover) return;
 
     if (popBadge) {
-      popBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white';
-      popBadge.textContent = '⇄ Cross-Line Connection';
+      popBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white uppercase tracking-wider';
+      popBadge.textContent = 'TRANSFER';
     }
-    if (popTimeframe) popTimeframe.textContent = `${source.label} ⇄ ${target.label}`;
-    if (popTitle) popTitle.textContent = `${source.label} ⇄ ${target.label}`;
-    if (popRole) popRole.textContent = `Shared Context: ${conn.reason}`;
-    if (popSummary) popSummary.textContent = conn.why;
+    if (popTimeframe) {
+      popTimeframe.textContent = conn.reason;
+    }
+    if (popTitle) {
+      popTitle.innerHTML = `
+        <span class="inline-flex items-center gap-2 flex-wrap text-[16px] font-bold leading-snug">
+          <span class="text-(--ink)">${source.label}</span>
+          <svg class="w-4 h-4 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 16l-4-4 4-4"></path>
+            <path d="M3 12h18"></path>
+            <path d="M17 8l4 4-4 4"></path>
+          </svg>
+          <span class="text-(--ink)">${target.label}</span>
+        </span>
+      `;
+    }
+    if (popRole) {
+      popRole.textContent = `${source.routeName} ↔ ${target.routeName}`;
+    }
+    if (popSummary) {
+      popSummary.textContent = conn.why;
+    }
 
     if (popLinkPrimary && popLinkText) {
       if (source.link) {
