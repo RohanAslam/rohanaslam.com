@@ -33,6 +33,9 @@
   --cobalt: #1B44D9;
   --cobalt-hover: #1739B4;
 
+  --connection-teal: #00875A;
+  --connection-teal-hover: #006B47;
+
   --ease: cubic-bezier(0.65, 0, 0.35, 1);
   --dur-micro: 100ms;
   --dur-base: 200ms;
@@ -55,6 +58,8 @@
     --line-5: #B77BE8;
     --cobalt: #6E90FF;
     --cobalt-hover: #8FA9FF;
+    --connection-teal: #3FCC94;
+    --connection-teal-hover: #3FCC94;
     color-scheme: dark;
   }
 }

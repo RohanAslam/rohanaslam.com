@@ -598,12 +598,12 @@ const lineTracks = [
                       )}
                       <div class="mobile-station-conns mt-3 pt-2 border-t border-(--ink-faint)/20">
                         <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
-                          <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <svg class="w-3.5 h-3.5 text-(--connection-teal) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M7 16l-4-4 4-4"></path>
                             <path d="M3 12h18"></path>
                             <path d="M17 8l4 4-4 4"></path>
                           </svg>
-                          <span>TRANSFERS:</span>
+                          <span>CONNECTIONS:</span>
                         </div>
                         <div class="mobile-conns-list flex flex-wrap gap-1.5" data-source-id={s.id}></div>
                       </div>
@@ -786,15 +786,15 @@ const lineTracks = [
           </a>
         </div>
 
-        <!-- Transfers / Connections List -->
+        <!-- Connections List -->
         <div id="inspector-conns" class="pt-2 border-t border-(--ink-faint)/20">
           <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="w-3.5 h-3.5 text-(--connection-teal) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M7 16l-4-4 4-4"></path>
               <path d="M3 12h18"></path>
               <path d="M17 8l4 4-4 4"></path>
             </svg>
-            <span>TRANSFERS:</span>
+            <span>CONNECTIONS:</span>
           </div>
           <div id="inspector-conns-list" class="flex flex-wrap gap-1.5 max-h-[76px] overflow-y-auto"></div>
         </div>
@@ -836,7 +836,7 @@ const lineTracks = [
 
   /* Target station highlight on connection hover */
   .station-hit.connected-target .node-ring {
-    stroke: var(--cobalt) !important;
+    stroke: var(--connection-teal) !important;
     stroke-width: 7px !important;
   }
 
@@ -850,7 +850,7 @@ const lineTracks = [
   :global(.connection-group.active-connection .connection-line-path) {
     opacity: 1 !important;
     stroke-width: 5px !important;
-    stroke: var(--cobalt) !important;
+    stroke: var(--connection-teal) !important;
   }
 
   @keyframes connectionDashFlow {
@@ -1258,7 +1258,7 @@ const lineTracks = [
     const sourceStation = dataMap[stationId];
     if (!sourceStation || !conns.length) return;
 
-    const strokeColor = routeColors[sourceStation.line] || 'var(--cobalt)';
+    const strokeColor = 'var(--connection-teal)';
 
     conns.forEach((c) => {
       const targetStation = dataMap[c.target];
@@ -1337,6 +1337,7 @@ const lineTracks = [
 
     if (inspBadge) {
       inspBadge.className = `bullet bullet-${s.line} text-[11px] font-bold uppercase tracking-wider`;
+      inspBadge.style.backgroundColor = '';
       inspBadge.textContent = s.routeName;
     }
     if (inspTimeframe) inspTimeframe.textContent = s.timeframe;
@@ -1381,7 +1382,7 @@ const lineTracks = [
           if (!target) return;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'px-2 py-1 border border-(--ink) font-mono text-[10px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
+          btn.className = 'px-2 py-1 border border-(--ink) font-mono text-[10px] font-bold uppercase transition-colors hover:border-(--connection-teal) hover:bg-(--surface) flex items-center gap-1.5';
           btn.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}</span>`;
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -1413,8 +1414,9 @@ const lineTracks = [
     }
 
     if (inspBadge) {
-      inspBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white uppercase tracking-wider';
-      inspBadge.textContent = 'TRANSFER';
+      inspBadge.className = 'bullet text-[11px] font-bold text-white uppercase tracking-wider';
+      inspBadge.style.backgroundColor = 'var(--connection-teal)';
+      inspBadge.textContent = 'CONNECTION';
     }
     if (inspTimeframe) {
       inspTimeframe.textContent = conn.reason;
@@ -1423,7 +1425,7 @@ const lineTracks = [
       inspTitle.innerHTML = `
         <span class="inline-flex items-center gap-2 flex-wrap text-[17px] font-bold leading-snug">
           <span class="text-(--ink)">${source.label}</span>
-          <svg class="w-4 h-4 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="w-4 h-4 text-(--connection-teal) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M7 16l-4-4 4-4"></path>
             <path d="M3 12h18"></path>
             <path d="M17 8l4 4-4 4"></path>
@@ -1532,7 +1534,7 @@ const lineTracks = [
               if (!target) return;
               const pill = document.createElement('a');
               pill.href = target.link || '#';
-              pill.className = 'px-2 py-1 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
+              pill.className = 'px-2 py-1 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:border-(--connection-teal) hover:bg-(--surface) flex items-center gap-1.5';
               pill.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label} (${c.reason})</span>`;
               connsContainer.appendChild(pill);
             });
