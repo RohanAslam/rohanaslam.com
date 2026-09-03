@@ -42,15 +42,15 @@
     --ink-faint: #7A828C;
     --rule-soft: #D3D3CE;
     --line-1: #1B44D9;
-    --line-2: #F2B705;
-    --line-3: #D6246E;
+    --line-2: #D6246E;
+    --line-3: #F2B705;
     --line-4: #00875A;
     --line-5: #7A3EB0;
     --cobalt: #1B44D9;
     --cobalt-hover: #1739B4;
     --on-1: #FFFFFF;
-    --on-2: #0B0E12;
-    --on-3: #FFFFFF;
+    --on-2: #FFFFFF;
+    --on-3: #0B0E12;
     --on-4: #FFFFFF;
     --on-5: #FFFFFF;
     --font-sans: 'Space Grotesk', 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -66,8 +66,8 @@
       --ink-faint: #727C88;
       --rule-soft: #2A313A;
       --line-1: #6E90FF;
-      --line-2: #FFC933;
-      --line-3: #FF6FA3;
+      --line-2: #FF6FA3;
+      --line-3: #FFC933;
       --line-4: #3FCC94;
       --line-5: #B77BE8;
       --cobalt: #6E90FF;
@@ -88,8 +88,8 @@
     --ink-faint: #727C88;
     --rule-soft: #2A313A;
     --line-1: #6E90FF;
-    --line-2: #FFC933;
-    --line-3: #FF6FA3;
+    --line-2: #FF6FA3;
+    --line-3: #FFC933;
     --line-4: #3FCC94;
     --line-5: #B77BE8;
     --cobalt: #6E90FF;
@@ -536,19 +536,20 @@
     { id: 'dyedurham',   route: 1, name: 'Dye & Durham',             year: '2025',    blurb: 'Product on eCore, where the users are lawyers and the constraints are compliance requirements rather than preferences.' },
     { id: 'sunlife',     route: 1, name: 'Sun Life',                 year: '2026',    blurb: 'Four months finding the manual work worth automating, then automating it. Copilot Studio agents, Power BI reporting, a pitch to business leadership.' },
 
-    // Line 2 - AI tools
-    { id: 'aios',        route: 2, name: 'Personal AI OS',           year: '2026',    blurb: 'A Telegram message in, an organized Notion page out, and no filing decisions in between. Self hosted n8n with Claude doing the classification.' },
-    { id: 'jobpipeline', route: 2, name: 'Job Search Pipeline',      year: '2026',    blurb: '18 ranked roles out of a feed that would have taken hours to read by hand. Apify scrape, model scoring, one shortlist.' },
-    { id: 'ragagent',    route: 2, name: 'Research Assistant',       year: '2026',    blurb: 'Answers only from indexed passages and cites each claim by page. If nothing relevant is retrieved the model is never called at all.' },
-    { id: 'sermonbot',   route: 2, name: 'Friday Sermon Bot',        year: '2026',    blurb: 'Scraped, narrated and posted to Discord every Friday at noon, for zero dollars a month. It has run unattended for two months.' },
-    { id: 'secondbrain', route: 2, name: 'Second Brain Wiki',        year: '2026',    blurb: 'Two folders and one rule. I drop things in and never organize them, the agent files, cross-references and synthesizes.' },
-    { id: 'khutba',      route: 2, name: 'Sermon Pipeline v1',       year: '2023',    blurb: 'The first attempt. Scrape, narrate, upload to Drive, email the link. It worked, and I stopped using it inside a month.' },
+    // Line 2 - business ventures
+    { id: 'smartsyllabus', route: 2, name: 'SmartSyllabus',          year: '2026',    blurb: 'Five syllabi, five formats, one semester. AI parsing that turns them into a structured plan. Live, and incubated at UTM ICUBE.' },
+    { id: 'smartqueue',  route: 2, name: 'SmartQueue',               year: '2025',    blurb: 'Office hours minus the chaos, plus a design system that deliberately refuses to look safe.' },
+    { id: 'skoll',       route: 2, name: 'Skoll',                    year: '2025',    blurb: 'A recruiting and roster tool for coaches, built mostly to find out where an AI scout stops being useful.' },
+    { id: 'presently',   route: 2, name: 'Presently',                year: '2026',    blurb: 'Gift buying treated as a matching problem. The intake form turned out to be the product insight, not the model.' },
+    { id: 'flingblade',  route: 2, name: 'FLINGBLADE',               year: '2023',    blurb: 'A Unity game taken all the way to a WebGL build, exploring game mechanics, constraint theory, and shipping to the browser.' },
 
-    // Line 3 - startup
-    { id: 'smartsyllabus', route: 3, name: 'SmartSyllabus',          year: '2026',    blurb: 'Five syllabi, five formats, one semester. AI parsing that turns them into a structured plan. Live, and incubated at UTM ICUBE.' },
-    { id: 'smartqueue',  route: 3, name: 'SmartQueue',               year: '2025',    blurb: 'Office hours minus the chaos, plus a design system that deliberately refuses to look safe.' },
-    { id: 'skoll',       route: 3, name: 'Skoll',                    year: '2026',    blurb: 'A recruiting and roster tool for coaches, built mostly to find out where an AI scout stops being useful.' },
-    { id: 'presently',   route: 3, name: 'Presently',                year: '2026',    blurb: 'Gift buying treated as a matching problem. The intake form turned out to be the product insight, not the model.' },
+    // Line 3 - AI tools
+    { id: 'aios',        route: 3, name: 'Personal AI OS',           year: '2026',    blurb: 'A Telegram message in, an organized Notion page out, and no filing decisions in between. Self hosted n8n with Claude doing the classification.' },
+    { id: 'jobpipeline', route: 3, name: 'Job Search Pipeline',      year: '2026',    blurb: '18 ranked roles out of a feed that would have taken hours to read by hand. Apify scrape, model scoring, one shortlist.' },
+    { id: 'ragagent',    route: 3, name: 'Research Assistant',       year: '2026',    blurb: 'Answers only from indexed passages and cites each claim by page. If nothing relevant is retrieved the model is never called at all.' },
+    { id: 'sermonbot',   route: 3, name: 'Friday Sermon Bot',        year: '2026',    blurb: 'Scraped, narrated and posted to Discord every Friday at noon, for zero dollars a month. It has run unattended for two months.' },
+    { id: 'secondbrain', route: 3, name: 'Second Brain Wiki',        year: '2026',    blurb: 'Two folders and one rule. I drop things in and never organize them, the agent files, cross-references and synthesizes.' },
+    { id: 'khutba',      route: 3, name: 'Sermon Pipeline v1',       year: '2023',    blurb: 'The first attempt. Scrape, narrate, upload to Drive, email the link. It worked, and I stopped using it inside a month.' },
 
     // Line 4 - data
     { id: 'moneyball',   route: 4, name: 'Data Storytelling in R',   year: '2024',    blurb: 'Decades of baseball statistics parsed in R to rerun the Oakland replacement problem, plus a ggplot2 rebuild of the Economist corruption chart.' },
@@ -557,14 +558,13 @@
     { id: 'aurum',       route: 4, name: 'Aurum Finance',            year: '2026',    blurb: 'Four lifestyle scenarios against 2026 Canadian brackets, to find the number that actually lands in the account.' },
     { id: 'kronos',      route: 4, name: 'Kronos Research',          year: '2026',    blurb: 'Reading a financial foundation model closely enough to work out that the tokenizer is the whole trick.' },
 
-    // Line 5 - passion projects
+    // Line 5 - writing
     { id: 'smartcommute', route: 5, name: 'Smart Commute',           year: '2024',    blurb: 'Interviewed student commuters and found the problem was never the route. The research that gave this whole site its language.' },
     { id: 'intlstudent', route: 5, name: 'Intl Student Research',    year: '2025',    blurb: 'Journey maps across arrival, settling in and belonging, published as a site people could click through instead of a PDF nobody opens.' },
     { id: 'assistive',   route: 5, name: 'Assistive Technology',     year: '2024',    blurb: 'Accessibility research that turned into a working habit rather than a checklist.' },
     { id: 'juventus',    route: 5, name: 'Juventus Rebrand',         year: '2023',    blurb: 'Nine crests since 1905, rebuilt as a brand system. The first time I wrote rules for other people to design against.' },
     { id: 'editorial',   route: 5, name: 'Editorial Layout',         year: '2022',    blurb: 'A magazine spread built around a single number, to learn that layout is an argument about what someone reads first.' },
     { id: 'visualdesign',route: 5, name: 'Visual Design',            year: '2022-25', blurb: 'Duty charts, QR flyers, wedding cards, Illustrator and Maya. Signage people follow without being told to.' },
-    { id: 'flingblade',  route: 5, name: 'FLINGBLADE',               year: '2023',    blurb: 'A Unity game taken all the way to a WebGL build, exploring game mechanics, constraint theory, and shipping to the browser.' },
     { id: 'earlyweb',    route: 5, name: 'Early Web Builds',         year: '2022',    blurb: 'Six small apps nobody but me ever used. Learning reps, kept visible because the gap between them and the job portal is the claim.' }
   ];
 
@@ -643,7 +643,7 @@
       why: 'Reading how the model works, then shipping something that depends on it working. In that order, which is the only order that has ever helped.' }
   ];
 
-  var ROUTE_NAMES = { 1: 'Line 1 · Strategy', 2: 'Line 2 · AI Tools', 3: 'Line 3 · Startup', 4: 'Line 4 · Data', 5: 'Line 5 · Passion Projects' };
+  var ROUTE_NAMES = { 1: 'Line 1 · Corporate', 2: 'Line 2 · Business Ventures', 3: 'Line 3 · AI Tools', 4: 'Line 4 · Data', 5: 'Line 5 · Writing' };
 
   var byId = {};
   NODES.forEach(function (n, i) { n.index = i; n.degree = 0; byId[n.id] = n; });

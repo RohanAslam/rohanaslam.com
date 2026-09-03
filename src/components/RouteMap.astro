@@ -467,11 +467,11 @@ const stations: StationData[] = [
 ];
 
 const routeColors: Record<number, string> = {
-  1: 'var(--line-1)', // Cobalt
-  2: 'var(--line-3)', // Rose for Business Ventures
-  3: 'var(--line-2)', // Amber for AI Tools
-  4: 'var(--line-4)', // Green for Data
-  5: 'var(--line-5)', // Purple for Writing
+  1: 'var(--line-1)', // Line 1: Cobalt
+  2: 'var(--line-2)', // Line 2: Pink (Business Ventures)
+  3: 'var(--line-3)', // Line 3: Yellow (AI Tools)
+  4: 'var(--line-4)', // Line 4: Green (Data)
+  5: 'var(--line-5)', // Line 5: Purple (Writing)
 };
 
 const routeTextColors: Record<number, string> = {
@@ -664,32 +664,49 @@ const lineTracks = [
                   <circle cx={s.x} cy={s.y} r="4.5" fill="var(--ink)" class="node-center-dot" />
                 </g>
 
-                {/* Station Name Label (generous spacing above year, high legibility) */}
+                {/* Station Name Label (high legibility Space Grotesk) */}
+                {s.id === 'otpp' ? (
+                  <text
+                    x={s.x}
+                    y={s.y - 54}
+                    class="route-label pointer-events-none"
+                    text-anchor="middle"
+                    fill="var(--ink)"
+                    font-family="var(--font-sans)"
+                    font-size="13.5"
+                    font-weight="700"
+                    letter-spacing="0.2"
+                  >
+                    <tspan x={s.x} dy="0">ONTARIO TEACHERS'</tspan>
+                    <tspan x={s.x} dy="16">PENSION PLAN</tspan>
+                  </text>
+                ) : (
+                  <text
+                    x={s.x}
+                    y={s.y - 44}
+                    class="route-label pointer-events-none"
+                    text-anchor="middle"
+                    fill="var(--ink)"
+                    font-family="var(--font-sans)"
+                    font-size="13.5"
+                    font-weight="700"
+                    letter-spacing="0.2"
+                  >
+                    {s.label}
+                  </text>
+                )}
+
+                {/* Station Sub / Year Label (bold ink black, crystal clear) */}
                 <text
                   x={s.x}
-                  y={s.y - 42}
+                  y={s.id === 'otpp' ? s.y - 20 : s.y - 24}
                   class="route-label pointer-events-none"
                   text-anchor="middle"
                   fill="var(--ink)"
                   font-family="var(--font-mono)"
-                  font-size={s.label.length > 20 ? "11" : "13"}
+                  font-size="12.5"
                   font-weight="700"
-                  letter-spacing={s.label.length > 20 ? "0.2" : "0.5"}
-                >
-                  {s.label}
-                </text>
-
-                {/* Station Sub / Year Label (clean gap above the node ring, clear contrast) */}
-                <text
-                  x={s.x}
-                  y={s.y - 25}
-                  class="route-label pointer-events-none"
-                  text-anchor="middle"
-                  fill="var(--ink-muted)"
-                  font-family="var(--font-mono)"
-                  font-size="11.5"
-                  font-weight="600"
-                  letter-spacing="0.8"
+                  letter-spacing="0.5"
                 >
                   {s.sub}
                 </text>
