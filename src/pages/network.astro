@@ -553,20 +553,18 @@
     // Line 4 - data
     { id: 'moneyball',   route: 4, name: 'Data Storytelling in R',   year: '2024',    blurb: 'Decades of baseball statistics parsed in R to rerun the Oakland replacement problem, plus a ggplot2 rebuild of the Economist corruption chart.' },
     { id: 'bikeshare',   route: 4, name: 'Bikeshare Demand Model',   year: '2024',    blurb: 'A regression on rental counts that was worth building mostly because of how clearly it failed. Two rush hours, and no straight line that fits them.' },
-    { id: 'pandas',      route: 4, name: 'Pandas & Seaborn',         year: '2025',    blurb: 'Thirty one notebooks worked end to end. Anything that has to run more than once now gets written in pandas.' },
     { id: 'jobportal',   route: 4, name: 'Job Portal',               year: '2026',    blurb: 'Five LLM providers, one local folder, and a ranked answer to which resume fits which job. Nothing leaves the laptop unless I choose.' },
     { id: 'aurum',       route: 4, name: 'Aurum Finance',            year: '2026',    blurb: 'Four lifestyle scenarios against 2026 Canadian brackets, to find the number that actually lands in the account.' },
     { id: 'kronos',      route: 4, name: 'Kronos Research',          year: '2026',    blurb: 'Reading a financial foundation model closely enough to work out that the tokenizer is the whole trick.' },
 
-    // Line 5 - earlier work
+    // Line 5 - passion projects
     { id: 'smartcommute', route: 5, name: 'Smart Commute',           year: '2024',    blurb: 'Interviewed student commuters and found the problem was never the route. The research that gave this whole site its language.' },
     { id: 'intlstudent', route: 5, name: 'Intl Student Research',    year: '2025',    blurb: 'Journey maps across arrival, settling in and belonging, published as a site people could click through instead of a PDF nobody opens.' },
     { id: 'assistive',   route: 5, name: 'Assistive Technology',     year: '2024',    blurb: 'Accessibility research that turned into a working habit rather than a checklist.' },
     { id: 'juventus',    route: 5, name: 'Juventus Rebrand',         year: '2023',    blurb: 'Nine crests since 1905, rebuilt as a brand system. The first time I wrote rules for other people to design against.' },
     { id: 'editorial',   route: 5, name: 'Editorial Layout',         year: '2022',    blurb: 'A magazine spread built around a single number, to learn that layout is an argument about what someone reads first.' },
-    { id: 'essay',       route: 5, name: 'Research Essay',           year: '2022',    blurb: 'How far creators move the decisions of 13 to 17 year olds, argued from parasocial trust research rather than screen time commentary.' },
     { id: 'visualdesign',route: 5, name: 'Visual Design',            year: '2022-25', blurb: 'Duty charts, QR flyers, wedding cards, Illustrator and Maya. Signage people follow without being told to.' },
-    { id: 'flingblade',  route: 5, name: 'FLINGBLADE',               year: '2023',    blurb: 'A Unity game taken all the way to a WebGL build, mostly to find out what shipping to the browser actually costs.' },
+    { id: 'flingblade',  route: 5, name: 'FLINGBLADE',               year: '2023',    blurb: 'A Unity game taken all the way to a WebGL build, exploring game mechanics, constraint theory, and shipping to the browser.' },
     { id: 'earlyweb',    route: 5, name: 'Early Web Builds',         year: '2022',    blurb: 'Six small apps nobody but me ever used. Learning reps, kept visible because the gap between them and the job portal is the claim.' }
   ];
 
@@ -587,10 +585,8 @@
       why: 'Both are me reading model internals instead of calling an API and trusting what comes back. One swaps providers to compare them, the other takes a tokenizer apart.' },
     { a: 'kronos', b: 'aurum', s: 0.5, shared: ['financial data', 'forecasting'],
       why: 'Financial data from opposite ends of the same telescope. Kronos forecasts a market. Aurum forecasts my rent.' },
-    { a: 'aurum', b: 'pandas', s: 0.62, shared: ['csv wrangling', 'aggregation', 'charts'],
-      why: 'Aurum is the notebooks with a front end on them. Same split, aggregate and compare, except the answer has to be readable in two seconds.' },
-    { a: 'pandas', b: 'bikeshare', s: 0.72, shared: ['same skill', 'regression', 'charts'],
-      why: 'One skill in two languages. I learned it in R on rental counts and rebuilt the habit in pandas, which is why the R work still shows up in how I think about a dataframe.' },
+    { a: 'aurum', b: 'bikeshare', s: 0.65, shared: ['modelling', 'aggregation', 'charts'],
+      why: 'One models commuter rental counts, the other models tax brackets and cash flows. Both turn raw tabular datasets into answers someone can act on.' },
     { a: 'bikeshare', b: 'moneyball', s: 0.88, shared: ['r', 'ggplot2', 'regression', 'same term'],
       why: 'Same language, same term, same library. One models the count and fails honestly, the other argues with the chart and wins.' },
     { a: 'moneyball', b: 'aurum', s: 0.34, shared: ['csv wrangling'],
@@ -613,10 +609,8 @@
       why: 'InDesign, type hierarchy, and the same argument underneath: decide what someone reads first, then make every size serve that order.' },
     { a: 'editorial', b: 'visualdesign', s: 0.6, shared: ['print', 'typography', 'craft'],
       why: 'Print craft either side of the classroom. One was graded. The other had forty volunteers waiting on it.' },
-    { a: 'editorial', b: 'essay', s: 0.4, shared: ['same course sequence', 'argument'],
-      why: 'Same year, same course sequence. One argues in prose and one argues in type, and the prose one taught me not to overclaim.' },
-    { a: 'essay', b: 'intlstudent', s: 0.36, shared: ['research writing', 'behaviour'],
-      why: 'Both are research writing about how people actually behave rather than how they say they do.' },
+    { a: 'editorial', b: 'intlstudent', s: 0.45, shared: ['research', 'visual communication'],
+      why: 'Both turn dense qualitative research into visual spreads and interactive artifacts that people actually want to read.' },
     { a: 'visualdesign', b: 'smartcommute', s: 0.52, shared: ['wayfinding', 'signage', 'transit'],
       why: 'Signage people follow without being told to. That is the thesis this whole site runs on, and it started with duty charts and a transit study rather than with a design brief.' },
     { a: 'smartcommute', b: 'innovation', s: 0.76, shared: ['interviews', 'journey mapping', 'synthesis'],
@@ -649,7 +643,7 @@
       why: 'Reading how the model works, then shipping something that depends on it working. In that order, which is the only order that has ever helped.' }
   ];
 
-  var ROUTE_NAMES = { 1: 'Line 1 · Strategy', 2: 'Line 2 · AI Tools', 3: 'Line 3 · Startup', 4: 'Line 4 · Data', 5: 'Line 5 · Earlier' };
+  var ROUTE_NAMES = { 1: 'Line 1 · Strategy', 2: 'Line 2 · AI Tools', 3: 'Line 3 · Startup', 4: 'Line 4 · Data', 5: 'Line 5 · Passion Projects' };
 
   var byId = {};
   NODES.forEach(function (n, i) { n.index = i; n.degree = 0; byId[n.id] = n; });

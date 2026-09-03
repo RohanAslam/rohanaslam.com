@@ -62,7 +62,7 @@ Five routes. Each maps to one work category, permanently. A project's route colo
 | **Line 2** | `ai-tools` | `#F2B705` amber | `#FFC933` | **ink, both modes** |
 | **Line 3** | `startup` | `#D6246E` rose | `#FF6FA3` | white on light, ink on dark |
 | **Line 4** | `data` | `#00875A` green | `#3FCC94` | white on light, ink on dark |
-| **Line 5** | `earlier-work` | `#7A828C` grey | `#8B95A1` | white on light, ink on dark |
+| **Line 5** | `earlier-work` (passion projects) | `#7A3EB0` purple | `#B77BE8` | white on light, ink on dark |
 
 Measured, light mode: white on cobalt **7.30**, white on rose **4.84**, white on green **4.55**, ink on amber **10.64**. Dark mode bullets all carry ink: cobalt **6.44**, amber **12.40**, rose **7.31**, green **9.33**.
 
