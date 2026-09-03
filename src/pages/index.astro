@@ -86,26 +86,28 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
   </section>
 
   <section class="mt-8 sm:mt-12 lg:mt-16">
+    <!-- Section Title, Subtitle, and Full-Width Reflection with bottom dividing rule -->
     <div class="border-b-2 border-(--ink) pb-5">
-      <div>
-        <h2 class="station text-[28px] sm:text-[34px] font-bold tracking-tight text-(--ink)">
-          Connections Across My Work
-        </h2>
-        <p class="font-mono text-[13px] font-bold text-(--ink-muted) uppercase tracking-wider mt-1">
-          2022 to now · Five lines
-        </p>
-        <p class="mt-3.5 text-[15px] sm:text-[16px] leading-relaxed text-(--ink) w-full">
-          Whether consciously or subconsciously, a lot of our work runs in parallel and builds directly on previous experiences. I put this together to help recognize those patterns in my own builds, and to give anyone interested in learning about me a way to see how lessons, tooling, and problems from one project carried forward into the next.
-        </p>
-      </div>
-      <div class="mt-4 flex flex-wrap gap-2.5 text-[13px]">
-        <span class="bullet bullet-1 text-[13px] font-bold">Line 1 · Corporate</span>
-        <span class="bullet bullet-2 text-[13px] font-bold">Line 2 · Business Ventures</span>
-        <span class="bullet bullet-3 text-[13px] font-bold">Line 3 · AI Tools</span>
-        <span class="bullet bullet-4 text-[13px] font-bold">Line 4 · Data</span>
-        <span class="bullet bullet-5 text-[13px] font-bold">Line 5 · Writing</span>
-      </div>
+      <h2 class="station text-[28px] sm:text-[34px] font-bold tracking-tight text-(--ink)">
+        Connections Across My Work
+      </h2>
+      <p class="font-mono text-[13px] font-bold text-(--ink-muted) uppercase tracking-wider mt-1">
+        2022 to now · Five lines
+      </p>
+      <p class="mt-3.5 text-[15px] sm:text-[16px] leading-relaxed text-(--ink) w-full">
+        Whether consciously or subconsciously, a lot of our work runs in parallel and builds directly on previous experiences. I put this together to help recognize those patterns in my own builds, and to give anyone interested in learning about me a way to see how lessons, tooling, and problems from one project carried forward into the next.
+      </p>
     </div>
+
+    <!-- Five Route Badges under the dividing line, introducing the visualization -->
+    <div class="pt-4 pb-1 flex flex-wrap gap-2.5 text-[13px]">
+      <span class="bullet bullet-1 text-[13px] font-bold">Line 1 · Corporate</span>
+      <span class="bullet bullet-2 text-[13px] font-bold">Line 2 · Business Ventures</span>
+      <span class="bullet bullet-3 text-[13px] font-bold">Line 3 · AI Tools</span>
+      <span class="bullet bullet-4 text-[13px] font-bold">Line 4 · Data</span>
+      <span class="bullet bullet-5 text-[13px] font-bold">Line 5 · Writing</span>
+    </div>
+
     <RouteMap />
 
     <!--
