@@ -1,77 +1,28 @@
 ---
 /**
- * The route diagram. Rohan's path as a transit line.
- * 45 and 90 degree angles only. Draws itself once on load.
- * Click, tap or keyboard focus a station to make it the current one. The train
- * rides the track to it, rerouting mid-ride if the target changes, and the panel
- * above the diagram updates to match. Hover only highlights a station ring; it no
- * longer sends the train, because a mouse crossing the diagram used to whip it
- * back and forth.
+ * The route diagram: Rohan's career path as a transit network.
+ * 5 isolated horizontal lines running in parallel:
+ *   Line 1: Corporate & Strategy (Cobalt)
+ *   Line 2: Business Ventures (Rose)
+ *   Line 3: AI Tools (Amber)
+ *   Line 4: Data (Green)
+ *   Line 5: Passion Projects (Purple)
  *
- * Geometry (viewBox 0 0 1240 800, main line at y=310). Five routes:
- *   line 1 strategy      M 0 310 H 1240                    = 1240
- *   line 3 startup       M 790 310 L 950 150 H 1240        = sqrt(160^2+160^2) + 290
- *   line 2 ai tools      M 790 310 L 950 470 H 1240        = sqrt(160^2+160^2) + 290
- *   line 4 data          M 150 310 L 520 680 H 1240        = sqrt(370^2+370^2) + 720
- *   line 5 earlier work  M 0 110 H 780                     = 780
- * Line 5 has no junction. It enters from the left edge like line 1 and terminates
- * at 780, before the line 3 diagonal climbs through that column. Its row is 110
- * rather than 150 so it clears the line 1 logo block, which starts at y=166. Line 4 leaves the
- * spine early (x=150) because the data work predates the AI tool work by two years,
- * and it needs the extra horizontal run to carry six stations.
- * Every constant below mirrors one of these paths. Change them together.
- *
- * Vertical rhythm per station, measured from the line, mirrored on both sides:
- *   name baseline 40, year baseline 62, logo block from 82 to 138.
- * Logos are for employers only. Project stations set no company, skip the logo
- * block entirely, and can therefore sit at a 105 to 130px pitch instead of 150.
- * The stack extent (138) plus node clearance is why the branch offset is 160.
- *
- * Timing. The line draws at one constant speed, so every station delay is derived
- * from its distance along the path by mainDelay() and branchDelay() below. Moving a
- * station only means changing its x.
+ * Dynamic Cross-Line Connections: Hovering or selecting any station draws
+ * SVG transit connectors across lines to related projects, illuminating
+ * the target nodes and displaying the transfer relationship.
  */
-import CompanyLogo from './CompanyLogo.astro';
-import Icon from './Icon.astro';
 
-const LINE_START_X = 0;
-const LINE_END_X = 1240;
-const JUNCTION_X = 790;
-const BEND_X = 950;
+const DRAW_SPEED = 1.2; // px per ms
+const TRACK_START_X = 150;
+const TRACK_END_X = 1220;
+const TRACK_LEN = TRACK_END_X - TRACK_START_X;
+const TRACK_DUR = Math.round(TRACK_LEN / DRAW_SPEED);
 
-const DRAW_SPEED = 1150 / 1500; // px per ms, the original line-draw speed
-const MAIN_LEN = LINE_END_X - LINE_START_X;
-const MAIN_DUR = Math.round(MAIN_LEN / DRAW_SPEED);
-const BRANCH_DIAG = Math.round(Math.hypot(160, 160)); // the 45 degree leg off the junction
-const BRANCH_LEN = BRANCH_DIAG + (LINE_END_X - BEND_X);
-const BRANCH_DUR = Math.round(BRANCH_LEN / DRAW_SPEED);
-const BRANCH_START = Math.round((JUNCTION_X - LINE_START_X) / DRAW_SPEED);
+const calcDelay = (x: number) => Math.round(((x - TRACK_START_X) / TRACK_LEN) * 600);
 
-// Line 4 - data. Leaves the spine at x=150 and drops 370px at 45 degrees to its row.
-const DATA_JUNCTION_X = 150;
-const DATA_BEND_X = 520;
-const DATA_ROW_Y = 680;
-const DATA_DROP = DATA_BEND_X - DATA_JUNCTION_X; // 370, equals the vertical drop
-const DATA_DIAG = Math.round(Math.hypot(DATA_DROP, DATA_DROP));
-const DATA_LEN = DATA_DIAG + (LINE_END_X - DATA_BEND_X);
-const DATA_DUR = Math.round(DATA_LEN / DRAW_SPEED);
-const DATA_START = Math.round((DATA_JUNCTION_X - LINE_START_X) / DRAW_SPEED);
-
-// Line 5 - earlier work. No junction, enters from the left edge and terminates.
-const EARLY_ROW_Y = 110;
-const EARLY_END_X = 780;
-const EARLY_LEN = EARLY_END_X - LINE_START_X;
-const EARLY_DUR = Math.round(EARLY_LEN / DRAW_SPEED);
-
-const mainDelay = (x: number) => Math.round((x - LINE_START_X) / DRAW_SPEED);
-const branchDelay = (x: number) =>
-  Math.round(BRANCH_START + (BRANCH_DIAG + (x - BEND_X)) / DRAW_SPEED);
-const dataDelay = (x: number) =>
-  Math.round(DATA_START + (DATA_DIAG + (x - DATA_BEND_X)) / DRAW_SPEED);
-const earlyDelay = (x: number) => Math.round((x - LINE_START_X) / DRAW_SPEED);
-
-const LOGO_W = 120;
-const LOGO_H = 56;
+const LOGO_W = 100;
+const LOGO_H = 46;
 
 interface StationData {
   id: string;
@@ -83,8 +34,7 @@ interface StationData {
   line: number;
   routeName: string;
   delay: number;
-  interchange?: boolean;
-  company?: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus' | 'n8n';
+  company?: 'rbc' | 'otpp' | 'uoft' | 'dyedurham' | 'sunlife' | 'smartsyllabus';
   role: string;
   organization: string;
   timeframe: string;
@@ -94,16 +44,19 @@ interface StationData {
 }
 
 const stations: StationData[] = [
+  // ==========================================
+  // Line 1 · Corporate & Strategy (y = 90)
+  // ==========================================
   {
     id: 'rbc',
-    x: 70,
-    y: 310,
+    x: 210,
+    y: 90,
     side: 'above',
     label: 'RBC',
     sub: '2022',
     line: 1,
-    routeName: 'Line 1 · Strategy',
-    delay: mainDelay(70),
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(210),
     company: 'rbc',
     organization: 'Royal Bank of Canada',
     role: 'Web Developer Intern',
@@ -111,96 +64,125 @@ const stations: StationData[] = [
     summary: 'Front end work, testing and documentation on an internal tool for wealth management advisors. First industry internship, and mostly a lesson in inheriting a codebase somebody else wrote.',
   },
   {
+    id: 'assistive',
+    x: 400,
+    y: 90,
+    side: 'above',
+    label: 'ASSISTIVE TECH',
+    sub: '2023',
+    line: 1,
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(400),
+    organization: 'Assistive Technology Design',
+    role: 'Design Lead',
+    timeframe: '2023',
+    summary: 'Accessibility research and device prototyping with end users. The term where accessibility stopped being an afterthought and became a primary design constraint.',
+    link: '/work/assistive-technology-design',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'uoft',
+    x: 590,
+    y: 90,
+    side: 'above',
+    label: 'INNOVATION HUB',
+    sub: '2024',
+    line: 1,
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(590),
+    company: 'uoft',
+    organization: 'U of T Innovation Hub',
+    role: 'Design Researcher',
+    timeframe: 'May 2024 – Aug 2024',
+    summary: 'A summer of interviewing educators across Ontario, 20+ conversations, synthesized into insights the team could act on. The problems that came back were ones nobody would have guessed at from a desk.',
+    link: '/work/innovation-hub-design-research',
+    linkLabel: 'Read case study',
+  },
+  {
     id: 'otpp',
-    x: 250,
-    y: 310,
+    x: 780,
+    y: 90,
     side: 'above',
     label: 'OTPP',
     sub: '2023–24',
     line: 1,
-    routeName: 'Line 1 · Strategy',
-    delay: mainDelay(250),
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(780),
     company: 'otpp',
     organization: "Ontario Teachers' Pension Plan",
     role: 'Experience Design & Innovation Intern',
     timeframe: 'May 2023 – Aug 2024 (16 Mos)',
     summary: 'Sixteen straight months across research, Figma prototyping, service mapping and tooling evaluation. A component library from it is still in use, and one process got restructured because the map showed a manual step everyone had stopped noticing.',
+    link: '/work/otpp-experience-design',
+    linkLabel: 'Read case study',
   },
   {
-    id: 'innovation-hub',
-    x: 430,
-    y: 310,
-    side: 'above',
-    label: 'INNOVATION HUB',
-    sub: '2025',
-    line: 1,
-    routeName: 'Line 1 · Strategy',
-    delay: mainDelay(430),
-    company: 'uoft',
-    organization: 'U of T Innovation Hub',
-    role: 'Design Researcher',
-    timeframe: 'May 2025 – Aug 2025',
-    summary: 'A summer of interviewing educators across Ontario, 20+ conversations, synthesized into insights the team could act on. The problems that came back were ones nobody would have guessed at from a desk.',
-  },
-  {
-    id: 'dye-durham',
-    x: 610,
-    y: 310,
+    id: 'dyedurham',
+    x: 970,
+    y: 90,
     side: 'above',
     label: 'DYE & DURHAM',
     sub: '2025',
     line: 1,
-    routeName: 'Line 1 · Strategy',
-    delay: mainDelay(610),
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(970),
     company: 'dyedurham',
     organization: 'Dye & Durham',
     role: 'Product Intern',
     timeframe: 'Sep 2025 – Dec 2025',
     summary: 'Product work on eCore, where the users are lawyers and the constraints are compliance requirements rather than preferences. Mostly translation between what a regulation demands and what someone will tolerate at 4pm on a Friday.',
-  },
-  {
-    id: 'sunlife-interchange',
-    x: 790,
-    y: 310,
-    side: 'above',
-    label: 'SUN LIFE',
-    sub: '2026',
-    line: 1,
-    routeName: 'Junction · 2026',
-    delay: mainDelay(790),
-    interchange: true,
-    company: 'sunlife',
-    organization: 'Sun Life',
-    role: 'Digital Transformation Coordinator',
-    timeframe: 'May 2026 – Aug 2026',
-    summary: 'Four months on the GTVRE team finding the manual work worth automating, then automating it. Copilot Studio agents, Power BI reporting, and a pitch to business leadership in the Intern Innovation Challenge. It turned into the full time offer.',
+    link: '/work/dye-durham-product',
+    linkLabel: 'Read case study',
   },
   {
     id: 'sunadvantage',
-    x: 1080,
-    y: 310,
+    x: 1160,
+    y: 90,
     side: 'above',
     label: 'SUN LIFE',
-    sub: '(SUNADVANTAGE)',
+    sub: 'SUNADVANTAGE',
     line: 1,
-    routeName: 'Line 1 · Strategy',
-    delay: mainDelay(1080),
+    routeName: 'Line 1 · Corporate & Strategy',
+    delay: calcDelay(1160),
     company: 'sunlife',
     organization: 'Sun Life (SunAdvantage)',
     role: 'Strategy & Operations Specialist',
     timeframe: 'Sep 2026 – Present (Full Time)',
-    summary: 'Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Just started, so there is nothing to write up yet.',
+    summary: 'Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Automated reporting, process discovery, and business transformation.',
+    link: '/work/sunlife-digital-transformation',
+    linkLabel: 'Read case study',
+  },
+
+  // ==========================================
+  // Line 2 · Business Ventures (y = 260)
+  // ==========================================
+  {
+    id: 'smartqueue',
+    x: 280,
+    y: 260,
+    side: 'above',
+    label: 'SMARTQUEUE',
+    sub: '2024',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    delay: calcDelay(280),
+    organization: 'SmartQueue',
+    role: 'Co-Founder & Tech Lead',
+    timeframe: '2024',
+    summary: 'Real-time office hours queuing system built to solve bottlenecks in large university courses. Real-time WebSockets, algorithmic student routing, and zero-drop reliability under heavy load.',
+    link: '/work/smartqueue',
+    linkLabel: 'Read case study',
   },
   {
     id: 'smartsyllabus',
-    x: 1010,
-    y: 150,
+    x: 570,
+    y: 260,
     side: 'above',
     label: 'SMARTSYLLABUS',
     sub: 'ICUBE',
-    line: 3,
-    routeName: 'Line 3 · Startup',
-    delay: branchDelay(1010),
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    delay: calcDelay(570),
     company: 'smartsyllabus',
     organization: 'SmartSyllabus / ICUBE',
     role: 'Co-Founder',
@@ -210,86 +192,142 @@ const stations: StationData[] = [
     linkLabel: 'Read case study',
   },
   {
-    id: 'smartsyllabus-live',
-    x: 1160,
-    y: 150,
+    id: 'skoll',
+    x: 860,
+    y: 260,
     side: 'above',
-    label: 'SMARTSYLLABUS.CA',
-    sub: 'LIVE SITE',
+    label: 'SKOLL',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    delay: calcDelay(860),
+    organization: 'Skoll',
+    role: 'Co-Founder & Developer',
+    timeframe: '2026',
+    summary: 'An AI-powered recruiting and athletic roster planner built for coaches to evaluate player fits, depth charts, and eligibility timelines under rapid iteration.',
+    link: '/work/skoll',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'presently',
+    x: 1150,
+    y: 260,
+    side: 'above',
+    label: 'PRESENTLY',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    delay: calcDelay(1150),
+    organization: 'Presently',
+    role: 'Product Lead & Developer',
+    timeframe: '2026',
+    summary: 'Gift giving treated as a structured preference matching problem. Testing the product surface and user onboarding before committing to heavyweight backend logic.',
+    link: '/work/presently',
+    linkLabel: 'Read case study',
+  },
+
+  // ==========================================
+  // Line 3 · AI Tools (y = 430)
+  // ==========================================
+  {
+    id: 'friday-sermon',
+    x: 230,
+    y: 430,
+    side: 'above',
+    label: 'SERMON BOT',
+    sub: '2023',
     line: 3,
-    routeName: 'Line 3 · Startup',
-    delay: branchDelay(1160),
-    company: 'smartsyllabus',
-    organization: 'SmartSyllabus (Live)',
-    role: 'Production Web App',
-    timeframe: 'Live in Production',
-    summary: 'Live at smartsyllabus.ca with parsing engine, semester planner, and user research-backed onboarding flow.',
-    link: 'https://smartsyllabus.ca',
-    linkLabel: 'Open live site',
+    routeName: 'Line 3 · AI Tools',
+    delay: calcDelay(230),
+    organization: 'Friday Sermon Audio Pipeline',
+    role: 'Creator & Developer',
+    timeframe: '2023',
+    summary: 'An automated weekly extraction and text-to-speech pipeline scraping institutional publications and delivering instant summaries to community members.',
+    link: '/work/friday-sermon-bot',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'rag-assistant',
+    x: 460,
+    y: 430,
+    side: 'above',
+    label: 'RAG AGENT',
+    sub: '2024',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    delay: calcDelay(460),
+    organization: 'Source-Grounded Research Assistant',
+    role: 'Creator & Architect',
+    timeframe: '2024 – Present',
+    summary: 'Retrieval assistant that answers only from indexed source passages and cites each claim by document and page. Hallucination is prevented by the retrieval architecture rather than by prompts.',
+    link: '/work/jamat-rag-assistant',
+    linkLabel: 'Read case study',
+  },
+  {
+    id: 'second-brain',
+    x: 690,
+    y: 430,
+    side: 'above',
+    label: 'SECOND BRAIN',
+    sub: '2024',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    delay: calcDelay(690),
+    organization: 'Second Brain Wiki',
+    role: 'Creator & Architect',
+    timeframe: '2024',
+    summary: 'A continuously self-updating markdown knowledge base with automated synthesis across dozens of research notes, articles, and operating playbooks.',
+    link: '/work/second-brain-wiki',
+    linkLabel: 'Read case study',
   },
   {
     id: 'personal-ai-os',
-    x: 985,
-    y: 470,
-    side: 'below',
+    x: 920,
+    y: 430,
+    side: 'above',
     label: 'AI OS',
-    sub: 'N8N',
-    line: 2,
-    routeName: 'Line 2 · AI Tools',
-    delay: branchDelay(985),
+    sub: '2025',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    delay: calcDelay(920),
     organization: 'Personal AI Infrastructure',
     role: 'Creator & Architect',
-    timeframe: 'June 2026 – Daily',
+    timeframe: '2025 – Daily',
     summary: 'Self-hosted n8n orchestrator on PikaPods with Telegram input and Claude classification, routing thoughts into structured Notion pages.',
     link: '/work/personal-ai-os',
     linkLabel: 'Read case study',
   },
   {
-    id: 'job-pipeline',
-    x: 1090,
-    y: 470,
-    side: 'below',
+    id: 'job-search',
+    x: 1150,
+    y: 430,
+    side: 'above',
     label: 'JOB PIPELINE',
-    sub: 'APIFY',
-    line: 2,
-    routeName: 'Line 2 · AI Tools',
-    delay: branchDelay(1090),
+    sub: '2026',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    delay: calcDelay(1150),
     organization: 'Automated Job Search Pipeline',
     role: 'Creator & Developer',
-    timeframe: 'July 2026',
+    timeframe: '2026',
     summary: 'Apify web scraper and LLM scoring pipeline ranking startup strategy roles automatically against specific skill criteria.',
     link: '/work/job-search-automation',
     linkLabel: 'Read case study',
   },
-  {
-    id: 'jamat-agent',
-    x: 1195,
-    y: 470,
-    side: 'below',
-    label: 'RAG AGENT',
-    sub: 'CITED',
-    line: 2,
-    routeName: 'Line 2 · AI Tools',
-    delay: branchDelay(1195),
-    organization: 'Source-Grounded Research Assistant',
-    role: 'Creator & Architect',
-    timeframe: 'Aug 2026 – Present',
-    summary: 'Retrieval assistant that answers only from indexed source passages and cites each claim by document and page. If nothing relevant is retrieved the model is never called and the system refuses instead, so hallucination is prevented by the architecture rather than by the prompt.',
-    link: '/work/jamat-rag-assistant',
-    linkLabel: 'Read case study',
-  },
 
-  // ---- Line 4 · data. Row y=680, no logos, pitch 130. ----
+  // ==========================================
+  // Line 4 · Data (y = 600)
+  // ==========================================
   {
     id: 'moneyball',
-    x: 580,
-    y: DATA_ROW_Y,
-    side: 'below',
+    x: 230,
+    y: 600,
+    side: 'above',
     label: 'DATA STORY',
-    sub: 'R + GGPLOT',
+    sub: '2024',
     line: 4,
     routeName: 'Line 4 · Data',
-    delay: dataDelay(580),
+    delay: calcDelay(230),
     organization: 'Data Storytelling in R',
     role: 'Analyst & Visualizer',
     timeframe: '2024',
@@ -299,14 +337,14 @@ const stations: StationData[] = [
   },
   {
     id: 'bikeshare',
-    x: 740,
-    y: DATA_ROW_Y,
-    side: 'below',
+    x: 460,
+    y: 600,
+    side: 'above',
     label: 'BIKESHARE',
-    sub: 'REGRESSION',
+    sub: '2024',
     line: 4,
     routeName: 'Line 4 · Data',
-    delay: dataDelay(740),
+    delay: calcDelay(460),
     organization: 'Bikeshare Demand Model',
     role: 'Modelling',
     timeframe: '2024',
@@ -316,14 +354,14 @@ const stations: StationData[] = [
   },
   {
     id: 'job-portal',
-    x: 900,
-    y: DATA_ROW_Y,
-    side: 'below',
+    x: 690,
+    y: 600,
+    side: 'above',
     label: 'JOB PORTAL',
-    sub: '5 PROVIDERS',
+    sub: '2026',
     line: 4,
     routeName: 'Line 4 · Data',
-    delay: dataDelay(900),
+    delay: calcDelay(690),
     organization: 'Job Portal',
     role: 'Creator & Developer',
     timeframe: 'May 2026 – Present',
@@ -333,14 +371,14 @@ const stations: StationData[] = [
   },
   {
     id: 'aurum',
-    x: 1060,
-    y: DATA_ROW_Y,
-    side: 'below',
+    x: 920,
+    y: 600,
+    side: 'above',
     label: 'AURUM',
-    sub: 'FINANCE',
+    sub: '2026',
     line: 4,
     routeName: 'Line 4 · Data',
-    delay: dataDelay(1060),
+    delay: calcDelay(920),
     organization: 'Aurum Finance Dashboard',
     role: 'Creator & Developer',
     timeframe: '2026',
@@ -350,14 +388,14 @@ const stations: StationData[] = [
   },
   {
     id: 'kronos',
-    x: 1220,
-    y: DATA_ROW_Y,
-    side: 'below',
+    x: 1150,
+    y: 600,
+    side: 'above',
     label: 'KRONOS',
-    sub: 'FORECASTS',
+    sub: '2026',
     line: 4,
     routeName: 'Line 4 · Data',
-    delay: dataDelay(1220),
+    delay: calcDelay(1150),
     organization: 'Kronos Forecasting Research',
     role: 'Research',
     timeframe: '2026',
@@ -366,17 +404,19 @@ const stations: StationData[] = [
     linkLabel: 'Read case study',
   },
 
-  // ---- Line 5 · passion projects. Row y=110, pitch 150-160. ----
+  // ==========================================
+  // Line 5 · Passion Projects (y = 770)
+  // ==========================================
   {
     id: 'early-web',
-    x: 100,
-    y: EARLY_ROW_Y,
+    x: 230,
+    y: 770,
     side: 'above',
     label: 'EARLY WEB',
-    sub: 'JS + REACT',
+    sub: '2021–22',
     line: 5,
     routeName: 'Line 5 · Passion Projects',
-    delay: earlyDelay(100),
+    delay: calcDelay(230),
     organization: 'Early Web Builds',
     role: 'Learning Reps',
     timeframe: '2021 – 2022',
@@ -386,14 +426,14 @@ const stations: StationData[] = [
   },
   {
     id: 'editorial',
-    x: 250,
-    y: EARLY_ROW_Y,
+    x: 460,
+    y: 770,
     side: 'above',
     label: 'EDITORIAL',
-    sub: 'LAYOUT',
+    sub: '2022',
     line: 5,
     routeName: 'Line 5 · Passion Projects',
-    delay: earlyDelay(250),
+    delay: calcDelay(460),
     organization: 'Editorial Layout & Poster',
     role: 'Design',
     timeframe: '2022',
@@ -403,14 +443,14 @@ const stations: StationData[] = [
   },
   {
     id: 'juventus',
-    x: 400,
-    y: EARLY_ROW_Y,
+    x: 690,
+    y: 770,
     side: 'above',
     label: 'JUVENTUS',
-    sub: 'REBRAND',
+    sub: '2023',
     line: 5,
     routeName: 'Line 5 · Passion Projects',
-    delay: earlyDelay(400),
+    delay: calcDelay(690),
     organization: 'Juventus Rebrand Style Guide',
     role: 'Brand Strategy',
     timeframe: '2023',
@@ -420,31 +460,31 @@ const stations: StationData[] = [
   },
   {
     id: 'flingblade',
-    x: 560,
-    y: EARLY_ROW_Y,
+    x: 920,
+    y: 770,
     side: 'above',
     label: 'FLINGBLADE',
-    sub: 'UNITY',
+    sub: '2023',
     line: 5,
     routeName: 'Line 5 · Passion Projects',
-    delay: earlyDelay(560),
-    organization: 'FLINGBLADE',
-    role: 'Game Development',
+    delay: calcDelay(920),
+    organization: 'FLINGBLADE (Unity WebGL)',
+    role: 'Game Developer',
     timeframe: '2023',
-    summary: 'A Unity project taken all the way to a WebGL build and put on the internet, which is a different job from making it run in the editor. The first thing I ever shipped that a stranger could break.',
+    summary: 'A Unity project taken all the way to a WebGL build and put on the internet. Sword mechanics, physics constraints, and browser performance budgets connecting directly to game design theory.',
     link: '/work/flingblade',
     linkLabel: 'Read case study',
   },
   {
     id: 'visual-design',
-    x: 720,
-    y: EARLY_ROW_Y,
+    x: 1150,
+    y: 770,
     side: 'above',
     label: 'VISUAL DESIGN',
-    sub: '3D + PRINT',
+    sub: '2022–25',
     line: 5,
     routeName: 'Line 5 · Passion Projects',
-    delay: earlyDelay(720),
+    delay: calcDelay(1150),
     organization: 'Visual Design & Community Materials',
     role: 'Design',
     timeframe: '2022 – 2025',
@@ -455,24 +495,40 @@ const stations: StationData[] = [
 ];
 
 const routeColors: Record<number, string> = {
-  1: 'var(--line-1)',
-  2: 'var(--line-2)',
-  3: 'var(--line-3)',
-  4: 'var(--line-4)',
-  5: 'var(--line-5)',
+  1: 'var(--line-1)', // Cobalt
+  2: 'var(--line-3)', // Rose for Business Ventures
+  3: 'var(--line-2)', // Amber for AI Tools
+  4: 'var(--line-4)', // Green for Data
+  5: 'var(--line-5)', // Purple for Passion Projects
+};
+
+const routeTextColors: Record<number, string> = {
+  1: '#FFFFFF',
+  2: '#FFFFFF',
+  3: '#0B0E12',
+  4: '#FFFFFF',
+  5: '#FFFFFF',
 };
 
 const lineNames: Record<number, string> = {
-  1: 'Line 1 · Strategy',
-  2: 'Line 2 · AI Tools',
-  3: 'Line 3 · Startup',
+  1: 'Line 1 · Corporate & Strategy',
+  2: 'Line 2 · Business Ventures',
+  3: 'Line 3 · AI Tools',
   4: 'Line 4 · Data',
   5: 'Line 5 · Passion Projects',
 };
+
+const lineTracks = [
+  { num: 1, y: 90, name: 'LINE 1 · CORPORATE' },
+  { num: 2, y: 260, name: 'LINE 2 · VENTURES' },
+  { num: 3, y: 430, name: 'LINE 3 · AI TOOLS' },
+  { num: 4, y: 600, name: 'LINE 4 · DATA' },
+  { num: 5, y: 770, name: 'LINE 5 · PASSION' },
+];
 ---
 
 <div class="route-map-container my-4">
-  <!-- Unified Top Transit Board & Station Inspector: Sits directly above the timeline (Always above the fold) -->
+  <!-- Unified Top Transit Board & Station Inspector -->
   <div
     id="station-inspector"
     class="mb-6 border-2 border-(--ink) bg-(--ground) transition-all"
@@ -484,72 +540,72 @@ const lineNames: Record<number, string> = {
       class="overflow-hidden border-b-2 border-(--ink) bg-[#0B0E12] px-4 py-2 text-[#F2B705] transition-all"
     >
       <div id="ttc-sign-track" class="flex items-center gap-2 font-mono text-[12px] font-bold tracking-widest uppercase ttc-slide-in">
-        <span class="inline-block h-2 w-2 rounded-full bg-[#F2B705] animate-pulse"></span>
-        <span id="ttc-status-text">ARRIVED AT</span>
+        <span id="ttc-status-pulse" class="inline-block h-2 w-2 rounded-full bg-[#F2B705]"></span>
+        <span id="ttc-sign-status">ARRIVING AT</span>
+        <span class="text-[#F2B705]/60">:</span>
+        <span id="ttc-sign-station">SUN LIFE (SUNADVANTAGE)</span>
+        <span class="text-[#F2B705]/40 ml-2 hidden md:inline" id="ttc-interchange-badge">⇄ HOVER STATIONS TO VIEW CONNECTIONS</span>
       </div>
     </div>
 
-    <!-- Active Station Quick Info Row -->
-    <div class="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div class="flex items-center gap-4 min-w-0">
-        <!-- Logo Box: Transparent background, no border, clean alignment -->
-        <div id="inspector-logo" class="flex h-14 w-20 shrink-0 items-center justify-center">
-          <CompanyLogo name="sunlife" width={80} height={40} class="logo-img h-full w-full object-contain" data-logo="sunlife" />
-          <CompanyLogo name="rbc" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="rbc" />
-          <CompanyLogo name="otpp" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="otpp" />
-          <CompanyLogo name="uoft" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="uoft" />
-          <CompanyLogo name="dyedurham" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="dyedurham" />
-          <CompanyLogo name="smartsyllabus" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="smartsyllabus" />
-          <CompanyLogo name="n8n" width={80} height={40} class="logo-img h-full w-full object-contain hidden" data-logo="n8n" />
-        </div>
-
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span id="inspector-bullet" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Strategy</span>
-            <span id="inspector-timeframe" class="label text-[12px] text-(--ink-faint)">2026 – Present</span>
+    <!-- Inspector Content Grid -->
+    <div class="p-4 sm:p-5">
+      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span id="inspector-bullet" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Corporate & Strategy</span>
+            <span id="inspector-timeframe" class="font-mono text-[12px] text-(--ink-faint)">Sep 2026 – Present (Full Time)</span>
           </div>
-          <h3 id="inspector-title" class="mt-0.5 text-[17px] sm:text-[19px] font-bold text-(--ink) truncate">
+          <h3 id="inspector-title" class="font-mono text-[18px] sm:text-[20px] font-bold text-(--ink) tracking-tight">
             Sun Life (SunAdvantage)
           </h3>
-          <div id="inspector-role" class="label text-[13px] font-bold text-(--cobalt) truncate">
+          <p id="inspector-role" class="text-[14px] font-medium text-(--ink-muted) mt-0.5">
             Strategy & Operations Specialist
+          </p>
+        </div>
+
+        <!-- Action / Case study link & Employer Logo -->
+        <div class="flex items-center gap-3 shrink-0">
+          <div id="inspector-logo" class="h-10 w-24 border border-(--ink-faint)/30 bg-(--surface) flex items-center justify-center p-1">
+            <img src="/images/logos/sunlife.png" alt="Sun Life" class="logo-img max-h-full max-w-full object-contain" data-logo="sunlife" />
+            <img src="/images/logos/otpp.png" alt="OTPP" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="otpp" />
+            <img src="/images/logos/dyedurham.png" alt="Dye & Durham" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="dyedurham" />
+            <img src="/images/logos/uoft.png" alt="U of T" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="uoft" />
+            <img src="/images/logos/rbc.png" alt="RBC" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="rbc" />
+            <img src="/images/logos/smartsyllabus.png" alt="SmartSyllabus" class="logo-img max-h-full max-w-full object-contain hidden" data-logo="smartsyllabus" />
           </div>
+
+          <a
+            id="inspector-link"
+            href="/work/sunlife-digital-transformation"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-(--ink) text-(--ground) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
+          >
+            <span id="inspector-link-text">Read case study</span>
+            <span>→</span>
+          </a>
+
+          <button
+            type="button"
+            id="inspector-toggle-details"
+            class="px-2.5 py-1.5 border border-(--ink) font-mono text-[11px] text-(--ink-muted) hover:text-(--ink) hover:border-(--cobalt) transition-colors"
+            aria-expanded="true"
+            title="Toggle notes"
+          >
+            NOTES
+          </button>
         </div>
       </div>
 
-      <!-- Action & Collapsible Details Toggle -->
-      <div class="flex items-center gap-2.5 shrink-0 self-start md:self-center">
-        <button
-          type="button"
-          id="inspector-toggle-details"
-          class="btn btn-secondary text-[11px] h-8 px-3 flex items-center gap-1.5"
-          aria-expanded="false"
-          aria-controls="inspector-summary-drawer"
-        >
-          <span id="toggle-details-text">Summary</span>
-          <Icon name="arrow-down" size={12} class="transition-transform duration-200" />
-        </button>
-
-        <a
-          id="inspector-link"
-          href="#"
-          class="btn btn-primary text-[11px] h-8 px-3 flex items-center gap-1.5"
-          style="display: none;"
-        >
-          <span id="inspector-link-text">Case study</span>
-          <Icon name="arrow-right" size={12} />
-        </a>
+      <!-- Collapsible Detailed Summary & Transfer Relationship drawer -->
+      <div id="inspector-summary-drawer" class="mt-3 pt-3 border-t border-(--ink-faint)/20">
+        <p id="inspector-summary" class="text-[14px] leading-relaxed text-(--ink-muted) max-w-[85ch]">
+          Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Automated reporting, process discovery, and business transformation.
+        </p>
+        <div id="inspector-transfers" class="mt-2 text-[12px] font-mono text-(--ink-faint) flex flex-wrap items-center gap-2 hidden">
+          <span class="font-bold text-(--ink)">CROSS-LINE CONNECTIONS:</span>
+          <span id="inspector-transfers-list">None</span>
+        </div>
       </div>
-    </div>
-
-    <!-- Collapsible Summary Drawer -->
-    <div
-      id="inspector-summary-drawer"
-      class="hidden border-t-2 border-(--rule-soft) bg-(--surface) px-4 py-3"
-    >
-      <p id="inspector-summary" class="max-w-[90ch] text-[13px] sm:text-[14px] leading-relaxed text-(--ink)">
-        Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Just started, so there is nothing to write up yet.
-      </p>
     </div>
   </div>
 
@@ -585,12 +641,11 @@ const lineNames: Record<number, string> = {
         [
           { id: 'sunadvantage', name: 'Sun Life' },
           { id: 'smartsyllabus', name: 'SmartSyllabus' },
-          { id: 'otpp', name: 'OTPP' },
-          { id: 'dyedurham', name: 'Dye & Durham' },
-          { id: 'uoft', name: 'U of T' },
-          { id: 'personal-ai-os', name: 'AI OS' },
-          { id: 'bikeshare', name: 'Bikeshare' },
           { id: 'flingblade', name: 'Flingblade' },
+          { id: 'personal-ai-os', name: 'AI OS' },
+          { id: 'job-portal', name: 'Job Portal' },
+          { id: 'otpp', name: 'OTPP' },
+          { id: 'uoft', name: 'U of T' },
         ].map((s) => (
           <button
             type="button"
@@ -617,7 +672,10 @@ const lineNames: Record<number, string> = {
           return (
             <div class="p-3">
               <div class="flex items-center gap-2 mb-2">
-                <span class={`bullet bullet-${lineNum} text-[11px] font-bold`}>
+                <span
+                  class="font-mono text-[11px] font-bold px-2 py-0.5"
+                  style={`background: ${routeColors[lineNum]}; color: ${routeTextColors[lineNum]}`}
+                >
                   {lineNames[lineNum]}
                 </span>
                 <span class="label text-[11px] text-(--ink-faint)">{lineStations.length} stops</span>
@@ -648,50 +706,53 @@ const lineNames: Record<number, string> = {
     ⇄ Pan track horizontally to explore stations
   </div>
 
+  <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections -->
   <figure id="route-map-figure" class="my-0 overflow-x-auto" aria-label="Career transit route diagram">
-    <svg viewBox="0 0 1240 800" class="w-full min-w-[1040px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Line 5 · earlier work. Enters from the left edge, terminates at 780. -->
-      <path
-        d={`M 0 ${EARLY_ROW_Y} H ${EARLY_END_X}`}
-        stroke="var(--line-5)" stroke-width="10" stroke-linecap="butt"
-        class="route-line"
-        style={`--len:${EARLY_LEN}; animation-delay:0ms; animation-duration:${EARLY_DUR}ms`}
-      />
-      <!-- Line 4 · data, branches down at 45 from x=150 -->
-      <path
-        d={`M ${DATA_JUNCTION_X} 310 L ${DATA_BEND_X} ${DATA_ROW_Y} H ${LINE_END_X}`}
-        stroke="var(--line-4)" stroke-width="10" stroke-linecap="butt" stroke-linejoin="miter"
-        class="route-line"
-        style={`--len:${DATA_LEN}; animation-delay:${DATA_START}ms; animation-duration:${DATA_DUR}ms`}
-      />
-      <!-- Line 1 · strategy -->
-      <path
-        d="M 0 310 H 1240"
-        stroke="var(--line-1)" stroke-width="10" stroke-linecap="butt"
-        class="route-line"
-        style={`--len:${MAIN_LEN}; animation-delay:0ms; animation-duration:${MAIN_DUR}ms`}
-      />
-      <!-- Line 3 · startup, branches up at 45 -->
-      <path
-        d="M 790 310 L 950 150 H 1240"
-        stroke="var(--line-3)" stroke-width="10" stroke-linecap="butt" stroke-linejoin="miter"
-        class="route-line"
-        style={`--len:${BRANCH_LEN}; animation-delay:${BRANCH_START}ms; animation-duration:${BRANCH_DUR}ms`}
-      />
-      <!-- Line 2 · ai tools, branches down at 45 -->
-      <path
-        d="M 790 310 L 950 470 H 1240"
-        stroke="var(--line-2)" stroke-width="10" stroke-linecap="butt" stroke-linejoin="miter"
-        class="route-line"
-        style={`--len:${BRANCH_LEN}; animation-delay:${BRANCH_START}ms; animation-duration:${BRANCH_DUR}ms`}
-      />
+    <svg viewBox="0 0 1260 870" class="w-full min-w-[1060px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* 5 Isolated Horizontal Routes */}
+      {
+        lineTracks.map((line) => (
+          <g class="route-track-group">
+            {/* Left Terminal Route Badge */}
+            <rect
+              x="20"
+              y={line.y - 15}
+              width="125"
+              height="30"
+              fill={routeColors[line.num]}
+            />
+            <text
+              x="82"
+              y={line.y + 5}
+              text-anchor="middle"
+              fill={routeTextColors[line.num]}
+              font-family="var(--font-mono)"
+              font-size="11"
+              font-weight="700"
+              letter-spacing="0.5"
+            >
+              {line.name}
+            </text>
 
-      <!-- Stations: node on the line, clean transparent logo, name, and year stacked cleanly with no overlap -->
+            {/* Horizontal Track Line */}
+            <path
+              d={`M ${TRACK_START_X} ${line.y} H ${TRACK_END_X}`}
+              stroke={routeColors[line.num]}
+              stroke-width="8"
+              stroke-linecap="square"
+              class="route-line"
+              style={`--len:${TRACK_LEN}; animation-delay:0ms; animation-duration:${TRACK_DUR}ms`}
+            />
+          </g>
+        ))
+      }
+
+      {/* Dynamic Cross-Line Connections Layer (Rendered underneath station nodes) */}
+      <g id="cross-connections-layer" class="pointer-events-none"></g>
+
+      {/* Stations: node on the line, clean transparent logo, name, and year stacked cleanly with no overlap */}
       {
         stations.map((s) => {
-          const labelY = s.side === 'above' ? s.y - 46 : s.y + 50;
-          const subY = s.side === 'above' ? s.y - 68 : s.y + 72;
-          const logoY = s.side === 'above' ? s.y - 144 : s.y + 88;
           return (
             <g
               class="station-hit cursor-pointer"
@@ -700,58 +761,59 @@ const lineNames: Record<number, string> = {
               role="button"
               aria-label={`Station: ${s.label}, ${s.organization}`}
             >
-              {/* Station Node on Track: Enlarge touch target + node ring + center dot */}
+              {/* Station Node on Track */}
               <g class="route-station" style={`animation-delay:${s.delay}ms; transform-origin:${s.x}px ${s.y}px`}>
                 <circle cx={s.x} cy={s.y} r="28" fill="transparent" class="node-hit-pad" />
-                <circle cx={s.x} cy={s.y} r="14" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="7" class="node-ring" />
-                <circle cx={s.x} cy={s.y} r="5" fill="var(--ink)" class="node-center-dot" />
+                <circle cx={s.x} cy={s.y} r="20" fill="none" stroke={routeColors[s.line]} stroke-width="2" class="node-pulse-ring opacity-0 pointer-events-none" />
+                <circle cx={s.x} cy={s.y} r="13" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="6" class="node-ring" />
+                <circle cx={s.x} cy={s.y} r="4.5" fill="var(--ink)" class="node-center-dot" />
               </g>
-
-              {/* Company logo, employers only. Project stations skip it entirely. */}
-              {s.company && (
-                <image
-                  href={`/images/logos/${s.company}.png`}
-                  x={s.x - LOGO_W / 2}
-                  y={logoY}
-                  width={LOGO_W}
-                  height={LOGO_H}
-                  preserveAspectRatio="xMidYMid meet"
-                  class="route-label pointer-events-none"
-                  style={`animation-delay:${s.delay + 150}ms`}
-                />
-              )}
 
               {/* Station Name Label */}
               <text
                 x={s.x}
-                y={labelY}
+                y={s.y - 38}
                 class="route-label pointer-events-none"
-                style={`animation-delay:${s.delay + 220}ms`}
+                style={`animation-delay:${s.delay + 180}ms`}
                 text-anchor="middle"
                 fill="var(--ink)"
                 font-family="var(--font-mono)"
-                font-size="14"
+                font-size="13"
                 font-weight="700"
-                letter-spacing="0.8"
+                letter-spacing="0.5"
               >
                 {s.label}
               </text>
 
-              {/* Station Sub / Year Label (Uniform neutral ink-faint color for all stations) */}
+              {/* Station Sub / Year Label */}
               <text
                 x={s.x}
-                y={subY}
+                y={s.y - 20}
                 class="route-label pointer-events-none"
-                style={`animation-delay:${s.delay + 290}ms`}
+                style={`animation-delay:${s.delay + 240}ms`}
                 text-anchor="middle"
                 fill="var(--ink-faint)"
                 font-family="var(--font-mono)"
-                font-size="12"
+                font-size="11"
                 font-weight="600"
-                letter-spacing="1"
+                letter-spacing="0.8"
               >
                 {s.sub}
               </text>
+
+              {/* Company logo (if present, placed below track) */}
+              {s.company && (
+                <image
+                  href={`/images/logos/${s.company}.png`}
+                  x={s.x - LOGO_W / 2}
+                  y={s.y + 16}
+                  width={LOGO_W}
+                  height={LOGO_H}
+                  preserveAspectRatio="xMidYMid meet"
+                  class="route-label pointer-events-none"
+                  style={`animation-delay:${s.delay + 280}ms`}
+                />
+              )}
             </g>
           );
         })
@@ -761,7 +823,7 @@ const lineNames: Record<number, string> = {
 </div>
 
 <style>
-  /* Hover and active station node styles */
+  /* Station Hit & Ring Hover */
   .station-hit {
     outline: none;
   }
@@ -770,10 +832,10 @@ const lineNames: Record<number, string> = {
   }
   .station-hit:hover .node-ring,
   .station-hit:focus-visible .node-ring {
-    stroke: var(--cobalt);
+    stroke: var(--cobalt) !important;
   }
 
-  /* Solid black center dot inside current station ring at all times */
+  /* Solid black center dot inside current station ring */
   .station-hit .node-center-dot {
     opacity: 0;
     transition: opacity var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
@@ -788,6 +850,39 @@ const lineNames: Record<number, string> = {
   .station-hit.current-station .node-ring {
     stroke: var(--cobalt) !important;
     stroke-width: 8px;
+  }
+
+  /* Cross-Line Connections: Dynamic Target Node Pulse */
+  .station-hit.connected-target .node-ring {
+    stroke: var(--cobalt) !important;
+    stroke-width: 7px !important;
+  }
+  .station-hit.connected-target .node-pulse-ring {
+    opacity: 1 !important;
+    stroke: var(--cobalt) !important;
+    animation: targetNodePulse 1.4s ease-in-out infinite;
+  }
+  @keyframes targetNodePulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.35);
+      opacity: 0.4;
+    }
+  }
+
+  /* Cross-Line Connection SVG Path: Animated Dash Flow */
+  :global(.connection-line-path) {
+    animation: connectionDashFlow 1s linear infinite;
+    opacity: 0.95;
+    transition: opacity 200ms ease;
+  }
+  @keyframes connectionDashFlow {
+    to {
+      stroke-dashoffset: -20;
+    }
   }
 
   /* TTC arrival sign container and sliding animations */
@@ -827,7 +922,8 @@ const lineNames: Record<number, string> = {
 
   @media (prefers-reduced-motion: reduce) {
     .ttc-slide-in,
-    .ttc-slide-out {
+    .ttc-slide-out,
+    :global(.connection-line-path) {
       animation: none !important;
       transform: none !important;
       opacity: 1 !important;
@@ -849,23 +945,135 @@ const lineNames: Record<number, string> = {
   .mobile-view-tab {
     border: 2px solid var(--ink);
     background: var(--surface);
-    color: var(--ink);
+    color: var(--ink-muted);
   }
   .mobile-view-tab.active {
     background: var(--ink);
     color: var(--ground);
-  }
-  .mobile-list-station-btn:focus-visible {
-    outline: 3px solid var(--cobalt);
-    outline-offset: 2px;
+    border-color: var(--ink);
   }
 </style>
 
-<script is:inline define:vars={{ stations }}>
+<script is:inline define:vars={{ stations, routeColors, lineNames }}>
   const dataMap = {};
   stations.forEach((s) => {
     dataMap[s.id] = s;
   });
+
+  // Cross-line curated connections graph
+  const CONNECTIONS = {
+    'flingblade': [
+      { target: 'early-web', reason: 'First browser builds' },
+      { target: 'smartqueue', reason: 'Interactive constraints' },
+      { target: 'visual-design', reason: '3D mechanics' }
+    ],
+    'smartsyllabus': [
+      { target: 'uoft', reason: 'Born out of U of T student research' },
+      { target: 'rag-assistant', reason: 'Document parsing & LLM retrieval' },
+      { target: 'smartqueue', reason: 'Student workflow tools' },
+      { target: 'kronos', reason: 'Transformer models' }
+    ],
+    'sunadvantage': [
+      { target: 'job-search', reason: 'Process automation & scripts' },
+      { target: 'dyedurham', reason: 'Enterprise transformation' },
+      { target: 'otpp', reason: 'Institutional systems' }
+    ],
+    'otpp': [
+      { target: 'assistive', reason: 'AODA & WCAG accessibility systems' },
+      { target: 'dyedurham', reason: 'Regulated compliance constraints' },
+      { target: 'uoft', reason: 'Design research & service mapping' }
+    ],
+    'job-portal': [
+      { target: 'job-search', reason: 'Ingestion pipeline to local UI' },
+      { target: 'kronos', reason: 'Local LLM benchmark scoring' },
+      { target: 'aurum', reason: 'Local-first desktop architecture' }
+    ],
+    'aurum': [
+      { target: 'bikeshare', reason: 'Tabular aggregation & modeling' },
+      { target: 'kronos', reason: 'Financial modeling' },
+      { target: 'moneyball', reason: 'Data visualization' }
+    ],
+    'personal-ai-os': [
+      { target: 'second-brain', reason: 'Automated cognitive synthesis' },
+      { target: 'job-search', reason: 'n8n workflow pipelines' },
+      { target: 'sunadvantage', reason: 'Enterprise to personal automations' }
+    ],
+    'juventus': [
+      { target: 'editorial', reason: 'Typography & layout rules' },
+      { target: 'smartqueue', reason: 'Design system rulebooks' }
+    ],
+    'editorial': [
+      { target: 'visual-design', reason: 'Print craft & hierarchy' },
+      { target: 'juventus', reason: 'Brand & visual rules' }
+    ],
+    'moneyball': [
+      { target: 'bikeshare', reason: 'R & regression analysis' },
+      { target: 'aurum', reason: 'Tabular data analysis' }
+    ],
+    'bikeshare': [
+      { target: 'moneyball', reason: 'Statistical storytelling' },
+      { target: 'aurum', reason: 'Residual modeling' }
+    ],
+    'smartqueue': [
+      { target: 'juventus', reason: 'Design system rulebooks' },
+      { target: 'smartsyllabus', reason: 'Student productivity' },
+      { target: 'flingblade', reason: 'First interactive shipping' }
+    ],
+    'assistive': [
+      { target: 'otpp', reason: 'Enterprise accessibility' },
+      { target: 'smartqueue', reason: 'Accessible UI standards' }
+    ],
+    'dyedurham': [
+      { target: 'sunadvantage', reason: 'Financial enterprise products' },
+      { target: 'otpp', reason: 'Regulated workflows' }
+    ],
+    'uoft': [
+      { target: 'smartsyllabus', reason: 'Student experience research' },
+      { target: 'otpp', reason: 'User journey mapping' }
+    ],
+    'early-web': [
+      { target: 'flingblade', reason: 'Browser WebGL deployment' },
+      { target: 'smartqueue', reason: 'Early React reps' }
+    ],
+    'kronos': [
+      { target: 'smartsyllabus', reason: 'Transformer models' },
+      { target: 'aurum', reason: 'Financial data' },
+      { target: 'job-portal', reason: 'Model internals' }
+    ],
+    'rag-assistant': [
+      { target: 'friday-sermon', reason: 'Corpus text & audio' },
+      { target: 'smartsyllabus', reason: 'Document RAG' },
+      { target: 'second-brain', reason: 'Document synthesis' }
+    ],
+    'friday-sermon': [
+      { target: 'rag-assistant', reason: 'Corpus scraping' }
+    ],
+    'second-brain': [
+      { target: 'personal-ai-os', reason: 'Automated personal systems' },
+      { target: 'rag-assistant', reason: 'Information retrieval' }
+    ],
+    'job-search': [
+      { target: 'job-portal', reason: 'Plumbing to product' },
+      { target: 'personal-ai-os', reason: 'n8n pipelines' },
+      { target: 'sunadvantage', reason: 'Workflow automation' }
+    ],
+    'skoll': [
+      { target: 'smartsyllabus', reason: 'Gemini prototype' },
+      { target: 'presently', reason: 'Matching problem' }
+    ],
+    'presently': [
+      { target: 'skoll', reason: 'Product surface testing' },
+      { target: 'job-portal', reason: 'Matching logic' }
+    ],
+    'visual-design': [
+      { target: 'editorial', reason: 'Print craft & signage' },
+      { target: 'flingblade', reason: '3D spatial design' }
+    ],
+    'rbc': [
+      { target: 'early-web', reason: 'First frontend reps' },
+      { target: 'otpp', reason: 'Institutional engineering' }
+    ]
+  };
 
   const inspector = document.getElementById('station-inspector');
   const elTitle = document.getElementById('inspector-title');
@@ -875,12 +1083,17 @@ const lineNames: Record<number, string> = {
   const elBullet = document.getElementById('inspector-bullet');
   const elLink = document.getElementById('inspector-link');
   const elLinkText = document.getElementById('inspector-link-text');
-  const elStatusText = document.getElementById('ttc-status-text');
   const signTrack = document.getElementById('ttc-sign-track');
+  const elStatusText = document.getElementById('ttc-sign-status');
+  const elStationText = document.getElementById('ttc-sign-station');
+  const elInterchangeBadge = document.getElementById('ttc-interchange-badge');
+  const transfersContainer = document.getElementById('inspector-transfers');
+  const transfersList = document.getElementById('inspector-transfers-list');
   const btnToggle = document.getElementById('inspector-toggle-details');
   const drawerSummary = document.getElementById('inspector-summary-drawer');
   const logoImgs = document.querySelectorAll('.logo-img');
   const nodes = document.querySelectorAll('.station-hit');
+  const connectionsLayer = document.getElementById('cross-connections-layer');
 
   let currentId = 'sunadvantage';
   let slideTimeout = null;
@@ -900,29 +1113,76 @@ const lineNames: Record<number, string> = {
     });
   }
 
+  // Draw cross-line connections in SVG
+  function renderConnections(stationId) {
+    if (!connectionsLayer) return [];
+    connectionsLayer.innerHTML = '';
+    document.querySelectorAll('.station-hit').forEach((el) => el.classList.remove('connected-target'));
+
+    const conns = CONNECTIONS[stationId] || [];
+    const sourceStation = dataMap[stationId];
+    if (!sourceStation || !conns.length) return [];
+
+    const summaries = [];
+    const strokeColor = routeColors[sourceStation.line] || 'var(--cobalt)';
+
+    conns.forEach((c) => {
+      const targetStation = dataMap[c.target];
+      if (!targetStation) return;
+
+      const sX = sourceStation.x;
+      const sY = sourceStation.y;
+      const tX = targetStation.x;
+      const tY = targetStation.y;
+
+      let pathD = '';
+      if (sY === tY) {
+        const midX = (sX + tX) / 2;
+        const arcH = Math.min(50, Math.abs(tX - sX) * 0.25);
+        pathD = `M ${sX} ${sY} Q ${midX} ${sY - arcH} ${tX} ${tY}`;
+      } else {
+        const midY = (sY + tY) / 2;
+        pathD = `M ${sX} ${sY} C ${sX} ${midY}, ${tX} ${midY}, ${tX} ${tY}`;
+      }
+
+      const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      pathEl.setAttribute('d', pathD);
+      pathEl.setAttribute('class', 'connection-line-path');
+      pathEl.setAttribute('stroke', strokeColor);
+      pathEl.setAttribute('stroke-width', '3');
+      pathEl.setAttribute('fill', 'none');
+      pathEl.setAttribute('stroke-dasharray', '6 4');
+      connectionsLayer.appendChild(pathEl);
+
+      const targetEl = document.querySelector(`.station-hit[data-station-id="${c.target}"]`);
+      if (targetEl) {
+        targetEl.classList.add('connected-target');
+      }
+
+      summaries.push(`${targetStation.label} (${c.reason})`);
+    });
+
+    return summaries;
+  }
+
   function updateInspector(stationId) {
     const s = dataMap[stationId];
     if (!s) return;
 
-    // Update route color styling on inspector card
-    const routeVar = `var(--line-${s.line})`;
     if (inspector) {
-      inspector.style.setProperty('--route', routeVar);
+      inspector.style.setProperty('--route', routeColors[s.line]);
     }
 
-    // Update text
     if (elTitle) elTitle.textContent = `${s.organization}`;
     if (elRole) elRole.textContent = s.role;
     if (elSummary) elSummary.textContent = s.summary;
     if (elTimeframe) elTimeframe.textContent = s.timeframe;
 
-    // Update bullet
     if (elBullet) {
       elBullet.className = `bullet bullet-${s.line} text-[11px] font-bold`;
       elBullet.textContent = s.routeName;
     }
 
-    // Update logo. Project stations carry no company, so the whole box goes away.
     const logoBox = document.getElementById('inspector-logo');
     if (logoBox) logoBox.classList.toggle('hidden', !s.company);
     logoImgs.forEach((img) => {
@@ -933,7 +1193,6 @@ const lineNames: Record<number, string> = {
       }
     });
 
-    // Update link
     if (elLink && elLinkText) {
       if (s.link) {
         elLink.style.display = 'inline-flex';
@@ -950,6 +1209,21 @@ const lineNames: Record<number, string> = {
         elLink.style.display = 'none';
       }
     }
+
+    // Render active connections
+    const connSummaries = renderConnections(stationId);
+    if (transfersContainer && transfersList) {
+      if (connSummaries.length > 0) {
+        transfersContainer.classList.remove('hidden');
+        transfersList.textContent = connSummaries.join(' · ');
+      } else {
+        transfersContainer.classList.add('hidden');
+      }
+    }
+
+    if (elStationText) {
+      elStationText.textContent = `${s.label} (${s.sub})`;
+    }
   }
 
   function triggerArrivalTransition() {
@@ -963,31 +1237,25 @@ const lineNames: Record<number, string> = {
       return;
     }
 
-    // Slide out to the right
     signTrack.classList.remove('ttc-slide-in', 'ttc-slide-prep-left');
     signTrack.classList.add('ttc-slide-out');
 
     slideTimeout = setTimeout(() => {
       if (elStatusText) elStatusText.textContent = 'ARRIVING AT';
 
-      // Position instantly off-screen to the left
       signTrack.classList.remove('ttc-slide-out');
       signTrack.classList.add('ttc-slide-prep-left');
-
-      // Force layout reflow
       void signTrack.offsetWidth;
 
-      // Slide in left to right
       signTrack.classList.remove('ttc-slide-prep-left');
       signTrack.classList.add('ttc-slide-in');
 
-      // Transition to 'ARRIVED AT' once arrival has completed
       arrivedTimeout = setTimeout(() => {
         if (elStatusText) {
           elStatusText.textContent = 'ARRIVED AT';
         }
-      }, 650);
-    }, 200);
+      }, 550);
+    }, 180);
   }
 
   function setCurrent(stationId) {
@@ -999,10 +1267,9 @@ const lineNames: Record<number, string> = {
       n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
     });
 
-    // Auto center station on mobile in figure if in map view
     const figure = document.getElementById('route-map-figure');
     if (figure && window.innerWidth < 768) {
-      const scale = figure.scrollWidth / 1240;
+      const scale = figure.scrollWidth / 1260;
       const targetScrollLeft = (s.x * scale) - (figure.clientWidth / 2);
       figure.scrollTo({ left: Math.max(0, targetScrollLeft), behavior: 'smooth' });
     }
@@ -1011,10 +1278,31 @@ const lineNames: Record<number, string> = {
     updateInspector(stationId);
   }
 
-  // Click, tap, focus or Enter on a station makes it the current station
+  // Hover & selection listeners on station nodes
   nodes.forEach((n) => {
     const sid = n.getAttribute('data-station-id');
     if (!sid) return;
+
+    n.addEventListener('mouseenter', () => {
+      const connSummaries = renderConnections(sid);
+      const s = dataMap[sid];
+      if (s && elInterchangeBadge) {
+        if (connSummaries.length > 0) {
+          elInterchangeBadge.textContent = `⇄ ${s.label} CONNECTS TO: ${connSummaries.slice(0, 2).join(' · ')}`;
+        } else {
+          elInterchangeBadge.textContent = `⇄ ${s.label} (${s.organization})`;
+        }
+      }
+    });
+
+    n.addEventListener('mouseleave', () => {
+      // Restore connections for the current selected station
+      renderConnections(currentId);
+      if (elInterchangeBadge) {
+        elInterchangeBadge.textContent = '⇄ HOVER STATIONS TO VIEW CONNECTIONS';
+      }
+    });
+
     n.addEventListener('focus', () => setCurrent(sid));
     n.addEventListener('click', () => setCurrent(sid));
     n.addEventListener('keydown', (e) => {
