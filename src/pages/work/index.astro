@@ -8,11 +8,11 @@ const all = (await getCollection('work')).sort(
 );
 const routes = [
   { key: 'all', n: 0, name: 'All lines' },
-  { key: 'strategy', n: 1, name: 'Line 1 · Strategy' },
-  { key: 'ai-tools', n: 2, name: 'Line 2 · AI Tools' },
-  { key: 'startup', n: 3, name: 'Line 3 · Startup' },
+  { key: 'strategy', n: 1, name: 'Line 1 · Corporate' },
+  { key: 'startup', n: 2, name: 'Line 2 · Business Ventures' },
+  { key: 'ai-tools', n: 3, name: 'Line 3 · AI Tools' },
   { key: 'data', n: 4, name: 'Line 4 · Data' },
-  { key: 'earlier-work', n: 5, name: 'Line 5 · Passion Projects' },
+  { key: 'earlier-work', n: 5, name: 'Line 5 · Writing' },
 ];
 ---
 
@@ -21,7 +21,7 @@ const routes = [
     <h1 class="h1">Work</h1>
     <hr class="rule-heavy mt-3" />
     <p class="mt-5 max-w-[85ch] text-[18px] leading-relaxed text-(--ink-muted)">
-      Startup strategy, AI tools, and experiments. New things land here as soon as they ship.
+      Projects and experiments across product strategy, AI tools, data analysis, and software development.
     </p>
     <div class="label mt-3 text-[14px] text-(--ink-faint)">{all.length} STATIONS · 5 LINES</div>
 

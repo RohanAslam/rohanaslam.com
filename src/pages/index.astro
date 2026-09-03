@@ -10,8 +10,8 @@ const all = (await getCollection('work')).sort(
 
 const ROUTES: Record<string, number> = {
   strategy: 1,
-  'ai-tools': 2,
-  startup: 3,
+  startup: 2,
+  'ai-tools': 3,
   data: 4,
   'earlier-work': 5,
 };
@@ -24,16 +24,15 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-20 items-center">
       <div class="lg:col-span-7">
         <h1 class="station text-[36px] sm:text-[52px] xl:text-[56px] leading-[1.05]">
-          <span class="text-(--cobalt)">Five</span> internships in.<br />Still building on weekends.
+          Product strategy, AI tools & weekend builds.
         </h1>
         <p class="mt-6 text-[18px] sm:text-[19px] leading-relaxed text-(--ink-muted)">
-          I'm Rohan. Five internships across RBC, Ontario Teachers', the U of T Innovation Hub, Dye
-          and Durham, and Sun Life, where I'm now full time on the SunAdvantage team.
+          I'm Rohan Aslam. I work in strategy and operations on the SunAdvantage team at Sun Life,
+          following internships at Ontario Teachers', RBC, Dye & Durham, and the U of T Innovation Hub.
         </p>
         <p class="mt-4 text-[18px] sm:text-[19px] leading-relaxed text-(--ink-muted)">
-          On the side I co-founded SmartSyllabus out of ICUBE, and most weekends I'm building some
-          small tool to test an idea I couldn't argue my way to. Some of it works. What works is
-          below.
+          On the side, I co-founded SmartSyllabus through UTM ICUBE, and I spend my free time building tools,
+          exploring data, and learning through hands-on projects. Here is an overview of what I've worked on.
         </p>
         <div class="mt-5">
           <a href="/about" class="btn btn-secondary text-[14px]">About me →</a>
