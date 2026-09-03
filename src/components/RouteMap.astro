@@ -538,139 +538,16 @@ const lineTracks = [
 <div id="route-map-wrapper" class="relative my-4">
   <!-- Mobile Advisory Notice (Only displayed on mobile viewports) -->
   <aside class="block md:hidden mb-4 border-2 border-(--ink) bg-(--surface) p-3" aria-label="Viewing recommendation">
-    <div class="flex items-start gap-2.5">
-      <span class="font-mono text-[13px] font-bold text-(--cobalt) shrink-0 mt-0.5">ℹ</span>
-      <div class="font-mono text-[11px] leading-relaxed text-(--ink)">
-        <span class="font-bold uppercase tracking-wider block mb-0.5">Desktop Recommended</span>
-        For the best viewing experience of this interactive visualization and animated cross-line tracks, please view on desktop.
-      </div>
+    <div class="flex items-center gap-2.5">
+      <span class="font-mono text-[13px] font-bold text-(--cobalt) shrink-0">ℹ</span>
+      <p class="font-mono text-[12px] font-medium leading-relaxed text-(--ink)">
+        Visualization works better on browser. Please view from there.
+      </p>
     </div>
   </aside>
 
-  <!-- Mobile View Switcher: Station Directory vs Track Map -->
-  <div class="block md:hidden mb-4">
-    <div class="flex items-center justify-between gap-3 border-2 border-(--ink) bg-(--ground) p-2 mb-2.5">
-      <div class="label text-[11px] font-bold text-(--ink) flex items-center gap-1.5">
-        <span class="inline-block h-2 w-2 rounded-full bg-(--cobalt)"></span>
-        <span>MOBILE VIEW</span>
-      </div>
-      <div class="flex items-center gap-1">
-        <button
-          type="button"
-          id="mobile-view-list"
-          class="mobile-view-tab active px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
-        >
-          Station Directory
-        </button>
-        <button
-          type="button"
-          id="mobile-view-map"
-          class="mobile-view-tab px-2.5 py-1 text-[11px] font-mono font-bold uppercase transition-colors"
-        >
-          Pan Track Map
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mobile Vertical Station Directory View (Default on mobile) -->
-  <div id="mobile-station-list-view" class="block md:hidden border-2 border-(--ink) bg-(--ground) mb-6">
-    <div class="bg-[#0B0E12] px-3.5 py-2 text-[#F2B705] font-mono text-[11px] font-bold tracking-wider uppercase flex items-center justify-between">
-      <span>STATION DIRECTORY · TAP TO READ & CONNECT</span>
-      <span>5 ROUTES</span>
-    </div>
-    <div class="divide-y-2 divide-(--ink)">
-      {
-        [1, 2, 3, 4, 5].map((lineNum) => {
-          const lineStations = stations.filter((s) => s.line === lineNum);
-          return (
-            <div class="p-3">
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <span
-                  class="font-mono text-[11px] font-bold px-2 py-0.5"
-                  style={`background: ${routeColors[lineNum]}; color: ${routeTextColors[lineNum]}`}
-                >
-                  {lineNames[lineNum]}
-                </span>
-                <span class="label text-[11px] text-(--ink-faint)">{lineStations.length} stops</span>
-              </div>
-              <div class="grid grid-cols-1 gap-2 pl-2 border-l-2" style={`border-color: ${routeColors[lineNum]}`}>
-                {lineStations.map((s) => (
-                  <div class="mobile-station-accordion border border-(--ink-faint)/30 bg-(--surface)" data-accordion-id={s.id}>
-                    <button
-                      type="button"
-                      class="mobile-station-toggle w-full text-left p-2.5 flex items-center justify-between gap-3 transition-colors hover:bg-(--ground)"
-                      data-station-id={s.id}
-                    >
-                      <div class="flex items-center gap-2.5 min-w-0">
-                        {s.company && (
-                          <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-(--ground) border border-(--ink) p-1 shrink-0">
-                            <img
-                              src={`/images/logos/${s.company}.png`}
-                              alt=""
-                              class="h-5 w-5 object-contain"
-                            />
-                          </span>
-                        )}
-                        <div class="min-w-0">
-                          <div class="font-mono text-[13px] font-bold text-(--ink) truncate">{s.label}</div>
-                          <div class="text-[12px] text-(--ink-muted) truncate">{s.roles && s.roles.length > 1 ? 'Multiple roles' : s.role}</div>
-                        </div>
-                      </div>
-                      <div class="font-mono text-[11px] text-(--ink-faint) shrink-0">{s.sub}</div>
-                    </button>
-                    <div class="mobile-station-drawer hidden p-3 pt-0 border-t border-(--ink-faint)/20">
-                      {s.roles && s.roles.length > 1 ? (
-                        <div class="mt-2.5 ml-2 pl-3 border-l-2 border-(--ink) flex flex-col gap-2">
-                          {s.roles.map((r) => (
-                            <div class="relative">
-                              <span class="absolute -left-[17px] top-1.5 h-2 w-2 rounded-full bg-(--ink) border-2 border-(--ground)"></span>
-                              <div class="text-[13px] font-bold text-(--ink) leading-snug">{r.title}</div>
-                              <div class="text-[11px] font-mono text-(--ink-muted)">{r.team ? `${r.team} · ` : ''}{r.timeframe}{r.type ? ` · ${r.type}` : ''}</div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : null}
-                      <p class="text-[13px] text-(--ink) leading-relaxed mt-2">{s.summary}</p>
-                      {s.link && (
-                        <div class="mt-3">
-                          <a
-                            href={s.link}
-                            class="inline-flex items-center gap-1.5 px-3 py-1 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
-                          >
-                            <span>{s.linkLabel || 'Learn more'}</span>
-                            <span>→</span>
-                          </a>
-                        </div>
-                      )}
-                      <div class="mobile-station-conns mt-3 pt-2 border-t border-(--ink-faint)/20">
-                        <div class="font-mono text-[12px] font-bold uppercase text-(--ink-muted) mb-2 flex items-center gap-2">
-                          <svg class="w-4 h-4 text-(--ink) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M7 16l-4-4 4-4"></path>
-                            <path d="M3 12h18"></path>
-                            <path d="M17 8l4 4-4 4"></path>
-                          </svg>
-                          <span>CONNECTIONS:</span>
-                        </div>
-                        <div class="mobile-conns-list flex flex-wrap gap-2" data-source-id={s.id}></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })
-      }
-    </div>
-  </div>
-
-  <div id="mobile-pan-hint" class="hidden text-center py-2 bg-(--surface) border-t-2 border-b-2 border-(--ink) font-mono text-[11px] font-bold text-(--ink) uppercase tracking-wide mb-2">
-    ⇄ Pan track horizontally to explore stations
-  </div>
-
-  <!-- Desktop Side-by-Side System: Tracks on Left, Fixed-Size Station Console on Right -->
-  <div id="route-system-grid" class="hidden md:flex flex-col lg:flex-row gap-6 items-start">
+  <!-- Route System: Tracks on Left, Station Inspector Console on Right -->
+  <div id="route-system-grid" class="flex flex-col lg:flex-row gap-6 items-start">
     <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections -->
     <figure id="route-map-figure" class="flex-1 min-w-0 overflow-x-auto w-full border-2 border-(--ink) bg-(--ground) p-4" aria-label="Career transit route diagram">
       <svg viewBox="0 0 1260 980" class="w-full min-w-[760px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -931,17 +808,6 @@ const lineTracks = [
     :global(.connection-line-path) {
       animation: none !important;
     }
-  }
-
-  .mobile-view-tab {
-    border: 2px solid var(--ink);
-    background: var(--surface);
-    color: var(--ink-muted);
-  }
-  .mobile-view-tab.active {
-    background: var(--ink);
-    color: var(--ground);
-    border-color: var(--ink);
   }
 </style>
 
@@ -1621,69 +1487,4 @@ const lineTracks = [
 
   // Initial load: populate with current anchor station (Sun Life)
   updateInspector(pinnedStationId);
-
-  // Mobile Accordion Directory handling
-  document.querySelectorAll('.mobile-station-toggle').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const parent = btn.closest('.mobile-station-accordion');
-      const drawer = parent ? parent.querySelector('.mobile-station-drawer') : null;
-      if (!drawer) return;
-
-      const isExpanded = !drawer.classList.contains('hidden');
-
-      // Close all other drawers
-      document.querySelectorAll('.mobile-station-drawer').forEach((d) => d.classList.add('hidden'));
-
-      if (!isExpanded) {
-        drawer.classList.remove('hidden');
-        const sid = btn.getAttribute('data-station-id');
-        const connsContainer = drawer.querySelector('.mobile-conns-list');
-        if (connsContainer && sid) {
-          const conns = CONNECTIONS[sid] || [];
-          connsContainer.innerHTML = '';
-          if (conns.length === 0) {
-            drawer.querySelector('.mobile-station-conns').style.display = 'none';
-          } else {
-            drawer.querySelector('.mobile-station-conns').style.display = 'block';
-            conns.forEach((c) => {
-              const target = dataMap[c.target];
-              if (!target) return;
-              const pill = document.createElement('a');
-              pill.href = target.link || '#';
-              pill.className = 'px-3 py-1.5 border-2 border-(--ink) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--ink) hover:text-(--ground) flex items-center gap-2';
-              pill.innerHTML = `<span class="inline-block h-2 w-2 rounded-full shrink-0" style="background:${routeColors[target.line]}"></span><span>${target.label} (${c.reason})</span>`;
-              connsContainer.appendChild(pill);
-            });
-          }
-        }
-      }
-    });
-  });
-
-  // Mobile View Switcher (List vs Map)
-  const btnMap = document.getElementById('mobile-view-map');
-  const btnList = document.getElementById('mobile-view-list');
-  const gridContainer = document.getElementById('route-system-grid');
-  const listView = document.getElementById('mobile-station-list-view');
-  const panHint = document.getElementById('mobile-pan-hint');
-
-  if (btnMap && btnList && gridContainer && listView) {
-    btnMap.addEventListener('click', () => {
-      btnMap.classList.add('active');
-      btnList.classList.remove('active');
-      gridContainer.classList.remove('hidden');
-      gridContainer.classList.add('flex');
-      if (panHint) panHint.classList.remove('hidden');
-      listView.classList.add('hidden');
-    });
-
-    btnList.addEventListener('click', () => {
-      btnList.classList.add('active');
-      btnMap.classList.remove('active');
-      gridContainer.classList.add('hidden');
-      gridContainer.classList.remove('flex');
-      if (panHint) panHint.classList.add('hidden');
-      listView.classList.remove('hidden');
-    });
-  }
 </script>
