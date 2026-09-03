@@ -8,10 +8,10 @@
  *   Line 4: Data (Green)
  *   Line 5: Writing (Purple)
  *
- * In-place interactive contextual popover:
- * Hovering or clicking any station or connection displays an in-place tooltip
- * right where the user is looking. No bulky top inspector, no scrolling away,
- * and no layout thrashing.
+ * Side-by-Side Dedicated Station & Transfer Inspector:
+ * Positioned permanently to the right of the lines on desktop.
+ * Fixed dimensions (380px wide x 460px high), zero occlusion of tracks,
+ * zero layout shift, and 100% unobstructed clickability of all nodes.
  */
 
 const TRACK_START_X = 60;
@@ -505,58 +505,6 @@ const lineTracks = [
     </div>
   </aside>
 
-  <!-- Floating In-Place Station & Connection Popover (Desktop / Tablet) -->
-  <div
-    id="route-popover"
-    class="pointer-events-none absolute z-40 opacity-0 transition-opacity duration-150 border-2 border-(--ink) bg-(--ground) p-4 max-w-[340px] sm:max-w-[380px]"
-    style="top: 0; left: 0;"
-    role="tooltip"
-    aria-hidden="true"
-  >
-    <div class="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-(--ink-faint)/20">
-      <span id="popover-badge" class="bullet bullet-1 text-[11px] font-bold">Line 1 · Corporate</span>
-      <span id="popover-timeframe" class="font-mono text-[11px] text-(--ink-faint)">2026</span>
-    </div>
-
-    <h4 id="popover-title" class="font-mono text-[16px] font-bold text-(--ink) leading-snug">Sun Life</h4>
-    <p id="popover-role" class="text-[12px] font-medium text-(--ink-muted) mt-0.5">Strategy & Operations Specialist</p>
-
-    <p id="popover-summary" class="text-[13px] leading-relaxed text-(--ink) mt-2.5">
-      Full time strategy and operations on the SunAdvantage group benefits platform.
-    </p>
-
-    <div id="popover-actions" class="mt-3 pt-2.5 border-t border-(--ink-faint)/20 flex flex-wrap items-center gap-2">
-      <a
-        id="popover-link-primary"
-        href="#"
-        class="inline-flex items-center gap-1.5 px-3 py-1 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
-      >
-        <span id="popover-link-text">Read case study</span>
-        <span>→</span>
-      </a>
-      <a
-        id="popover-link-secondary"
-        href="#"
-        class="hidden items-center gap-1.5 px-2.5 py-1 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground)"
-      >
-        <span id="popover-link-secondary-text">Read target</span>
-        <span>→</span>
-      </a>
-    </div>
-
-    <div id="popover-conns" class="mt-2.5 pt-2 border-t border-(--ink-faint)/20">
-      <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M7 16l-4-4 4-4"></path>
-          <path d="M3 12h18"></path>
-          <path d="M17 8l4 4-4 4"></path>
-        </svg>
-        <span>TRANSFERS:</span>
-      </div>
-      <div id="popover-conns-list" class="flex flex-wrap gap-1.5"></div>
-    </div>
-  </div>
-
   <!-- Mobile View Switcher: Station Directory vs Track Map -->
   <div class="block md:hidden mb-4">
     <div class="flex items-center justify-between gap-3 border-2 border-(--ink) bg-(--ground) p-2 mb-2.5">
@@ -657,81 +605,157 @@ const lineTracks = [
     ⇄ Pan track horizontally to explore stations
   </div>
 
-  <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections (Desktop default) -->
-  <figure id="route-map-figure" class="my-0 overflow-x-auto hidden md:block" aria-label="Career transit route diagram">
-    <svg viewBox="0 0 1260 870" class="w-full min-w-[1060px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* 5 Isolated Horizontal Routes (Clean unbadged tracks spanning from 60 to 1200) */}
-      {
-        lineTracks.map((line) => (
-          <g class="route-track-group">
-            <path
-              d={`M ${TRACK_START_X} ${line.y} H ${TRACK_END_X}`}
-              stroke={routeColors[line.num]}
-              stroke-width="8"
-              stroke-linecap="square"
-              class="route-line"
-              style={`--len:${TRACK_LEN}; animation-delay:0ms; animation-duration:600ms`}
-            />
-          </g>
-        ))
-      }
-
-      {/* Dynamic Cross-Line Connections Layer */}
-      <g id="cross-connections-layer"></g>
-
-      {/* Stations: node on the line, clean name, and year (Logos removed for maximum clarity) */}
-      {
-        stations.map((s) => {
-          return (
-            <g
-              class="station-hit cursor-pointer"
-              data-station-id={s.id}
-              tabindex="0"
-              role="button"
-              aria-label={`Station: ${s.label}, ${s.organization}`}
-            >
-              {/* Station Node on Track: Hit pad + node ring + solid center dot */}
-              <g class="route-station" style={`transform-origin:${s.x}px ${s.y}px`}>
-                <circle cx={s.x} cy={s.y} r="28" fill="transparent" class="node-hit-pad" />
-                <circle cx={s.x} cy={s.y} r="13" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="6" class="node-ring" />
-                <circle cx={s.x} cy={s.y} r="4.5" fill="var(--ink)" class="node-center-dot" />
-              </g>
-
-              {/* Station Name Label */}
-              <text
-                x={s.x}
-                y={s.y - 34}
-                class="route-label pointer-events-none"
-                text-anchor="middle"
-                fill="var(--ink)"
-                font-family="var(--font-mono)"
-                font-size="13"
-                font-weight="700"
-                letter-spacing="0.5"
-              >
-                {s.label}
-              </text>
-
-              {/* Station Sub / Year Label */}
-              <text
-                x={s.x}
-                y={s.y - 18}
-                class="route-label pointer-events-none"
-                text-anchor="middle"
-                fill="var(--ink-faint)"
-                font-family="var(--font-mono)"
-                font-size="11"
-                font-weight="600"
-                letter-spacing="0.8"
-              >
-                {s.sub}
-              </text>
+  <!-- Desktop Side-by-Side System: Tracks on Left, Fixed-Size Station Console on Right -->
+  <div id="route-system-grid" class="hidden md:flex flex-col lg:flex-row gap-6 items-start">
+    <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections -->
+    <figure id="route-map-figure" class="flex-1 min-w-0 overflow-x-auto w-full border-2 border-(--ink) bg-(--ground) p-4" aria-label="Career transit route diagram">
+      <svg viewBox="0 0 1260 870" class="w-full min-w-[760px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* 5 Isolated Horizontal Routes (Clean unbadged tracks spanning from 60 to 1200) */}
+        {
+          lineTracks.map((line) => (
+            <g class="route-track-group">
+              <path
+                d={`M ${TRACK_START_X} ${line.y} H ${TRACK_END_X}`}
+                stroke={routeColors[line.num]}
+                stroke-width="8"
+                stroke-linecap="square"
+                class="route-line"
+                style={`--len:${TRACK_LEN}; animation-delay:0ms; animation-duration:600ms`}
+              />
             </g>
-          );
-        })
-      }
-    </svg>
-  </figure>
+          ))
+        }
+
+        {/* Dynamic Cross-Line Connections Layer */}
+        <g id="cross-connections-layer"></g>
+
+        {/* Stations: node on the line, clean name, and year */}
+        {
+          stations.map((s) => {
+            return (
+              <g
+                class="station-hit cursor-pointer"
+                data-station-id={s.id}
+                tabindex="0"
+                role="button"
+                aria-label={`Station: ${s.label}, ${s.organization}`}
+              >
+                {/* Station Node on Track: Hit pad + node ring + solid center dot */}
+                <g class="route-station" style={`transform-origin:${s.x}px ${s.y}px`}>
+                  <circle cx={s.x} cy={s.y} r="28" fill="transparent" class="node-hit-pad" />
+                  <circle cx={s.x} cy={s.y} r="13" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="6" class="node-ring" />
+                  <circle cx={s.x} cy={s.y} r="4.5" fill="var(--ink)" class="node-center-dot" />
+                </g>
+
+                {/* Station Name Label */}
+                <text
+                  x={s.x}
+                  y={s.y - 34}
+                  class="route-label pointer-events-none"
+                  text-anchor="middle"
+                  fill="var(--ink)"
+                  font-family="var(--font-mono)"
+                  font-size="13"
+                  font-weight="700"
+                  letter-spacing="0.5"
+                >
+                  {s.label}
+                </text>
+
+                {/* Station Sub / Year Label */}
+                <text
+                  x={s.x}
+                  y={s.y - 18}
+                  class="route-label pointer-events-none"
+                  text-anchor="middle"
+                  fill="var(--ink-faint)"
+                  font-family="var(--font-mono)"
+                  font-size="11"
+                  font-weight="600"
+                  letter-spacing="0.8"
+                >
+                  {s.sub}
+                </text>
+              </g>
+            );
+          })
+        }
+      </svg>
+    </figure>
+
+    <!-- Dedicated Fixed Station & Transfer Console (Positioned to the right, constant size, never occludes tracks) -->
+    <aside
+      id="route-station-inspector"
+      class="w-full lg:w-[380px] shrink-0 border-2 border-(--ink) bg-(--ground) p-5 lg:sticky lg:top-8 h-[460px] flex flex-col justify-between"
+      aria-label="Station and route details"
+    >
+      <!-- Top Section: Header, Title, Role, Summary -->
+      <div class="flex-1 flex flex-col min-h-0">
+        <!-- Header: Line badge & timeframe/context -->
+        <div class="flex items-center justify-between gap-2 pb-3 border-b-2 border-(--ink)">
+          <span id="inspector-badge" class="bullet bullet-1 text-[11px] font-bold uppercase tracking-wider">
+            Line 1 · Corporate
+          </span>
+          <span id="inspector-timeframe" class="font-mono text-[11px] text-(--ink-faint) truncate">
+            Sep 2026 – Present
+          </span>
+        </div>
+
+        <!-- Title & Role -->
+        <div class="mt-3.5">
+          <h3 id="inspector-title" class="font-mono text-[18px] font-bold text-(--ink) leading-snug tracking-tight">
+            SUN LIFE
+          </h3>
+          <p id="inspector-role" class="text-[12px] font-medium text-(--ink-muted) mt-1 truncate">
+            Strategy & Operations Specialist
+          </p>
+        </div>
+
+        <!-- Summary / Reflection (scrolls cleanly if long so height never changes) -->
+        <div class="mt-3 overflow-y-auto pr-1 flex-1">
+          <p id="inspector-summary" class="text-[13px] leading-relaxed text-(--ink)">
+            Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Automated reporting, process discovery, and business transformation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bottom Section: Primary/Secondary Action buttons & Transfers -->
+      <div class="pt-3 border-t border-(--ink-faint)/20 shrink-0">
+        <!-- Action Links -->
+        <div id="inspector-actions" class="flex flex-wrap items-center gap-2 mb-3">
+          <a
+            id="inspector-link-primary"
+            href="/work/sunlife-digital-transformation"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-(--ink) text-(--ground) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
+          >
+            <span id="inspector-link-text">Read case study</span>
+            <span>→</span>
+          </a>
+          <a
+            id="inspector-link-secondary"
+            href="#"
+            class="hidden items-center gap-1.5 px-3 py-1.5 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground)"
+          >
+            <span id="inspector-link-secondary-text">Read target</span>
+            <span>→</span>
+          </a>
+        </div>
+
+        <!-- Transfers / Connections List -->
+        <div id="inspector-conns" class="pt-2 border-t border-(--ink-faint)/20">
+          <div class="font-mono text-[10px] font-bold uppercase text-(--ink-faint) mb-1.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 16l-4-4 4-4"></path>
+              <path d="M3 12h18"></path>
+              <path d="M17 8l4 4-4 4"></path>
+            </svg>
+            <span>TRANSFERS:</span>
+          </div>
+          <div id="inspector-conns-list" class="flex flex-wrap gap-1.5 max-h-[76px] overflow-y-auto"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>
 
 <style>
@@ -888,7 +912,7 @@ const lineTracks = [
       {
         target: 'presently',
         reason: 'Gemini MVP surface testing',
-        why: 'Building fast prototype surfaces to evaluate user onboarding and product demand before writing heavyweight backend matching logic.'
+        why: 'Building fast prototype surfaces to evaluate user onboarding and product demand before writing heavyweight backend logic.'
       },
       {
         target: 'job-portal',
@@ -1157,26 +1181,25 @@ const lineTracks = [
     ]
   };
 
-  const wrapper = document.getElementById('route-map-wrapper');
-  const popover = document.getElementById('route-popover');
-  const popBadge = document.getElementById('popover-badge');
-  const popTimeframe = document.getElementById('popover-timeframe');
-  const popTitle = document.getElementById('popover-title');
-  const popRole = document.getElementById('popover-role');
-  const popSummary = document.getElementById('popover-summary');
-  const popLinkPrimary = document.getElementById('popover-link-primary');
-  const popLinkText = document.getElementById('popover-link-text');
-  const popLinkSecondary = document.getElementById('popover-link-secondary');
-  const popLinkSecondaryText = document.getElementById('popover-link-secondary-text');
-  const popConnsSection = document.getElementById('popover-conns');
-  const popConnsList = document.getElementById('popover-conns-list');
+  const inspector = document.getElementById('route-station-inspector');
+  const inspBadge = document.getElementById('inspector-badge');
+  const inspTimeframe = document.getElementById('inspector-timeframe');
+  const inspTitle = document.getElementById('inspector-title');
+  const inspRole = document.getElementById('inspector-role');
+  const inspSummary = document.getElementById('inspector-summary');
+  const inspLinkPrimary = document.getElementById('inspector-link-primary');
+  const inspLinkText = document.getElementById('inspector-link-text');
+  const inspLinkSecondary = document.getElementById('inspector-link-secondary');
+  const inspLinkSecondaryText = document.getElementById('inspector-link-secondary-text');
+  const inspConnsSection = document.getElementById('inspector-conns');
+  const inspConnsList = document.getElementById('inspector-conns-list');
 
   const nodes = document.querySelectorAll('.station-hit');
   const connectionsLayer = document.getElementById('cross-connections-layer');
 
-  let activeStationId = null;
-  let isPinned = false;
-  let hideTimer = null;
+  let activeStationId = 'sunadvantage';
+  let pinnedStationId = 'sunadvantage';
+  let restoreTimer = null;
 
   // Render cross-line connection paths in SVG
   function drawConnections(stationId) {
@@ -1216,7 +1239,7 @@ const lineTracks = [
       const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       hitPath.setAttribute('d', pathD);
       hitPath.setAttribute('stroke', 'transparent');
-      hitPath.setAttribute('stroke-width', '20');
+      hitPath.setAttribute('stroke-width', '24');
       hitPath.setAttribute('fill', 'none');
 
       // Visible dashed animated connector
@@ -1233,23 +1256,20 @@ const lineTracks = [
 
       // Hover / Click on connection line
       group.addEventListener('mouseenter', () => {
-        clearTimeout(hideTimer);
+        clearTimeout(restoreTimer);
         group.classList.add('active-connection');
-        const midPoint = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
-        showConnectionPopover(sourceStation, targetStation, c, midPoint);
+        updateTransfer(sourceStation, targetStation, c);
       });
 
       group.addEventListener('mouseleave', () => {
         group.classList.remove('active-connection');
-        scheduleHide();
+        scheduleRestore();
       });
 
       group.addEventListener('click', (e) => {
         e.stopPropagation();
-        isPinned = true;
         group.classList.add('active-connection');
-        const midPoint = { x: (sX + tX) / 2, y: (sY + tY) / 2 };
-        showConnectionPopover(sourceStation, targetStation, c, midPoint);
+        updateTransfer(sourceStation, targetStation, c);
       });
 
       connectionsLayer.appendChild(group);
@@ -1261,93 +1281,61 @@ const lineTracks = [
     });
   }
 
-  function positionPopover(svgX, svgY) {
-    if (!wrapper || !popover) return;
-    const svg = wrapper.querySelector('svg');
-    if (!svg) return;
-
-    const svgRect = svg.getBoundingClientRect();
-    const wrapRect = wrapper.getBoundingClientRect();
-    const scale = svgRect.width / 1260;
-
-    const posX = (svgRect.left - wrapRect.left) + (svgX * scale);
-    const posY = (svgRect.top - wrapRect.top) + (svgY * scale);
-
-    const popW = Math.min(360, wrapRect.width - 24);
-    let left = posX - (popW / 2);
-    left = Math.max(12, Math.min(left, wrapRect.width - popW - 12));
-
-    let top;
-    if (svgY < 350) {
-      // Lines 1 & 2: show popover below station
-      top = posY + 32;
-    } else {
-      // Lines 3, 4, 5: show popover above station
-      top = Math.max(12, posY - 240);
-    }
-
-    popover.style.width = `${popW}px`;
-    popover.style.left = `${left}px`;
-    popover.style.top = `${top}px`;
-    popover.classList.remove('pointer-events-none', 'opacity-0');
-    popover.classList.add('pointer-events-auto', 'opacity-100');
-    popover.setAttribute('aria-hidden', 'false');
-  }
-
-  function showStationPopover(stationId) {
-    clearTimeout(hideTimer);
+  function updateInspector(stationId) {
+    clearTimeout(restoreTimer);
     const s = dataMap[stationId];
-    if (!s || !popover) return;
+    if (!s || !inspector) return;
 
     activeStationId = stationId;
 
-    if (popBadge) {
-      popBadge.className = `bullet bullet-${s.line} text-[11px] font-bold`;
-      popBadge.textContent = s.routeName;
+    if (inspBadge) {
+      inspBadge.className = `bullet bullet-${s.line} text-[11px] font-bold uppercase tracking-wider`;
+      inspBadge.textContent = s.routeName;
     }
-    if (popTimeframe) popTimeframe.textContent = s.timeframe;
-    if (popTitle) popTitle.textContent = s.label;
-    if (popRole) {
+    if (inspTimeframe) inspTimeframe.textContent = s.timeframe;
+    if (inspTitle) inspTitle.textContent = s.label;
+    if (inspRole) {
       const orgClean = s.organization.replace(/\(.*?\)/g, '').trim().toLowerCase();
       const lblClean = s.label.toLowerCase();
-      popRole.textContent = orgClean === lblClean ? s.role : `${s.organization} · ${s.role}`;
+      inspRole.textContent = orgClean === lblClean ? s.role : `${s.organization} · ${s.role}`;
     }
-    if (popSummary) popSummary.textContent = s.summary;
+    if (inspSummary) inspSummary.textContent = s.summary;
 
-    if (popLinkPrimary && popLinkText) {
+    if (inspLinkPrimary && inspLinkText) {
       if (s.link) {
-        popLinkPrimary.style.display = 'inline-flex';
-        popLinkPrimary.setAttribute('href', s.link);
-        popLinkText.textContent = s.linkLabel || 'Read case study';
+        inspLinkPrimary.style.display = 'inline-flex';
+        inspLinkPrimary.setAttribute('href', s.link);
+        inspLinkText.textContent = s.linkLabel || 'Read case study';
       } else {
-        popLinkPrimary.style.display = 'none';
+        inspLinkPrimary.style.display = 'none';
       }
     }
 
-    if (popLinkSecondary) popLinkSecondary.style.display = 'none';
+    if (inspLinkSecondary) inspLinkSecondary.style.display = 'none';
 
     // Populate connected stations pills
     const conns = CONNECTIONS[stationId] || [];
-    if (popConnsSection && popConnsList) {
+    if (inspConnsSection && inspConnsList) {
       if (conns.length > 0) {
-        popConnsSection.style.display = 'block';
-        popConnsList.innerHTML = '';
+        inspConnsSection.style.display = 'block';
+        inspConnsList.innerHTML = '';
         conns.forEach((c) => {
           const target = dataMap[c.target];
           if (!target) return;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'px-2 py-0.5 border border-(--ink) font-mono text-[10px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
+          btn.className = 'px-2 py-1 border border-(--ink) font-mono text-[10px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
           btn.innerHTML = `<span class="inline-block h-1.5 w-1.5 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}</span>`;
           btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            showStationPopover(target.id);
+            pinnedStationId = target.id;
+            updateInspector(target.id);
             drawConnections(target.id);
           });
-          popConnsList.appendChild(btn);
+          inspConnsList.appendChild(btn);
         });
       } else {
-        popConnsSection.style.display = 'none';
+        inspConnsSection.style.display = 'none';
       }
     }
 
@@ -1356,23 +1344,22 @@ const lineTracks = [
     });
 
     drawConnections(stationId);
-    positionPopover(s.x, s.y);
   }
 
-  function showConnectionPopover(source, target, conn, midPoint) {
-    clearTimeout(hideTimer);
-    if (!popover) return;
+  function updateTransfer(source, target, conn) {
+    clearTimeout(restoreTimer);
+    if (!inspector) return;
 
-    if (popBadge) {
-      popBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white uppercase tracking-wider';
-      popBadge.textContent = 'TRANSFER';
+    if (inspBadge) {
+      inspBadge.className = 'bullet text-[11px] font-bold bg-(--cobalt) text-white uppercase tracking-wider';
+      inspBadge.textContent = 'TRANSFER';
     }
-    if (popTimeframe) {
-      popTimeframe.textContent = conn.reason;
+    if (inspTimeframe) {
+      inspTimeframe.textContent = conn.reason;
     }
-    if (popTitle) {
-      popTitle.innerHTML = `
-        <span class="inline-flex items-center gap-2 flex-wrap text-[16px] font-bold leading-snug">
+    if (inspTitle) {
+      inspTitle.innerHTML = `
+        <span class="inline-flex items-center gap-2 flex-wrap text-[17px] font-bold leading-snug">
           <span class="text-(--ink)">${source.label}</span>
           <svg class="w-4 h-4 text-(--cobalt) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M7 16l-4-4 4-4"></path>
@@ -1383,58 +1370,42 @@ const lineTracks = [
         </span>
       `;
     }
-    if (popRole) {
-      popRole.textContent = `${source.routeName} ↔ ${target.routeName}`;
+    if (inspRole) {
+      inspRole.textContent = `${source.routeName} ↔ ${target.routeName}`;
     }
-    if (popSummary) {
-      popSummary.textContent = conn.why;
+    if (inspSummary) {
+      inspSummary.textContent = conn.why;
     }
 
-    if (popLinkPrimary && popLinkText) {
+    if (inspLinkPrimary && inspLinkText) {
       if (source.link) {
-        popLinkPrimary.style.display = 'inline-flex';
-        popLinkPrimary.setAttribute('href', source.link);
-        popLinkText.textContent = `Read ${source.label}`;
+        inspLinkPrimary.style.display = 'inline-flex';
+        inspLinkPrimary.setAttribute('href', source.link);
+        inspLinkText.textContent = `Read ${source.label}`;
       } else {
-        popLinkPrimary.style.display = 'none';
+        inspLinkPrimary.style.display = 'none';
       }
     }
 
-    if (popLinkSecondary && popLinkSecondaryText) {
+    if (inspLinkSecondary && inspLinkSecondaryText) {
       if (target.link) {
-        popLinkSecondary.classList.remove('hidden');
-        popLinkSecondary.style.display = 'inline-flex';
-        popLinkSecondary.setAttribute('href', target.link);
-        popLinkSecondaryText.textContent = `Read ${target.label}`;
+        inspLinkSecondary.classList.remove('hidden');
+        inspLinkSecondary.style.display = 'inline-flex';
+        inspLinkSecondary.setAttribute('href', target.link);
+        inspLinkSecondaryText.textContent = `Read ${target.label}`;
       } else {
-        popLinkSecondary.style.display = 'none';
+        inspLinkSecondary.style.display = 'none';
       }
     }
 
-    if (popConnsSection) popConnsSection.style.display = 'none';
-
-    positionPopover(midPoint.x, midPoint.y);
+    if (inspConnsSection) inspConnsSection.style.display = 'none';
   }
 
-  function scheduleHide() {
-    if (isPinned) return;
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      if (!isPinned && popover) {
-        popover.classList.add('opacity-0', 'pointer-events-none');
-        popover.classList.remove('pointer-events-auto', 'opacity-100');
-        popover.setAttribute('aria-hidden', 'true');
-        if (connectionsLayer) connectionsLayer.innerHTML = '';
-        nodes.forEach((n) => {
-          n.classList.remove('current-station', 'connected-target');
-        });
-      }
-    }, 250);
-  }
-
-  if (popover) {
-    popover.addEventListener('mouseenter', () => clearTimeout(hideTimer));
-    popover.addEventListener('mouseleave', scheduleHide);
+  function scheduleRestore() {
+    clearTimeout(restoreTimer);
+    restoreTimer = setTimeout(() => {
+      updateInspector(pinnedStationId);
+    }, 300);
   }
 
   // Station node event listeners
@@ -1443,33 +1414,33 @@ const lineTracks = [
     if (!sid) return;
 
     n.addEventListener('mouseenter', () => {
-      if (!isPinned) showStationPopover(sid);
+      updateInspector(sid);
     });
 
-    n.addEventListener('mouseleave', scheduleHide);
+    n.addEventListener('mouseleave', scheduleRestore);
 
     n.addEventListener('click', (e) => {
       e.stopPropagation();
-      isPinned = true;
-      showStationPopover(sid);
+      pinnedStationId = sid;
+      updateInspector(sid);
     });
 
     n.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        isPinned = true;
-        showStationPopover(sid);
+        pinnedStationId = sid;
+        updateInspector(sid);
       }
     });
   });
 
-  // Clicking outside dismisses pinned popover
-  document.addEventListener('click', (e) => {
-    if (popover && !popover.contains(e.target) && !e.target.closest('.station-hit')) {
-      isPinned = false;
-      scheduleHide();
-    }
-  });
+  if (inspector) {
+    inspector.addEventListener('mouseenter', () => clearTimeout(restoreTimer));
+    inspector.addEventListener('mouseleave', scheduleRestore);
+  }
+
+  // Initial load: populate with current anchor station (Sun Life)
+  updateInspector(pinnedStationId);
 
   // Mobile Accordion Directory handling
   document.querySelectorAll('.mobile-station-toggle').forEach((btn) => {
@@ -1500,7 +1471,7 @@ const lineTracks = [
               const pill = document.createElement('a');
               pill.href = target.link || '#';
               pill.className = 'px-2 py-1 border border-(--ink) font-mono text-[11px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground) flex items-center gap-1.5';
-              pill.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label}: ${c.reason}</span>`;
+              pill.innerHTML = `<span class="inline-block h-2 w-2 rounded-full" style="background:${routeColors[target.line]}"></span><span>${target.label} (${c.reason})</span>`;
               connsContainer.appendChild(pill);
             });
           }
@@ -1512,15 +1483,16 @@ const lineTracks = [
   // Mobile View Switcher (List vs Map)
   const btnMap = document.getElementById('mobile-view-map');
   const btnList = document.getElementById('mobile-view-list');
-  const mapView = document.getElementById('route-map-figure');
+  const gridContainer = document.getElementById('route-system-grid');
   const listView = document.getElementById('mobile-station-list-view');
   const panHint = document.getElementById('mobile-pan-hint');
 
-  if (btnMap && btnList && mapView && listView) {
+  if (btnMap && btnList && gridContainer && listView) {
     btnMap.addEventListener('click', () => {
       btnMap.classList.add('active');
       btnList.classList.remove('active');
-      mapView.classList.remove('hidden');
+      gridContainer.classList.remove('hidden');
+      gridContainer.classList.add('flex');
       if (panHint) panHint.classList.remove('hidden');
       listView.classList.add('hidden');
     });
@@ -1528,7 +1500,8 @@ const lineTracks = [
     btnList.addEventListener('click', () => {
       btnList.classList.add('active');
       btnMap.classList.remove('active');
-      mapView.classList.add('hidden');
+      gridContainer.classList.add('hidden');
+      gridContainer.classList.remove('flex');
       if (panHint) panHint.classList.add('hidden');
       listView.classList.remove('hidden');
     });
