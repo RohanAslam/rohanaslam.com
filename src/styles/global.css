@@ -43,27 +43,6 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ground: #0D1014;
-    --surface: #1A1F26;
-    --ink: #EDEFF2;
-    --ink-muted: #9AA3AE;
-    --ink-faint: #727C88;
-    --rule-soft: #2A313A;
-    --line-1: #6E90FF;
-    --line-2: #FF6FA3;
-    --line-3: #FFC933;
-    --line-4: #3FCC94;
-    --line-5: #B77BE8;
-    --cobalt: #6E90FF;
-    --cobalt-hover: #8FA9FF;
-    --connection-teal: #3FCC94;
-    --connection-teal-hover: #3FCC94;
-    color-scheme: dark;
-  }
-}
-
 html {
   background: var(--ground);
   color: var(--ink);
@@ -173,21 +152,18 @@ html {
   padding: 0 12px;
   border-radius: 999px;
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
   white-space: nowrap;
+  color: #FFFFFF !important;
 }
-.bullet-1 { background: var(--line-1); color: #fff; }
-.bullet-2 { background: var(--line-2); color: #fff; }
-.bullet-3 { background: var(--line-3); color: #0B0E12; }
-.bullet-4 { background: var(--line-4); color: #fff; }
-.bullet-5 { background: var(--line-5); color: #fff; }
-@media (prefers-color-scheme: dark) {
-  .bullet-1, .bullet-2, .bullet-4, .bullet-5 { color: #0D1014; }
-  .bullet-3 { color: #0D1014; }
-}
+.bullet-1 { background: var(--line-1); }
+.bullet-2 { background: var(--line-2); }
+.bullet-3 { background: var(--line-3); }
+.bullet-4 { background: var(--line-4); }
+.bullet-5 { background: var(--line-5); }
 
 /* stack labels are outlined, not filled: they are not routes */
 .tag {
@@ -197,7 +173,7 @@ html {
   padding: 0 12px;
   border: 2px solid var(--ink);
   font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--ink);
@@ -224,7 +200,6 @@ html {
 }
 .btn-primary { background: var(--cobalt); color: #fff; }
 .btn-primary:hover { background: var(--cobalt-hover); }
-@media (prefers-color-scheme: dark) { .btn-primary { color: #0D1014; } }
 .btn-secondary { border-color: var(--ink); color: var(--ink); }
 .btn-secondary:hover { background: var(--ink); color: var(--ground); }
 
