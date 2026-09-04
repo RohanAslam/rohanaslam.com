@@ -109,7 +109,7 @@ const groups = [
                 class="station-card group transition-all"
                 style="--route: var(--line-5);"
               >
-                <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+                <div class="flex flex-row items-center justify-between gap-4 sm:gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="label flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
                       <span class="bullet bullet-5 text-[11px] font-bold">{item.category}</span>
@@ -123,11 +123,11 @@ const groups = [
                       {item.blurb}
                     </p>
                   </div>
-                  <div class="flex shrink-0 items-center justify-center sm:self-center">
+                  <div class="relative flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-2.5 sm:p-3 transition-colors duration-200 group-hover:border-(--cobalt)">
                     <img
                       src={item.image}
                       alt=""
-                      class="h-16 w-16 sm:h-20 sm:w-20 object-contain transition-transform duration-200 group-hover:scale-105"
+                      class="max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-105"
                       loading="lazy"
                     />
                   </div>

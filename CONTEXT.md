@@ -28,7 +28,7 @@ You need this to make correct calls about content and tone.
 - Recent University of Toronto Mississauga grad. CCIT (Communication, Culture, Information and Technology) with a Computer Science minor. He calls it an arts degree that taught him to build.
 - Five internships: RBC (web dev, 2022), Ontario Teachers' Pension Plan (Experience Design and Innovation, 16 months, 2023 to 2024), U of T Innovation Hub (design research, 2025), Dye & Durham (product, eCore, 2025), Sun Life (digital transformation, 2026).
 - Now full time at Sun Life on the **SunAdvantage** team, group benefits for small businesses.
-- Co-founder of **SmartSyllabus**, an AI academic planning product built through ICUBE at UTM, live at smartsyllabus.ca.
+- Co-founder of **SmartSyllabus**, an AI academic planning product built through University of Toronto ICUBE, live at smartsyllabus.ca.
 - Based in Scarborough, Ontario. Hikes Ontario and Quebec. Plans events and volunteer rotations in his community.
 
 **Positioning, in one line:** he thinks in strategy and proves it by shipping. Strategic claims on this site are always backed by something he actually built.
