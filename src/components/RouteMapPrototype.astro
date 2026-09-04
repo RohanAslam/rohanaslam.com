@@ -220,8 +220,6 @@ const stations: StationData[] = [
     summary: 'A real-time office hours queue management system researched, designed, and evaluated using HCI methodologies at U of T. Dynamic wait estimates, structured intake, and DBSCAN question clustering scoring an 89.6 SUS (Grade A).',
     link: '/work/smartqueue',
     linkLabel: 'Learn more',
-    artifact3d: '/images/tokens/smartqueue-3d.png',
-    artifactLabel: 'Interactive Queue Kiosk Tablet',
   },
   {
     id: 'smartsyllabus',
@@ -238,8 +236,6 @@ const stations: StationData[] = [
     summary: 'Started as a CSC301 project in January and stopped being one. AI parsing that turns multi-format syllabi into a structured semester. Incubated at University of Toronto ICUBE from the summer, alongside the Sun Life term.',
     link: '/work/smartsyllabus',
     linkLabel: 'Learn more',
-    artifact3d: '/images/tokens/smartsyllabus-3d.png',
-    artifactLabel: 'Dual-Screen Syllabus AI Terminal',
   },
 
   // ==========================================
@@ -683,8 +679,8 @@ const lineTracks = [
     >
       <!-- Header: Line badge -->
       <div class="flex items-center justify-between gap-2 pb-3 border-b-2 border-(--ink)">
-        <span id="inspector-badge" class="bullet bullet-2 text-[12.5px] font-bold uppercase tracking-wider">
-          Line 2 · Business Ventures
+        <span id="inspector-badge" class="bullet bullet-5 text-[12.5px] font-bold uppercase tracking-wider">
+          Line 5 · Writing
         </span>
       </div>
 
@@ -695,10 +691,10 @@ const lineTracks = [
         </div>
         <div class="min-w-0 flex-1">
           <h3 id="inspector-title" class="font-mono text-[22px] sm:text-[25px] font-bold text-(--ink) leading-snug tracking-tight">
-            SMARTSYLLABUS
+            DEAR GO TRAIN
           </h3>
           <p id="inspector-role" class="text-[13px] sm:text-[14px] font-bold text-(--ink-muted) uppercase tracking-wider mt-0.5">
-            SmartSyllabus / University of Toronto ICUBE · Co-Founder
+            Reflection (Transit & Place)
           </p>
         </div>
       </div>
@@ -721,22 +717,22 @@ const lineTracks = [
         <div class="h-36 w-full flex items-center justify-center relative z-10 py-1">
           <img
             id="inspector-artifact-img"
-            src="/images/tokens/smartsyllabus-3d.png"
-            alt="Dual-Screen Syllabus AI Terminal"
+            src="/images/writing/go-train.png"
+            alt="GO Transit Commuter Rail Token"
             class="max-h-32 max-w-[200px] object-contain transition-transform duration-300 hover:scale-105"
           />
         </div>
 
         <!-- Specimen Caption -->
         <div id="inspector-artifact-caption" class="w-full text-center font-mono text-[11px] font-bold text-(--ink-muted) uppercase tracking-wider mt-1 relative z-10">
-          Dual-Screen Syllabus AI Terminal
+          GO Transit Commuter Rail Token
         </div>
       </div>
 
       <!-- Dedicated Timeframe Row for single role -->
       <div id="inspector-timeframe-row" class="flex items-center gap-2 font-mono text-[13px] font-semibold text-(--ink-muted)">
         <span class="inline-block h-2 w-2 rounded-full bg-(--ink) shrink-0"></span>
-        <span id="inspector-timeframe">Jan 2026 – Present</span>
+        <span id="inspector-timeframe">December 2025</span>
       </div>
 
       <!-- Multiple Roles Timeline Container (LinkedIn style vertical connector) -->
@@ -747,7 +743,7 @@ const lineTracks = [
       <!-- Summary / Reflection (full text visible, no scroll) -->
       <div>
         <p id="inspector-summary" class="text-[14.5px] sm:text-[15px] leading-relaxed text-(--ink)">
-          Started as a CSC301 project in January and stopped being one. AI parsing that turns multi-format syllabi into a structured semester. Incubated at University of Toronto ICUBE from the summer, alongside the Sun Life term.
+          A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own corporate job downtown. The quiet rhythm of regional transit and shared public life.
         </p>
       </div>
 
@@ -755,10 +751,10 @@ const lineTracks = [
       <div id="inspector-actions" class="pt-2 border-t border-(--ink-faint)/20 flex flex-wrap items-center gap-2">
         <a
           id="inspector-link-primary"
-          href="/work/smartsyllabus"
+          href="/writing"
           class="inline-flex items-center gap-1.5 px-4 py-2 bg-(--ink) text-(--ground) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
         >
-          <span id="inspector-link-text">Learn more</span>
+          <span id="inspector-link-text">View essay on Writing</span>
           <span>→</span>
         </a>
         <a
@@ -1234,8 +1230,8 @@ const lineTracks = [
   const nodes = document.querySelectorAll('.station-hit');
   const connectionsLayer = document.getElementById('cross-connections-layer');
 
-  let activeStationId = 'smartsyllabus';
-  let pinnedStationId = 'smartsyllabus';
+  let activeStationId = 'dear-go-train';
+  let pinnedStationId = 'dear-go-train';
   let restoreTimer = null;
 
   // Render cross-line connection paths in SVG
