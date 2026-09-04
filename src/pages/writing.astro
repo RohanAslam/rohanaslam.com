@@ -1,84 +1,90 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const groups = [
+const filterCategories = [
+  { key: 'all', label: 'All writing' },
+  { key: 'creative', label: 'Creative & Reflection' },
+  { key: 'essays', label: 'Essays & Research Papers' },
+  { key: 'analyses', label: 'Analyses & Critiques' },
+];
+
+const items = [
   {
-    name: 'Creative & Reflection',
-    items: [
-      {
-        title: 'Dear GO Train',
-        blurb:
-          'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own job downtown.',
-        date: 'December 2025',
-        file: 'dear-go-train.pdf',
-        image: '/images/writing/go-train.png',
-        category: 'Transit & Place',
-      },
-    ],
+    title: 'Dear GO Train',
+    blurb:
+      'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own job downtown.',
+    date: 'December 2025',
+    file: 'dear-go-train.pdf',
+    image: '/images/writing/go-train.png',
+    category: 'Transit & Place',
+    groupKey: 'creative',
+    groupName: 'Creative & Reflection',
   },
   {
-    name: 'Essays & Research Papers',
-    items: [
-      {
-        title: 'Rethinking FIFA International Soccer (1993) as a Classic',
-        blurb:
-          "Why a game with a $100,000 budget deserves classic status, argued through what it started rather than how it played.",
-        date: 'April 2026',
-        file: 'fifa-international-soccer.pdf',
-        image: '/images/writing/soccer-ball.png',
-        category: 'Game Design',
-      },
-      {
-        title: 'Intellectual Property Rights: Profitization of Knowledge in Canada',
-        blurb:
-          'How copyright law and weak open access policy let publishers profit from research the public already paid for, plus the reforms that would fix it.',
-        date: 'March 2026',
-        file: 'intellectual-property-rights.pdf',
-        image: '/images/writing/canada-map.png',
-        category: 'Policy & Law',
-      },
-      {
-        title: 'The Repairability and Politics of Infrastructure',
-        blurb:
-          'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable phone have in common.',
-        date: 'August 2025',
-        file: 'repairability-and-politics-of-infrastructure.pdf',
-        image: '/images/writing/ttc-tracks.png',
-        category: 'Infrastructure',
-      },
-      {
-        title: "Searle's Chinese Room Argument and Functionalism",
-        blurb:
-          "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it doesn't.",
-        date: 'August 2025',
-        file: 'chinese-room-argument.pdf',
-        image: '/images/writing/chinese-room.png',
-        category: 'Philosophy of AI',
-      },
-    ],
+    title: 'Rethinking FIFA International Soccer (1993) as a Classic',
+    blurb:
+      "Why a game with a $100,000 budget deserves classic status, argued through what it started rather than how it played.",
+    date: 'April 2026',
+    file: 'fifa-international-soccer.pdf',
+    image: '/images/writing/soccer-ball.png',
+    category: 'Game Design',
+    groupKey: 'essays',
+    groupName: 'Essays & Research Papers',
   },
   {
-    name: 'Analyses & Critiques',
-    items: [
-      {
-        title: 'Analyzing Work Collaboration Software',
-        blurb:
-          'Zoom and Slack sold freedom from the office. What they actually built was a circuit that never turns off.',
-        date: 'October 2025',
-        file: 'work-collaboration-software.pdf',
-        image: '/images/writing/slack.png',
-        category: 'Workplace Tech',
-      },
-      {
-        title: 'Close Playing Analysis: Split-Screen Multiplayer in Halo',
-        blurb:
-          'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built community that online play never could.',
-        date: 'November 2025',
-        file: 'close-playing-analysis.pdf',
-        image: '/images/writing/halo-chief.png',
-        category: 'Game Culture',
-      },
-    ],
+    title: 'Intellectual Property Rights: Profitization of Knowledge in Canada',
+    blurb:
+      'How copyright law and weak open access policy let publishers profit from research the public already paid for, plus the reforms that would fix it.',
+    date: 'March 2026',
+    file: 'intellectual-property-rights.pdf',
+    image: '/images/writing/canada-map.png',
+    category: 'Policy & Law',
+    groupKey: 'essays',
+    groupName: 'Essays & Research Papers',
+  },
+  {
+    title: 'The Repairability and Politics of Infrastructure',
+    blurb:
+      'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable phone have in common.',
+    date: 'August 2025',
+    file: 'repairability-and-politics-of-infrastructure.pdf',
+    image: '/images/writing/ttc-tracks.png',
+    category: 'Infrastructure',
+    groupKey: 'essays',
+    groupName: 'Essays & Research Papers',
+  },
+  {
+    title: "Searle's Chinese Room Argument and Functionalism",
+    blurb:
+      "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it doesn't.",
+    date: 'August 2025',
+    file: 'chinese-room-argument.pdf',
+    image: '/images/writing/chinese-room.png',
+    category: 'Philosophy of AI',
+    groupKey: 'essays',
+    groupName: 'Essays & Research Papers',
+  },
+  {
+    title: 'Analyzing Work Collaboration Software',
+    blurb:
+      'Zoom and Slack sold freedom from the office. What they actually built was a circuit that never turns off.',
+    date: 'October 2025',
+    file: 'work-collaboration-software.pdf',
+    image: '/images/writing/slack.png',
+    category: 'Workplace Tech',
+    groupKey: 'analyses',
+    groupName: 'Analyses & Critiques',
+  },
+  {
+    title: 'Close Playing Analysis: Split-Screen Multiplayer in Halo',
+    blurb:
+      'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built community that online play never could.',
+    date: 'November 2025',
+    file: 'close-playing-analysis.pdf',
+    image: '/images/writing/halo-chief.png',
+    category: 'Game Culture',
+    groupKey: 'analyses',
+    groupName: 'Analyses & Critiques',
   },
 ];
 ---
@@ -91,52 +97,135 @@ const groups = [
       Research essays and critical writing from my undergrad that I really enjoyed working on and still give me a good point of reflection.
     </p>
     <div class="label mt-3 text-[14px] text-(--ink-faint)">
-      {groups.reduce((n, g) => n + g.items.length, 0)} PIECES
+      {items.length} PIECES · LINE 5
     </div>
 
-    {
-      groups.map((group) => (
-        <section class="mt-14">
-          <div class="label border-b-2 border-(--ink) pb-3 text-[15px] font-bold text-(--ink)">
-            {group.name}
-          </div>
-          <div class="mt-6 grid gap-5">
-            {group.items.map((item) => (
-              <a
-                href={`/writing/${item.file}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="station-card group transition-all"
-                style="--route: var(--line-5);"
-              >
-                <div class="flex flex-row items-center justify-between gap-4 sm:gap-6">
-                  <div class="min-w-0 flex-1">
-                    <div class="label flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
-                      <span class="bullet bullet-5 text-[11px] font-bold">{item.category}</span>
-                      <span class="tag text-[11px] font-bold">PDF</span>
-                      <span class="text-(--ink-faint)">{item.date}</span>
-                    </div>
-                    <h3 class="mt-2 text-[20px] sm:text-[22px] font-bold leading-snug text-(--ink) transition-colors group-hover:text-(--cobalt)">
-                      {item.title}
-                    </h3>
-                    <p class="mt-2 max-w-[75ch] text-[15px] leading-relaxed text-(--ink-muted)">
-                      {item.blurb}
-                    </p>
-                  </div>
-                  <div class="relative flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center border-2 border-(--ink) bg-(--surface) p-2.5 sm:p-3 transition-colors duration-200 group-hover:border-(--cobalt)">
-                    <img
-                      src={item.image}
-                      alt=""
-                      class="max-h-full max-w-full object-contain transition-transform duration-200 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
+    <!-- Filter Bar -->
+    <div class="mt-8 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2.5" id="writing-filters">
+        {
+          filterCategories.map((cat, idx) => (
+            <button
+              data-filter={cat.key}
+              class:list={[
+                idx === 0
+                  ? 'tag uppercase tracking-[0.08em] text-[13px] font-bold py-1 px-3 cursor-pointer'
+                  : 'bullet bullet-5 text-[13px] font-bold py-1 px-3 cursor-pointer opacity-40',
+                'transition-opacity',
+              ]}
+            >
+              {cat.label}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="font-mono text-[13px] font-bold text-(--ink-faint)">
+        LINE 5 · ROYAL PURPLE
+      </div>
+    </div>
+
+    <!-- Multi-column Grid (Left to Right) -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="writing-grid">
+      {
+        items.map((item) => (
+          <a
+            href={`/writing/${item.file}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-group={item.groupKey}
+            class="writing-card group flex flex-col justify-between border-2 border-(--ink) bg-(--ground) relative transition-all duration-200 hover:border-(--cobalt)"
+          >
+            <!-- 3D Model Showcase Stage -->
+            <div class="relative flex h-60 sm:h-64 w-full items-center justify-center border-b-2 border-(--ink) bg-(--surface) p-6 transition-colors duration-200 group-hover:bg-(--surface-subtle) overflow-hidden">
+              <div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(var(--ink)_1px,transparent_1px)] [background-size:16px_16px]" />
+              <img
+                src={item.image}
+                alt={item.title}
+                class="relative z-1 h-full w-full object-contain transition-transform duration-300 group-hover:scale-108"
+                loading="lazy"
+              />
+            </div>
+
+            <!-- Card Content Body -->
+            <div class="flex flex-1 flex-col justify-between p-5 pl-7">
+              <div>
+                <div class="label flex flex-wrap items-center gap-2 text-[12px]">
+                  <span class="bullet bullet-5 text-[11px] font-bold">{item.category}</span>
+                  <span class="tag text-[11px] font-bold">PDF</span>
+                  <span class="text-(--ink-faint) ml-auto font-mono text-[12px]">{item.date}</span>
                 </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))
-    }
+
+                <h3 class="mt-3 text-[19px] sm:text-[20px] font-bold leading-snug text-(--ink) transition-colors group-hover:text-(--cobalt)">
+                  {item.title}
+                </h3>
+
+                <p class="mt-2.5 text-[14px] leading-relaxed text-(--ink-muted)">
+                  {item.blurb}
+                </p>
+              </div>
+
+              <div class="mt-5 pt-3 border-t border-(--rule-soft) flex items-center justify-between">
+                <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-(--ink-faint)">
+                  {item.groupName}
+                </span>
+                <span class="inline-flex items-center gap-1 font-mono text-[13px] font-bold text-(--cobalt) group-hover:underline">
+                  <span>Read paper</span>
+                  <span aria-hidden="true">→</span>
+                </span>
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
   </div>
+
+  <style>
+    .writing-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 2px solid var(--ink);
+      background: var(--ground);
+      transition: border-color var(--dur-micro) var(--ease);
+    }
+    .writing-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--line-5);
+      z-index: 10;
+    }
+    .writing-card:hover {
+      border-color: var(--cobalt);
+    }
+  </style>
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('#writing-filters button');
+    const cards = document.querySelectorAll<HTMLElement>('#writing-grid [data-group]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter!;
+        buttons.forEach((b) => {
+          const active = b === btn;
+          if (b.dataset.filter === 'all') {
+            b.style.opacity = active ? '1' : '0.4';
+          } else {
+            b.classList.toggle('opacity-40', !active);
+          }
+        });
+
+        cards.forEach((card) => {
+          card.style.display = filter === 'all' || card.dataset.group === filter ? '' : 'none';
+        });
+      });
+    });
+  </script>
 </Base>
