@@ -26,7 +26,7 @@ const items = [
       "Why a game with a $100,000 budget deserves classic status, argued through what it started rather than how it played.",
     date: 'April 2026',
     file: 'fifa-international-soccer.pdf',
-    image: '/images/writing/soccer-ball.png',
+    image: '/images/writing/soccer-ball-3d.png',
     category: 'Game Design',
     groupKey: 'essays',
     groupName: 'Essays & Research Papers',
@@ -37,7 +37,7 @@ const items = [
       'How copyright law and weak open access policy let publishers profit from research the public already paid for, plus the reforms that would fix it.',
     date: 'March 2026',
     file: 'intellectual-property-rights.pdf',
-    image: '/images/writing/canada-map.png',
+    image: '/images/writing/canada-3d.png',
     category: 'Policy & Law',
     groupKey: 'essays',
     groupName: 'Essays & Research Papers',
@@ -70,7 +70,7 @@ const items = [
       'Zoom and Slack sold freedom from the office. What they actually built was a circuit that never turns off.',
     date: 'October 2025',
     file: 'work-collaboration-software.pdf',
-    image: '/images/writing/slack.png',
+    image: '/images/writing/slack-3d.png',
     category: 'Workplace Tech',
     groupKey: 'analyses',
     groupName: 'Analyses & Critiques',
@@ -148,7 +148,7 @@ const items = [
             </div>
 
             <!-- Card Content Body -->
-            <div class="flex flex-1 flex-col justify-between p-5 pl-7">
+            <div class="flex flex-1 flex-col justify-between p-5 sm:p-6">
               <div>
                 <div class="label flex flex-wrap items-center gap-2 text-[12px]">
                   <span class="bullet bullet-5 text-[11px] font-bold">{item.category}</span>
@@ -190,16 +190,6 @@ const items = [
       border: 2px solid var(--ink);
       background: var(--ground);
       transition: border-color var(--dur-micro) var(--ease);
-    }
-    .writing-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 6px;
-      background: var(--line-5);
-      z-index: 10;
     }
     .writing-card:hover {
       border-color: var(--cobalt);
