@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import RouteMap from '../components/RouteMap.astro';
-import HeroCarousel from '../components/HeroCarousel.astro';
+import ExperienceBulletin from '../components/ExperienceBulletin.astro';
 
 const all = (await getCollection('work')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -21,8 +21,8 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
 
 <Base>
   <section class="py-12 sm:py-18 lg:py-24">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-20 items-center">
-      <div class="lg:col-span-7">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-start">
+      <div class="lg:col-span-5 xl:col-span-5">
         <h1 class="station text-[36px] sm:text-[52px] xl:text-[56px] leading-[1.05]">
           Product strategy, AI tools & weekend builds.
         </h1>
@@ -79,8 +79,8 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
         </div>
       </div>
 
-      <div class="lg:col-span-5 w-full">
-        <HeroCarousel />
+      <div class="lg:col-span-7 xl:col-span-7 w-full">
+        <ExperienceBulletin />
       </div>
     </div>
   </section>

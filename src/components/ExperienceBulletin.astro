@@ -1,0 +1,335 @@
+---
+/**
+ * ExperienceBulletin.astro
+ *
+ * Tactile bulletin board showcasing pinned Polaroid dispatches from
+ * internships, ventures, and research experiences.
+ * Adheres strictly to DESIGN.md transit wayfinding system:
+ * - Radius: 0 (cards) or 999px (pushpins)
+ * - 3D depth achieved via neo-brutalist solid offset ink blocks (no box-shadow)
+ * - Approved color tokens only
+ * - Archivo and IBM Plex Mono typography
+ */
+import CompanyLogo from './CompanyLogo.astro';
+
+interface PinnedPhoto {
+  id: string;
+  company: 'smartsyllabus' | 'sunlife' | 'otpp' | 'dyedurham' | 'uoft';
+  org: string;
+  role: string;
+  timeframe: string;
+  caption: string;
+  image: string;
+  alt: string;
+  objectPosition?: string;
+  line: number;
+  lineBadge: string;
+  tilt: string;
+  z: number;
+  desktopLayoutClass: string;
+}
+
+const pins: PinnedPhoto[] = [
+  {
+    id: 'smartsyllabus',
+    company: 'smartsyllabus',
+    org: 'SmartSyllabus',
+    role: 'Co-Founder',
+    timeframe: '2026 - Present',
+    caption: 'Syllabus parsing and term-planning venture incubated at U of T ICUBE.',
+    image: '/images/carousel/smartsyllabus.jpg',
+    alt: 'SmartSyllabus founding team at University of Toronto ICUBE',
+    objectPosition: 'center center',
+    line: 2,
+    lineBadge: 'L2 · STARTUP',
+    tilt: '-2deg',
+    z: 10,
+    desktopLayoutClass: 'sm:col-start-1 sm:row-start-1',
+  },
+  {
+    id: 'sunlife',
+    company: 'sunlife',
+    org: 'Sun Life',
+    role: 'Strategy & Ops Specialist',
+    timeframe: '2026 - Present',
+    caption: 'SunAdvantage product operations and digital benefit systems.',
+    image: '/images/carousel/sunlife.jpg',
+    alt: 'Sun Life team with Rohan Aslam',
+    objectPosition: 'center center',
+    line: 1,
+    lineBadge: 'L1 · STRATEGY',
+    tilt: '2.5deg',
+    z: 12,
+    desktopLayoutClass: 'sm:col-start-2 sm:row-start-1 sm:-ml-3 lg:-ml-5 sm:translate-y-2',
+  },
+  {
+    id: 'otpp',
+    company: 'otpp',
+    org: "Ontario Teachers'",
+    role: 'Experience Design Intern',
+    timeframe: '2023 - 2024',
+    caption: 'Experience design lab research and prototype validation at OTPP.',
+    image: '/images/carousel/otpp.jpg',
+    alt: 'Ontario Teachers Experience Design Lab internship team',
+    objectPosition: 'center center',
+    line: 5,
+    lineBadge: 'L5 · DESIGN',
+    tilt: '1.8deg',
+    z: 11,
+    desktopLayoutClass: 'sm:col-start-1 sm:row-start-2 sm:-mt-5 lg:-mt-7',
+  },
+  {
+    id: 'dyedurham',
+    company: 'dyedurham',
+    org: 'Dye & Durham',
+    role: 'Product Intern',
+    timeframe: '2025',
+    caption: 'Legal tech workflow optimization and product intelligence.',
+    image: '/images/carousel/dyedurham.jpg',
+    alt: 'Dye & Durham team event with Rohan Aslam',
+    objectPosition: 'center center',
+    line: 1,
+    lineBadge: 'L1 · PRODUCT',
+    tilt: '-2.2deg',
+    z: 13,
+    desktopLayoutClass: 'sm:col-start-2 sm:row-start-2 sm:-ml-2 sm:-mt-4 lg:-mt-5',
+  },
+  {
+    id: 'uoft',
+    company: 'uoft',
+    org: 'U of T Innovation Hub',
+    role: 'Design Researcher',
+    timeframe: '2025',
+    caption: 'Qualitative educator interviews and student experience mapping.',
+    image: '/images/carousel/innovationHub.JPG',
+    alt: 'U of T Innovation Hub educator fieldwork research',
+    objectPosition: 'center 70%',
+    line: 4,
+    lineBadge: 'L4 · RESEARCH',
+    tilt: '-1deg',
+    z: 14,
+    desktopLayoutClass: 'sm:col-span-2 sm:row-start-3 sm:max-w-[370px] sm:mx-auto sm:-mt-5 lg:-mt-6',
+  },
+];
+---
+
+<div
+  class="experience-bulletin border-2 border-(--ink) bg-(--ground) text-(--ink) overflow-hidden flex flex-col relative"
+  id="experience-bulletin"
+  aria-label="Career experience bulletin board with pinned photos"
+>
+  <!-- Board Header: Wayfinding Strip & Board Controls -->
+  <div class="border-b-2 border-(--ink) bg-(--surface) px-4 py-2.5 flex items-center justify-between gap-3 text-[12px] font-mono select-none">
+    <div class="flex items-center gap-2 font-bold uppercase tracking-wider text-(--ink)">
+      <span class="inline-block h-2.5 w-2.5 rounded-full bg-(--line-1)"></span>
+      <span>Experience Bulletin</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-(--ink-faint) uppercase tracking-widest text-[11px] hidden sm:inline-block">
+        5 Pinned Artifacts
+      </span>
+      <button
+        type="button"
+        id="btn-shuffle-pins"
+        class="inline-flex items-center gap-1.5 px-2 py-0.5 border border-(--ink) bg-(--ground) hover:bg-(--ink) hover:text-(--ground) text-[11px] font-mono font-bold transition-colors cursor-pointer"
+        title="Cycle top pinned card"
+      >
+        <span>Shuffle</span>
+        <span aria-hidden="true">↺</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Board Surface Canvas with Industrial Dot Grid -->
+  <div
+    class="bulletin-canvas relative p-4 sm:p-6 lg:p-7 bg-(--ground) overflow-hidden"
+    id="bulletin-canvas"
+  >
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 sm:gap-y-0 relative">
+      {
+        pins.map((card, i) => (
+          <article
+            class={`polaroid-card group relative w-full max-w-[360px] mx-auto sm:max-w-none sm:mx-0 bg-white dark:bg-(--surface) border-2 border-(--ink) p-2.5 sm:p-3 transition-all duration-200 cursor-pointer select-none ${card.desktopLayoutClass}`}
+            data-index={i}
+            data-tilt={card.tilt}
+            style={`--card-tilt: ${card.tilt}; z-index: ${card.z};`}
+            tabindex="0"
+            role="button"
+            aria-label={`${card.org}: ${card.role} (${card.timeframe}). Click to bring forward.`}
+          >
+            {/* Tactile 3D Drop Block (strictly no box-shadow!) */}
+            <div
+              class="polaroid-depth-block absolute inset-0 bg-(--ink) -z-10 translate-x-1.5 translate-y-1.5 transition-transform duration-200 group-hover:translate-x-2 group-hover:translate-y-2"
+              aria-hidden="true"
+            />
+
+            {/* Enameled Pushpin Tack at Top Center */}
+            <div
+              class="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center pointer-events-none"
+              aria-hidden="true"
+            >
+              <div
+                class="h-4 w-4 rounded-full border-2 border-(--ink) relative flex items-center justify-center transition-transform group-hover:scale-110"
+                style={`background: var(--line-${card.line});`}
+              >
+                {/* Highlight reflection dot */}
+                <span class="absolute top-0.5 left-0.5 h-1 w-1 rounded-full bg-white opacity-90" />
+                {/* Pin center rivet core */}
+                <span class="h-1 w-1 rounded-full bg-(--ink) opacity-30" />
+              </div>
+              {/* Pin shaft into card */}
+              <div class="h-1.5 w-[2px] bg-(--ink) -mt-0.5" />
+            </div>
+
+            {/* Polaroid Photo Frame */}
+            <div class="relative aspect-4/3 w-full overflow-hidden border border-(--ink) bg-(--ground)">
+              <img
+                src={card.image}
+                alt={card.alt}
+                width={600}
+                height={450}
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                style={card.objectPosition ? `object-position: ${card.objectPosition};` : undefined}
+                loading={i < 2 ? 'eager' : 'lazy'}
+              />
+
+              {/* Transit line badge in photo corner */}
+              <div class="absolute top-1.5 left-1.5 px-1.5 py-0.5 bg-(--ground) border border-(--ink) font-mono text-[10px] font-bold text-(--ink) leading-none">
+                {card.lineBadge}
+              </div>
+            </div>
+
+            {/* Polaroid Chin: Context & Metadata */}
+            <div class="pt-2.5 pb-1 px-1">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="flex h-5 w-5 shrink-0 items-center justify-center border border-(--ink) bg-(--ground) p-0.5" aria-hidden="true">
+                    <CompanyLogo name={card.company} size={14} class="shrink-0" />
+                  </div>
+                  <h3 class="text-[14px] sm:text-[15px] font-bold leading-tight text-(--ink) truncate">
+                    {card.org}
+                  </h3>
+                </div>
+                <span class="font-mono text-[10.5px] font-bold text-(--ink-muted) shrink-0">
+                  {card.timeframe}
+                </span>
+              </div>
+
+              <div class="mt-1 font-mono text-[11px] font-bold text-(--cobalt) truncate">
+                {card.role}
+              </div>
+
+              <p class="mt-1 text-[11.5px] leading-snug text-(--ink-muted) line-clamp-2">
+                {card.caption}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Board Footer: Interactive Tip & Direct Links -->
+  <div class="border-t-2 border-(--ink) bg-(--surface) px-4 py-2 flex items-center justify-between text-[11px] font-mono text-(--ink-muted)">
+    <span>Click any photo to bring it to front</span>
+    <a href="/about" class="text-(--cobalt) font-bold hover:underline">
+      Full Timeline →
+    </a>
+  </div>
+</div>
+
+<style>
+  .bulletin-canvas {
+    /* Technical Drafting Dot Grid (using token --rule-soft, strict house-rule compliance) */
+    background-image: radial-gradient(var(--rule-soft) 1.5px, transparent 1.5px);
+    background-size: 22px 22px;
+  }
+
+  /* Natural rotation transforms applied from CSS variable */
+  .polaroid-card {
+    transform: rotate(var(--card-tilt, 0deg));
+    will-change: transform, z-index;
+  }
+
+  /* Lift and straighten slightly on hover or focus */
+  .polaroid-card:hover,
+  .polaroid-card:focus-visible {
+    transform: rotate(0deg) scale(1.03) !important;
+    z-index: 50 !important;
+  }
+
+  /* Bring forward active state */
+  .polaroid-card.is-active {
+    transform: rotate(0deg) scale(1.04) !important;
+    z-index: 60 !important;
+  }
+
+  .polaroid-card.is-active .polaroid-depth-block {
+    transform: translate(8px, 8px);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const board = document.getElementById('experience-bulletin');
+    if (!board) return;
+
+    const cards = Array.from(board.querySelectorAll('.polaroid-card'));
+    const shuffleBtn = document.getElementById('btn-shuffle-pins');
+    let highestZ = 30;
+    let activeCard = null;
+
+    function bringToFront(card) {
+      highestZ += 2;
+      card.style.zIndex = highestZ;
+
+      if (activeCard && activeCard !== card) {
+        activeCard.classList.remove('is-active');
+      }
+
+      card.classList.add('is-active');
+      activeCard = card;
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener('mouseenter', () => {
+        if (card !== activeCard) {
+          highestZ += 1;
+          card.style.zIndex = highestZ;
+        }
+      });
+
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        bringToFront(card);
+      });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          bringToFront(card);
+        }
+      });
+    });
+
+    // Shuffle button cycles through cards bringing the next one to the top
+    if (shuffleBtn) {
+      let shuffleIdx = 0;
+      shuffleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        shuffleIdx = (shuffleIdx + 1) % cards.length;
+        bringToFront(cards[shuffleIdx]);
+      });
+    }
+
+    // Clicking anywhere on the canvas clears active accent but preserves z-order
+    board.addEventListener('click', (e) => {
+      if (e.target === board || e.target.id === 'bulletin-canvas') {
+        if (activeCard) {
+          activeCard.classList.remove('is-active');
+          activeCard = null;
+        }
+      }
+    });
+  })();
+</script>
