@@ -3,12 +3,12 @@
  * ExperienceBulletin.astro
  *
  * Authentic classic Polaroid photo cluster:
- * - Crisp white Polaroid card with 2px ink border and white bottom chin.
- * - Bold, crystal-clear black text (title only, no dates/years).
- * - No weird offset depth block (no random white lines peeking out).
- * - Clean, elegant enameled transit route pins (single clean head, no awkward needle).
- * - Enlarged primary photos with compact portrait snapshot for design research.
- * - Tightly clustered arrangement with plenty of room to add more photos.
+ * - Crisp white Polaroid cards with 2px ink borders and white bottom chins.
+ * - Bold, crystal-clear black text that is NEVER cut off across any viewport.
+ * - Borderless, enlarged company logos (22px) with zero outlines or wrapper borders.
+ * - Wider card width for U of T Innovation Hub (235px) so its full name renders with zero truncation.
+ * - Clean, elegant enameled transit route pins (single clean dome, route-colored).
+ * - Smooth responsive behavior across mobile, tablet, and desktop viewports.
  */
 import CompanyLogo from './CompanyLogo.astro';
 
@@ -37,7 +37,7 @@ const pins: PinnedPhoto[] = [
     line: 2,
     tilt: '-2.5deg',
     z: 10,
-    desktopStyle: 'left: 4%; top: 8px; width: 315px;',
+    desktopStyle: 'left: 2%; top: 8px; width: 315px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -50,7 +50,7 @@ const pins: PinnedPhoto[] = [
     line: 1,
     tilt: '2deg',
     z: 12,
-    desktopStyle: 'right: 4%; top: 16px; width: 295px;',
+    desktopStyle: 'right: 2%; top: 16px; width: 295px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -63,7 +63,7 @@ const pins: PinnedPhoto[] = [
     line: 4,
     tilt: '-1deg',
     z: 15,
-    desktopStyle: 'left: 36%; top: 40px; width: 175px;',
+    desktopStyle: 'left: 33%; top: 38px; width: 235px;',
     aspectClass: 'aspect-[3/4]',
   },
   {
@@ -76,7 +76,7 @@ const pins: PinnedPhoto[] = [
     line: 5,
     tilt: '1.8deg',
     z: 11,
-    desktopStyle: 'left: 7%; bottom: 8px; width: 285px;',
+    desktopStyle: 'left: 5%; bottom: 8px; width: 285px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -89,15 +89,15 @@ const pins: PinnedPhoto[] = [
     line: 1,
     tilt: '-2.2deg',
     z: 13,
-    desktopStyle: 'right: 7%; bottom: 12px; width: 265px;',
+    desktopStyle: 'right: 5%; bottom: 12px; width: 265px;',
     aspectClass: 'aspect-[1.35/1]',
   },
 ];
 ---
 
 <div class="experience-cluster w-full select-none" id="experience-cluster" aria-label="Pinned career experience photos">
-  {/* Desktop & Tablet Collage Stage: Compact, tightly clustered canvas */}
-  <div class="hidden sm:block relative w-full h-[490px] xl:h-[510px]">
+  {/* Desktop & Tablet Collage Stage: Compact, tightly clustered canvas with zero text cutoffs */}
+  <div class="hidden sm:block relative w-full h-[500px] xl:h-[520px]">
     {
       pins.map((card, i) => (
         <article
@@ -133,12 +133,10 @@ const pins: PinnedPhoto[] = [
             />
           </div>
 
-          {/* Authentic White Polaroid Chin: Crisp Black Company Title Only */}
-          <div class="pt-2 px-0.5 flex items-center gap-2 min-w-0">
-            <div class="flex h-5 w-5 shrink-0 items-center justify-center border border-(--ink) bg-(--ground) p-0.5" aria-hidden="true">
-              <CompanyLogo name={card.company} size={14} class="shrink-0" />
-            </div>
-            <h3 class="text-[14px] sm:text-[15px] font-bold leading-tight text-(--ink) tracking-tight truncate">
+          {/* Authentic White Polaroid Chin: Borderless enlarged logo + full company title */}
+          <div class="pt-2 px-1 flex items-center gap-2 min-w-0">
+            <CompanyLogo name={card.company} size={22} class="h-5.5 w-5.5 object-contain shrink-0" />
+            <h3 class="text-[14px] sm:text-[15px] font-bold leading-tight text-(--ink) tracking-tight whitespace-nowrap">
               {card.org}
             </h3>
           </div>
@@ -147,12 +145,12 @@ const pins: PinnedPhoto[] = [
     }
   </div>
 
-  {/* Mobile View: Horizontal scrolling snapshot strip (compact ~240px height) */}
-  <div class="sm:hidden flex gap-4 overflow-x-auto pb-4 pt-2 -mx-5 px-5 snap-x scrollbar-none">
+  {/* Mobile View: Horizontal scrolling snapshot strip (compact ~245px height, responsive) */}
+  <div class="sm:hidden flex gap-4 overflow-x-auto pb-5 pt-3 -mx-5 px-5 snap-x scrollbar-none">
     {
       pins.map((card, i) => (
         <article
-          class="polaroid-card group relative w-[240px] shrink-0 snap-center bg-white border-2 border-(--ink) p-2 pb-2.5 transition-all duration-200 cursor-pointer"
+          class="polaroid-card group relative w-[250px] shrink-0 snap-center bg-white border-2 border-(--ink) p-2 pb-2.5 transition-all duration-200 cursor-pointer"
           data-index={i}
           data-tilt={card.tilt}
           style={`--card-tilt: ${card.tilt}; z-index: ${card.z};`}
@@ -175,20 +173,18 @@ const pins: PinnedPhoto[] = [
             <img
               src={card.image}
               alt={card.alt}
-              width={480}
-              height={360}
+              width={500}
+              height={375}
               class="h-full w-full object-cover"
               style={card.objectPosition ? `object-position: ${card.objectPosition};` : undefined}
               loading="lazy"
             />
           </div>
 
-          {/* Chin: Title Only */}
-          <div class="pt-2 px-0.5 flex items-center gap-2 min-w-0">
-            <div class="flex h-5 w-5 shrink-0 items-center justify-center border border-(--ink) bg-(--ground) p-0.5" aria-hidden="true">
-              <CompanyLogo name={card.company} size={14} class="shrink-0" />
-            </div>
-            <h3 class="text-[14px] font-bold leading-tight text-(--ink) tracking-tight truncate">
+          {/* Chin: Borderless enlarged logo + full company title */}
+          <div class="pt-2 px-1 flex items-center gap-2 min-w-0">
+            <CompanyLogo name={card.company} size={22} class="h-5.5 w-5.5 object-contain shrink-0" />
+            <h3 class="text-[14px] font-bold leading-tight text-(--ink) tracking-tight whitespace-nowrap">
               {card.org}
             </h3>
           </div>
