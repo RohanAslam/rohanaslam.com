@@ -85,7 +85,7 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
     </div>
   </section>
 
-  <section class="mt-8 sm:mt-12 lg:mt-16">
+  <section id="connections" class="mt-8 sm:mt-12 lg:mt-16 scroll-mt-8">
     <!-- Section Title, Subtitle, and Full-Width Reflection with bottom dividing rule -->
     <div class="border-b-2 border-(--ink) pb-5">
       <h2 class="station text-[28px] sm:text-[34px] font-bold tracking-tight text-(--ink)">
@@ -109,26 +109,5 @@ const heroLines = all.filter((e) => e.data.featured || e.data.status !== 'shippe
     </div>
 
     <RouteMap />
-
-    <!--
-      Second entry point, directly under the diagram. The route map is the
-      chronology. The network is the other question people actually ask, which
-      is whether any of it adds up to one thing.
-    -->
-    <a
-      href="/network"
-      class="group mt-8 flex flex-col gap-5 border-2 border-(--ink) p-6 no-underline transition-colors hover:border-(--cobalt) md:flex-row md:items-center md:justify-between md:gap-10"
-    >
-      <div class="min-w-0">
-        <div class="label text-[12px] text-(--ink-faint)">Second view · 27 nodes · 36 links</div>
-        <h2 class="h2 mt-2.5 text-(--ink)">See how projects connect</h2>
-        <p class="mt-2.5 max-w-[66ch] text-[15px] leading-relaxed text-(--ink-muted)">
-          The diagram above is the order things happened in. This one is what they have in
-          common. Projects that share enough get pulled together until they overlap, and
-          clicking a seam tells you why.
-        </p>
-      </div>
-      <span class="btn btn-primary shrink-0 self-start md:self-center">Open the network</span>
-    </a>
   </section>
 </Base>

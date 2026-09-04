@@ -12,22 +12,26 @@ const { Content } = await render(entry);
 const { title, summary, date, stack, status, links, tags, image, imageAlt, imageCaption } = entry.data;
 const fmt = new Intl.DateTimeFormat('en-CA', { month: 'short', year: 'numeric' });
 
-const ROUTES = {
-  strategy: { n: 1, name: 'Line 1 · Strategy' },
-  'ai-tools': { n: 2, name: 'Line 2 · AI Tools' },
-  startup: { n: 3, name: 'Line 3 · Startup' },
+const ROUTES: Record<string, { n: number; name: string }> = {
+  strategy: { n: 1, name: 'Line 1 · Corporate' },
+  startup: { n: 2, name: 'Line 2 · Business Ventures' },
+  'ai-tools': { n: 3, name: 'Line 3 · AI Tools' },
   data: { n: 4, name: 'Line 4 · Data' },
-  'earlier-work': { n: 5, name: 'Line 5 · Passion Projects' },
+  'earlier-work': { n: 5, name: 'Line 5 · Writing' },
 };
-const routes = tags.map((t) => ROUTES[t]).filter(Boolean);
+const primaryKey = tags[0];
+const primary = ROUTES[primaryKey] ?? ROUTES['earlier-work'];
 ---
 
 <Base title={`${title} · Rohan Aslam`} description={summary}>
   <article class="pt-10">
     <a href="/work" class="nav-link !text-(--ink-muted) hover:!text-(--cobalt)">← Back to all work</a>
 
-    <div class="mt-6 flex flex-wrap items-center gap-2">
-      {routes.map((r) => <span class={`bullet bullet-${r.n} text-[13px] font-bold py-1 px-3`}>{r.name}</span>)}
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <span class={`bullet bullet-${primary.n} text-[13px] font-bold py-1 px-3`}>{primary.name}</span>
+      <a href="/#connections" class="font-mono text-[12px] font-bold text-(--cobalt) hover:underline">
+        See how my work connects →
+      </a>
     </div>
 
     <h1 class="h1 mt-4 text-[32px] sm:text-[44px]">{title}</h1>

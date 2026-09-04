@@ -25,6 +25,20 @@ const routes = [
     </p>
     <div class="label mt-3 text-[14px] text-(--ink-faint)">{all.length} STATIONS · 5 LINES</div>
 
+    <!-- Cross-line connection link back to homepage interactive diagram -->
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-(--ink) bg-(--surface) px-4 py-2.5">
+      <span class="font-mono text-[12px] sm:text-[13px] text-(--ink-muted)">
+        Filtered by primary line. Looking for cross-line connections?
+      </span>
+      <a
+        href="/#connections"
+        class="inline-flex items-center gap-1.5 font-mono text-[12px] sm:text-[13px] font-bold text-(--cobalt) hover:underline"
+      >
+        <span>See how my work connects</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
     <div class="mt-8 flex flex-wrap gap-3" id="filters">
       {
         routes.map((r) => (
@@ -50,7 +64,7 @@ const routes = [
 
   <script>
     const buttons = document.querySelectorAll<HTMLButtonElement>('#filters button');
-    const cards = document.querySelectorAll<HTMLElement>('#grid [data-tags]');
+    const cards = document.querySelectorAll<HTMLElement>('#grid [data-line]');
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const f = btn.dataset.filter!;
@@ -60,7 +74,7 @@ const routes = [
           if (b.dataset.n === '0') b.style.opacity = active ? '1' : '0.4';
         });
         cards.forEach((c) => {
-          c.style.display = f === 'all' || c.dataset.tags!.split(' ').includes(f) ? '' : 'none';
+          c.style.display = f === 'all' || c.dataset.line === f ? '' : 'none';
         });
       });
     });

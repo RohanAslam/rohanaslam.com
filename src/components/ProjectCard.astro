@@ -7,20 +7,22 @@ const { entry } = Astro.props;
 const { title, summary, stack, status, date, tags } = entry.data;
 const fmt = new Intl.DateTimeFormat('en-CA', { month: 'short', year: 'numeric' });
 
-const ROUTES = {
-  strategy: { n: 1, name: 'Line 1 · Strategy' },
-  'ai-tools': { n: 2, name: 'Line 2 · AI Tools' },
-  startup: { n: 3, name: 'Line 3 · Startup' },
+const ROUTES: Record<string, { n: number; name: string }> = {
+  strategy: { n: 1, name: 'Line 1 · Corporate' },
+  startup: { n: 2, name: 'Line 2 · Business Ventures' },
+  'ai-tools': { n: 3, name: 'Line 3 · AI Tools' },
   data: { n: 4, name: 'Line 4 · Data' },
-  'earlier-work': { n: 5, name: 'Line 5 · Passion Projects' },
+  'earlier-work': { n: 5, name: 'Line 5 · Writing' },
 };
-const primary = ROUTES[tags[0]] ?? ROUTES['earlier-work'];
+const primaryKey = tags[0];
+const primary = ROUTES[primaryKey] ?? ROUTES['earlier-work'];
 ---
 
 <a
   href={`/work/${entry.id}`}
   class="station-card group"
   style={`--route: var(--line-${primary.n})`}
+  data-line={primaryKey}
   data-tags={tags.join(' ')}
 >
   <div class="label flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px]">
