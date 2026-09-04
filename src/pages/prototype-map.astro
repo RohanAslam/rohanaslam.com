@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import RouteMapPrototype from '../components/RouteMapPrototype.astro';
+---
+
+<Base title="Station Artifact Tokens Prototype · Rohan Aslam" description="Prototype testing lab for 3D station artifact tokens in the Route Map inspector.">
+  <section class="py-8">
+    <!-- Prototype Banner -->
+    <div class="mb-6 border-2 border-(--ink) bg-(--surface) p-4 sm:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-(--ink-faint)/30">
+        <div class="flex items-center gap-2">
+          <span class="inline-block h-3 w-3 rounded-full bg-(--line-2)"></span>
+          <span class="font-mono text-[13px] font-bold uppercase tracking-wider text-(--ink)">
+            PROTOTYPE LAB // Station Artifact Tokens
+          </span>
+        </div>
+        <a href="/" class="font-mono text-[12px] font-bold text-(--cobalt) hover:underline flex items-center gap-1">
+          ← Back to Homepage
+        </a>
+      </div>
+
+      <p class="mt-3 text-[15px] sm:text-[16px] leading-relaxed text-(--ink)">
+        This is a dedicated preview environment for testing 3D isometric artifact tokens inside the station inspector panel.
+        Click any station below or on the route diagram to inspect its tangible product specimen.
+      </p>
+
+      <!-- Quick Jump Station Pills -->
+      <div class="mt-4 flex flex-wrap items-center gap-2 font-mono text-[12px]">
+        <span class="font-bold text-(--ink-muted) uppercase text-[11px]">Quick Test 3D Stations:</span>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="smartsyllabus">
+          SmartSyllabus (Terminal)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="smartqueue">
+          SmartQueue (Tablet)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="dear-go-train">
+          Dear GO Train (Train)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="fifa-soccer">
+          FIFA 1993 (Soccer)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="ip-rights">
+          IP Rights (Canada)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="chinese-room">
+          Chinese Room
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="halo-analysis">
+          Halo (Helmet)
+        </button>
+        <button type="button" class="prototype-quick-btn px-2.5 py-1 border border-(--ink) bg-(--ground) font-bold hover:bg-(--ink) hover:text-(--ground) cursor-pointer" data-target="sunadvantage">
+          Sun Life (Platform)
+        </button>
+      </div>
+    </div>
+
+    <!-- The Prototype Component -->
+    <RouteMapPrototype />
+  </section>
+</Base>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btns = document.querySelectorAll('.prototype-quick-btn');
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        const stationEl = document.querySelector(`.station-hit[data-station-id="${targetId}"]`);
+        if (stationEl) {
+          stationEl.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
+    });
+  });
+</script>

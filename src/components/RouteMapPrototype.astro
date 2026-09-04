@@ -1,0 +1,1579 @@
+---
+/**
+ * The route diagram: Rohan's career path as an isolated transit network.
+ * 5 isolated horizontal lines running in parallel:
+ *   Line 1: Corporate & Strategy (Cobalt)
+ *   Line 2: Business Ventures (Rose)
+ *   Line 3: AI Tools (Amber)
+ *   Line 4: Data (Green)
+ *   Line 5: Writing (Purple)
+ *
+ * Side-by-Side Dedicated Station & Transfer Inspector:
+ * Positioned permanently to the right of the lines on desktop.
+ * Fixed dimensions (380px wide x 460px high), zero occlusion of tracks,
+ * zero layout shift, and 100% unobstructed clickability of all nodes.
+ */
+
+const TRACK_START_X = 60;
+const TRACK_END_X = 1200;
+const TRACK_LEN = TRACK_END_X - TRACK_START_X;
+
+interface RoleHistory {
+  title: string;
+  timeframe: string;
+  team?: string;
+  type?: string;
+}
+
+interface StationData {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
+  sub: string;
+  line: number;
+  routeName: string;
+  company?: string;
+  role: string;
+  organization: string;
+  timeframe: string;
+  summary: string;
+  link?: string;
+  linkLabel?: string;
+  roles?: RoleHistory[];
+  artifact3d?: string;
+  artifactLabel?: string;
+}
+
+const stations: StationData[] = [
+  // ==========================================
+  // Line 1 · Corporate & Strategy (y = 110)
+  // ==========================================
+  {
+    id: 'rbc',
+    x: 120,
+    y: 110,
+    label: 'RBC',
+    sub: '2022',
+    line: 1,
+    routeName: 'Line 1 · Corporate',
+    company: 'rbc',
+    organization: 'Royal Bank of Canada',
+    role: 'Web Developer Intern',
+    timeframe: 'May 2022 – Aug 2022',
+    summary: 'Front end work, testing and documentation on an internal tool for wealth management advisors. First industry internship, and mostly a lesson in inheriting a codebase somebody else wrote.',
+  },
+  {
+    id: 'uoft',
+    x: 380,
+    y: 110,
+    label: 'INNOVATION HUB',
+    sub: '2024',
+    line: 1,
+    routeName: 'Line 1 · Corporate',
+    company: 'uoft',
+    organization: 'U of T Innovation Hub',
+    role: 'Design Researcher',
+    timeframe: 'May 2024 – Aug 2024',
+    summary: 'A summer of interviewing educators across Ontario, 20+ conversations, synthesized into insights the team could act on. The problems that came back were ones nobody would have guessed at from a desk.',
+    link: '/work/innovation-hub-design-research',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'otpp',
+    x: 640,
+    y: 110,
+    label: "ONTARIO TEACHERS' PENSION PLAN",
+    sub: '2023–24',
+    line: 1,
+    routeName: 'Line 1 · Corporate',
+    company: 'otpp',
+    organization: "Ontario Teachers' Pension Plan",
+    role: 'Experience Design & Innovation Intern',
+    timeframe: 'May 2023 – Aug 2024 (16 Mos · 2 Roles)',
+    roles: [
+      {
+        title: 'Experience Design & Innovation Intern',
+        timeframe: 'Jan 2024 – Aug 2024',
+        team: 'Experience Design & Innovation',
+        type: '8 mos',
+      },
+      {
+        title: 'Service Design & Prototyping Intern',
+        timeframe: 'May 2023 – Dec 2023',
+        team: 'Experience Design & Innovation',
+        type: '8 mos',
+      },
+    ],
+    summary: 'Sixteen straight months across research, Figma prototyping, service mapping and tooling evaluation. A component library from it is still in use, and one process got restructured because the map showed a manual step everyone had stopped noticing.',
+    link: '/work/otpp-experience-design',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'dyedurham',
+    x: 900,
+    y: 110,
+    label: 'DYE & DURHAM',
+    sub: '2025',
+    line: 1,
+    routeName: 'Line 1 · Corporate',
+    company: 'dyedurham',
+    organization: 'Dye & Durham',
+    role: 'Product Intern',
+    timeframe: 'Sep 2025 – Dec 2025',
+    summary: 'Product work on eCore, where the users are lawyers and the constraints are compliance requirements rather than preferences. Mostly translation between what a regulation demands and what someone will tolerate at 4pm on a Friday.',
+    link: '/work/dye-durham-product',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'sunadvantage',
+    x: 1150,
+    y: 110,
+    label: 'SUN LIFE',
+    sub: '2026',
+    line: 1,
+    routeName: 'Line 1 · Corporate',
+    company: 'sunlife',
+    organization: 'Sun Life (SunAdvantage)',
+    role: 'Strategy & Operations Specialist',
+    timeframe: 'May 2026 – Present (2 Roles)',
+    roles: [
+      {
+        title: 'Strategy & Operations Specialist',
+        timeframe: 'Sep 2026 – Present',
+        team: 'SunAdvantage',
+        type: 'Full Time',
+      },
+      {
+        title: 'Digital Transformation Coordinator',
+        timeframe: 'May 2026 – Aug 2026',
+        team: 'Digital Transformation',
+        type: 'Internship',
+      },
+    ],
+    summary: 'Full time strategy and operations on the SunAdvantage group benefits platform, which modernizes health and dental coverage for small and medium businesses. Automated reporting, process discovery, and business transformation.',
+    link: '/work/sunlife-digital-transformation',
+    linkLabel: 'Learn more',
+    artifact3d: '/images/logos/sunlife.png',
+    artifactLabel: 'SunAdvantage Enterprise Platform Specimen',
+  },
+
+  // ==========================================
+  // Line 2 · Business Ventures (y = 310)
+  // ==========================================
+  {
+    id: 'flingblade',
+    x: 120,
+    y: 310,
+    label: 'FLINGBLADE',
+    sub: '2023',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'FLINGBLADE (Unity WebGL)',
+    role: 'Creator & Developer',
+    timeframe: '2023',
+    summary: 'A Unity project taken all the way to a WebGL build and put on the internet. Sword mechanics, physics constraints, and browser performance budgets connecting directly to game design theory.',
+    link: '/work/flingblade',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'skoll',
+    x: 380,
+    y: 310,
+    label: 'SKOLL',
+    sub: '2025',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'Skoll',
+    role: 'Co-Founder & Developer',
+    timeframe: '2025',
+    summary: 'An AI-powered recruiting and athletic roster planner built for coaches to evaluate player fits, depth charts, and eligibility timelines under rapid iteration.',
+    link: '/work/skoll',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'presently',
+    x: 640,
+    y: 310,
+    label: 'PRESENTLY',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'Presently',
+    role: 'Product Lead & Developer',
+    timeframe: '2026',
+    summary: 'Gift giving treated as a structured preference matching problem. Testing the product surface and user onboarding before committing to heavyweight backend logic.',
+    link: '/work/presently',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'smartqueue',
+    x: 900,
+    y: 310,
+    label: 'SMARTQUEUE',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    organization: 'SmartQueue (CSC318)',
+    role: 'Front-End Prototype & Refinement',
+    timeframe: '2026',
+    summary: 'A real-time office hours queue management system researched, designed, and evaluated using HCI methodologies at U of T. Dynamic wait estimates, structured intake, and DBSCAN question clustering scoring an 89.6 SUS (Grade A).',
+    link: '/work/smartqueue',
+    linkLabel: 'Learn more',
+    artifact3d: '/images/tokens/smartqueue-3d.png',
+    artifactLabel: 'Interactive Queue Kiosk Tablet',
+  },
+  {
+    id: 'smartsyllabus',
+    x: 1150,
+    y: 310,
+    label: 'SMARTSYLLABUS',
+    sub: '2026',
+    line: 2,
+    routeName: 'Line 2 · Business Ventures',
+    company: 'smartsyllabus',
+    organization: 'SmartSyllabus / University of Toronto ICUBE',
+    role: 'Co-Founder',
+    timeframe: 'Jan 2026 – Present',
+    summary: 'Started as a CSC301 project in January and stopped being one. AI parsing that turns multi-format syllabi into a structured semester. Incubated at University of Toronto ICUBE from the summer, alongside the Sun Life term.',
+    link: '/work/smartsyllabus',
+    linkLabel: 'Learn more',
+    artifact3d: '/images/tokens/smartsyllabus-3d.png',
+    artifactLabel: 'Dual-Screen Syllabus AI Terminal',
+  },
+
+  // ==========================================
+  // Line 3 · AI Tools (y = 500)
+  // ==========================================
+  {
+    id: 'khutba',
+    x: 120,
+    y: 500,
+    label: 'SERMON PIPELINE',
+    sub: '2023',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Sermon Summary Pipeline (2023)',
+    role: 'Creator & Developer',
+    timeframe: 'Dec 2023',
+    summary: 'The first attempt: scrape, narrate with pyttsx3, upload to Google Drive, and email the link. Taught the hard lesson that an email with a Drive link dies inside a month.',
+    link: '/work/khutba-summary-pipeline',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'friday-sermon',
+    x: 320,
+    y: 500,
+    label: 'SERMON BOT',
+    sub: '2024',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Friday Sermon Audio Pipeline',
+    role: 'Creator & Developer',
+    timeframe: '2024 – Present',
+    summary: 'The rebuild: drops a playable neural audio file straight into Discord where people already are. Scraping weekly publications and delivering automated audio summaries to the community.',
+    link: '/work/friday-sermon-bot',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'rag-assistant',
+    x: 520,
+    y: 500,
+    label: 'RAG AGENT',
+    sub: '2024',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Source-Grounded Research Assistant',
+    role: 'Creator & Architect',
+    timeframe: '2024 – Present',
+    summary: 'Retrieval assistant that answers only from indexed source passages and cites each claim by document and page. Hallucination is prevented by the retrieval architecture rather than by prompts.',
+    link: '/work/jamat-rag-assistant',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'second-brain',
+    x: 730,
+    y: 500,
+    label: 'SECOND BRAIN',
+    sub: '2024',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Second Brain Wiki',
+    role: 'Creator & Architect',
+    timeframe: '2024',
+    summary: 'A continuously self-updating markdown knowledge base with automated synthesis across dozens of research notes, articles, and operating playbooks.',
+    link: '/work/second-brain-wiki',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'personal-ai-os',
+    x: 940,
+    y: 500,
+    label: 'AI OS',
+    sub: '2025',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Personal AI Infrastructure',
+    role: 'Creator & Architect',
+    timeframe: '2025 – Daily',
+    summary: 'Self-hosted n8n orchestrator on PikaPods with Telegram input and Claude classification, routing thoughts into structured Notion pages.',
+    link: '/work/personal-ai-os',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'job-search',
+    x: 1150,
+    y: 500,
+    label: 'JOB PIPELINE',
+    sub: '2026',
+    line: 3,
+    routeName: 'Line 3 · AI Tools',
+    organization: 'Automated Job Search Pipeline',
+    role: 'Creator & Developer',
+    timeframe: '2026',
+    summary: 'Apify web scraper and LLM scoring pipeline ranking startup strategy roles automatically against specific skill criteria.',
+    link: '/work/job-search-automation',
+    linkLabel: 'Learn more',
+  },
+
+  // ==========================================
+  // Line 4 · Data (y = 690)
+  // ==========================================
+  {
+    id: 'moneyball',
+    x: 120,
+    y: 690,
+    label: 'DATA STORY',
+    sub: '2024',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    organization: 'Data Storytelling in R',
+    role: 'Analyst & Visualizer',
+    timeframe: '2024',
+    summary: 'Decades of baseball statistics parsed in R to rerun the Oakland replacement problem, plus a ggplot2 rebuild of the Economist corruption chart. The lesson was that a chart is an argument about what someone notices first.',
+    link: '/work/data-storytelling-r',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'bikeshare',
+    x: 380,
+    y: 690,
+    label: 'BIKESHARE',
+    sub: '2024',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    organization: 'Bikeshare Demand Model',
+    role: 'Modelling',
+    timeframe: '2024',
+    summary: 'A linear regression on rental counts against temperature, season and hour. The model underperformed, and reading the residuals is what made it worth building. Two commuter rush hours in the scatter plot said more than the metrics did.',
+    link: '/work/bikeshare-demand-model',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'job-portal',
+    x: 640,
+    y: 690,
+    label: 'JOB PORTAL',
+    sub: '2026',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    organization: 'Job Portal',
+    role: 'Creator & Developer',
+    timeframe: 'May 2026 – Present',
+    summary: 'Local first job search app. Apify ingestion, resume parsing, and model scored matching behind one provider interface covering Claude, Gemini, Groq, local Ollama and a stub mode. Everything stays on disk, and live calls stay gated behind flags.',
+    link: '/work/job-portal',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'aurum',
+    x: 900,
+    y: 690,
+    label: 'AURUM',
+    sub: '2026',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    organization: 'Aurum Finance Dashboard',
+    role: 'Creator & Developer',
+    timeframe: '2026',
+    summary: 'CSV import, category rules and take home pay modelled against 2026 Canadian brackets across four lifestyle scenarios. Runs entirely in the browser, because it is my money and it does not need an account.',
+    link: '/work/aurum-finance',
+    linkLabel: 'Learn more',
+  },
+  {
+    id: 'kronos',
+    x: 1150,
+    y: 690,
+    label: 'KRONOS',
+    sub: '2026',
+    line: 4,
+    routeName: 'Line 4 · Data',
+    organization: 'Kronos Forecasting Research',
+    role: 'Research',
+    timeframe: '2026',
+    summary: 'Reading a financial foundation model closely enough to work out that the tokenizer is the whole trick. Fine tuning setup, architecture notes, and a much better sense of what these models can and cannot claim.',
+    link: '/work/kronos-forecasting-research',
+    linkLabel: 'Learn more',
+  },
+
+  // ==========================================
+  // Line 5 · Writing (y = 870)
+  // ==========================================
+  {
+    id: 'repairability',
+    x: 120,
+    y: 870,
+    label: 'INFRASTRUCTURE',
+    sub: '2025',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'The Repairability & Politics of Infrastructure',
+    role: 'Essay (Infrastructure & Policy)',
+    timeframe: 'August 2025',
+    summary: 'On Langdon Winner and Steven Jackson, and what a closed TTC line and an unrepairable smartphone have in common. A critique of planned obsolescence and public utility stewardship.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/ttc-tracks.png',
+    artifactLabel: 'TTC Track & Transit Rail Infrastructure',
+  },
+  {
+    id: 'chinese-room',
+    x: 320,
+    y: 870,
+    label: 'CHINESE ROOM',
+    sub: '2025',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: "Searle's Chinese Room & Functionalism",
+    role: 'Essay (Philosophy of AI)',
+    timeframe: 'August 2025',
+    summary: "Taking the Systems Reply seriously: why the room understands Chinese even if the person inside it does not. The boundary between syntactic symbol manipulation and semantic comprehension.",
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/chinese-room.png',
+    artifactLabel: "Searle's Chinese Room Gedankenexperiment",
+  },
+  {
+    id: 'halo-analysis',
+    x: 520,
+    y: 870,
+    label: 'HALO SPLIT-SCREEN',
+    sub: '2025',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'Close Playing Analysis: Split-Screen in Halo',
+    role: 'Critique (Game Culture)',
+    timeframe: 'November 2025',
+    summary: 'Four strangers on one couch, one Xbox controller each, and an argument for why local co-op built social community that online matchmaking never could replicate.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/halo-chief.png',
+    artifactLabel: 'Master Chief Spartan Helmet Specimen',
+  },
+  {
+    id: 'dear-go-train',
+    x: 730,
+    y: 870,
+    label: 'DEAR GO TRAIN',
+    sub: '2025',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'Dear GO Train',
+    role: 'Reflection (Transit & Place)',
+    timeframe: 'December 2025',
+    summary: 'A letter to the commuter train that carried an immigrant kid to a Raptors game and, years later, to his own corporate job downtown. The quiet rhythm of regional transit and shared public life.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/go-train.png',
+    artifactLabel: 'GO Transit Commuter Rail Token',
+  },
+  {
+    id: 'ip-rights',
+    x: 940,
+    y: 870,
+    label: 'IP RIGHTS',
+    sub: '2026',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'Intellectual Property Rights in Canada',
+    role: 'Research Paper (Policy & Law)',
+    timeframe: 'March 2026',
+    summary: 'How copyright law and weak open access policy let corporate publishers profit from research the public already paid for, plus the systemic reforms required to restore open scholarship.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/canada-3d.png',
+    artifactLabel: 'Canadian IP & Copyright Specimen',
+  },
+  {
+    id: 'fifa-soccer',
+    x: 1150,
+    y: 870,
+    label: 'FIFA 1993',
+    sub: '2026',
+    line: 5,
+    routeName: 'Line 5 · Writing',
+    organization: 'Rethinking FIFA International Soccer (1993)',
+    role: 'Essay (Game Design)',
+    timeframe: 'April 2026',
+    summary: 'Why a game with a $100,000 budget deserves classic status, argued through what it started in sports simulation architecture rather than how it played.',
+    link: '/writing',
+    linkLabel: 'View essay on Writing',
+    artifact3d: '/images/writing/soccer-ball-3d.png',
+    artifactLabel: 'FIFA 1993 Simulation Specimen',
+  },
+];
+
+const routeColors: Record<number, string> = {
+  1: 'var(--line-1)', // Line 1: Cobalt
+  2: 'var(--line-2)', // Line 2: Pink (Business Ventures)
+  3: 'var(--line-3)', // Line 3: Yellow (AI Tools)
+  4: 'var(--line-4)', // Line 4: Green (Data)
+  5: 'var(--line-5)', // Line 5: Purple (Writing)
+};
+
+const routeTextColors: Record<number, string> = {
+  1: '#FFFFFF',
+  2: '#FFFFFF',
+  3: '#FFFFFF',
+  4: '#FFFFFF',
+  5: '#FFFFFF',
+};
+
+const lineNames: Record<number, string> = {
+  1: 'Line 1 · Corporate',
+  2: 'Line 2 · Business Ventures',
+  3: 'Line 3 · AI Tools',
+  4: 'Line 4 · Data',
+  5: 'Line 5 · Writing',
+};
+
+const lineTracks = [
+  { num: 1, y: 110 },
+  { num: 2, y: 310 },
+  { num: 3, y: 500 },
+  { num: 4, y: 690 },
+  { num: 5, y: 870 },
+];
+---
+
+<div id="route-map-wrapper" class="relative my-4">
+  <!-- Mobile Advisory Notice (Only displayed on mobile viewports) -->
+  <aside class="block md:hidden mb-4 border-2 border-(--ink) bg-(--surface) p-3" aria-label="Viewing recommendation">
+    <div class="flex items-center gap-2.5">
+      <span class="font-mono text-[13px] font-bold text-(--cobalt) shrink-0">ℹ</span>
+      <p class="font-mono text-[12px] font-medium leading-relaxed text-(--ink)">
+        Visualization works better on browser. Please view from there.
+      </p>
+    </div>
+  </aside>
+
+  <!-- Route System: Tracks on Left, Station Inspector Console on Right -->
+  <div id="route-system-grid" class="flex flex-col lg:flex-row gap-6 items-start">
+    <!-- SVG Route Diagram: 5 Parallel Isolated Lines + Dynamic Cross-Line Connections -->
+    <figure id="route-map-figure" class="flex-1 min-w-0 overflow-x-auto w-full border-2 border-(--ink) bg-(--ground) p-4" aria-label="Career transit route diagram">
+      <svg viewBox="0 0 1260 980" class="w-full min-w-[760px] select-none" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* 5 Isolated Horizontal Routes (Clean unbadged tracks spanning from 60 to 1200) */}
+        {
+          lineTracks.map((line) => (
+            <g class="route-track-group">
+              <path
+                d={`M ${TRACK_START_X} ${line.y} H ${TRACK_END_X}`}
+                stroke={routeColors[line.num]}
+                stroke-width="8"
+                stroke-linecap="square"
+                class="route-line"
+                style={`--len:${TRACK_LEN}; animation-delay:0ms; animation-duration:600ms`}
+              />
+            </g>
+          ))
+        }
+
+        {/* Dynamic Cross-Line Connections Layer */}
+        <g id="cross-connections-layer"></g>
+
+        {/* Stations: node on the line, clean name, and year */}
+        {
+          stations.map((s) => {
+            return (
+              <g
+                class="station-hit cursor-pointer"
+                data-station-id={s.id}
+                tabindex="0"
+                role="button"
+                aria-label={`Station: ${s.label}, ${s.organization}`}
+              >
+                {/* Station Node on Track: Hit pad + node ring + solid center dot */}
+                <g class="route-station" style={`transform-origin:${s.x}px ${s.y}px`}>
+                  <circle cx={s.x} cy={s.y} r="28" fill="transparent" class="node-hit-pad" />
+                  <circle cx={s.x} cy={s.y} r="13" fill="var(--ground)" stroke={routeColors[s.line]} stroke-width="6" class="node-ring" />
+                  <circle cx={s.x} cy={s.y} r="4.5" fill="var(--ink)" class="node-center-dot" />
+                </g>
+
+                {/* Station Name Label (high legibility Space Grotesk) */}
+                {s.id === 'otpp' ? (
+                  <text
+                    x={s.x}
+                    y={s.y - 60}
+                    class="route-label pointer-events-none"
+                    text-anchor="middle"
+                    fill="var(--ink)"
+                    font-family="var(--font-sans)"
+                    font-size="14.5"
+                    font-weight="700"
+                    letter-spacing="0.2"
+                  >
+                    <tspan x={s.x} dy="0">ONTARIO TEACHERS'</tspan>
+                    <tspan x={s.x} dy="18">PENSION PLAN</tspan>
+                  </text>
+                ) : (
+                  <text
+                    x={s.x}
+                    y={s.y - 48}
+                    class="route-label pointer-events-none"
+                    text-anchor="middle"
+                    fill="var(--ink)"
+                    font-family="var(--font-sans)"
+                    font-size="15"
+                    font-weight="700"
+                    letter-spacing="0.2"
+                  >
+                    {s.label}
+                  </text>
+                )}
+
+                {/* Station Sub / Year Label (bold ink black, crystal clear) */}
+                <text
+                  x={s.x}
+                  y={s.id === 'otpp' ? s.y - 20 : s.y - 24}
+                  class="route-label pointer-events-none"
+                  text-anchor="middle"
+                  fill="var(--ink)"
+                  font-family="var(--font-mono)"
+                  font-size="13.5"
+                  font-weight="700"
+                  letter-spacing="0.5"
+                >
+                  {s.sub}
+                </text>
+
+                {/* Company logo emblem for Corporate Line and SmartSyllabus (clean floating logo, no circle) */}
+                {s.company && (
+                  <g class="pointer-events-none">
+                    <image
+                      href={`/images/logos/${s.company}.png`}
+                      x={s.x - 24}
+                      y={s.y + 22}
+                      width="48"
+                      height="48"
+                      preserveAspectRatio="xMidYMid meet"
+                    />
+                  </g>
+                )}
+              </g>
+            );
+          })
+        }
+      </svg>
+    </figure>
+
+    <!-- Dedicated Station & Transfer Console (Positioned to the right, dynamic natural height, never scrolls) -->
+    <aside
+      id="route-station-inspector"
+      class="w-full lg:w-[430px] shrink-0 border-2 border-(--ink) bg-(--ground) p-6 lg:sticky lg:top-8 flex flex-col gap-4"
+      aria-label="Station and route details"
+    >
+      <!-- Header: Line badge -->
+      <div class="flex items-center justify-between gap-2 pb-3 border-b-2 border-(--ink)">
+        <span id="inspector-badge" class="bullet bullet-2 text-[12.5px] font-bold uppercase tracking-wider">
+          Line 2 · Business Ventures
+        </span>
+      </div>
+
+      <!-- Title & Role with optional Company Emblem (clean, uncluttered) -->
+      <div class="flex items-center gap-4">
+        <div id="inspector-logo-box" class="hidden h-16 w-16 shrink-0 items-center justify-center bg-transparent p-0.5">
+          <img id="inspector-logo-img" src="" alt="" class="h-14 w-14 object-contain" />
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 id="inspector-title" class="font-mono text-[22px] sm:text-[25px] font-bold text-(--ink) leading-snug tracking-tight">
+            SMARTSYLLABUS
+          </h3>
+          <p id="inspector-role" class="text-[13px] sm:text-[14px] font-bold text-(--ink-muted) uppercase tracking-wider mt-0.5">
+            SmartSyllabus / University of Toronto ICUBE · Co-Founder
+          </p>
+        </div>
+      </div>
+
+      <!-- 3D Artifact Token Specimen Stage (Prototype Feature) -->
+      <div id="inspector-artifact-box" class="border-2 border-(--ink) bg-(--surface) p-3 flex flex-col items-center justify-center relative overflow-hidden transition-all duration-200">
+        <!-- Dot grid background -->
+        <div class="absolute inset-0 pointer-events-none opacity-20" style="background-image: radial-gradient(var(--ink) 1px, transparent 1px); background-size: 12px 12px;"></div>
+        
+        <!-- Header status bar -->
+        <div class="w-full flex items-center justify-between font-mono text-[10px] font-bold text-(--ink-muted) uppercase tracking-wider mb-1.5 relative z-10">
+          <span class="flex items-center gap-1.5">
+            <span class="inline-block h-2 w-2 rounded-full bg-(--cobalt)"></span>
+            Station Artifact Specimen
+          </span>
+          <span id="inspector-artifact-tag" class="text-(--cobalt) font-bold">3D Specimen</span>
+        </div>
+
+        <!-- Render Stage -->
+        <div class="h-36 w-full flex items-center justify-center relative z-10 py-1">
+          <img
+            id="inspector-artifact-img"
+            src="/images/tokens/smartsyllabus-3d.png"
+            alt="Dual-Screen Syllabus AI Terminal"
+            class="max-h-32 max-w-[200px] object-contain transition-transform duration-300 hover:scale-105"
+          />
+        </div>
+
+        <!-- Specimen Caption -->
+        <div id="inspector-artifact-caption" class="w-full text-center font-mono text-[11px] font-bold text-(--ink-muted) uppercase tracking-wider mt-1 relative z-10">
+          Dual-Screen Syllabus AI Terminal
+        </div>
+      </div>
+
+      <!-- Dedicated Timeframe Row for single role -->
+      <div id="inspector-timeframe-row" class="flex items-center gap-2 font-mono text-[13px] font-semibold text-(--ink-muted)">
+        <span class="inline-block h-2 w-2 rounded-full bg-(--ink) shrink-0"></span>
+        <span id="inspector-timeframe">Jan 2026 – Present</span>
+      </div>
+
+      <!-- Multiple Roles Timeline Container (LinkedIn style vertical connector) -->
+      <div id="inspector-roles-timeline" class="hidden ml-2 pl-4 border-l-2 border-(--ink) flex flex-col gap-3">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Summary / Reflection (full text visible, no scroll) -->
+      <div>
+        <p id="inspector-summary" class="text-[14.5px] sm:text-[15px] leading-relaxed text-(--ink)">
+          Started as a CSC301 project in January and stopped being one. AI parsing that turns multi-format syllabi into a structured semester. Incubated at University of Toronto ICUBE from the summer, alongside the Sun Life term.
+        </p>
+      </div>
+
+      <!-- Action Links -->
+      <div id="inspector-actions" class="pt-2 border-t border-(--ink-faint)/20 flex flex-wrap items-center gap-2">
+        <a
+          id="inspector-link-primary"
+          href="/work/smartsyllabus"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-(--ink) text-(--ground) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--cobalt)"
+        >
+          <span id="inspector-link-text">Learn more</span>
+          <span>→</span>
+        </a>
+        <a
+          id="inspector-link-secondary"
+          href="#"
+          class="hidden items-center gap-1.5 px-4 py-2 border border-(--ink) bg-(--surface) text-(--ink) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--cobalt) hover:text-(--ground)"
+        >
+          <span id="inspector-link-secondary-text">Learn more</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <!-- Connections List (full list visible, no scroll) -->
+      <div id="inspector-conns" class="pt-2 border-t border-(--ink-faint)/20">
+        <div class="font-mono text-[12px] font-bold uppercase text-(--ink-muted) mb-2 flex items-center gap-2">
+          <svg class="w-4 h-4 text-(--ink) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 16l-4-4 4-4"></path>
+            <path d="M3 12h18"></path>
+            <path d="M17 8l4 4-4 4"></path>
+          </svg>
+          <span>CONNECTIONS:</span>
+        </div>
+        <div id="inspector-conns-list" class="flex flex-wrap gap-2"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<style>
+  /* Station Hit & Ring Hover */
+  .station-hit {
+    outline: none;
+  }
+  .station-hit .node-ring {
+    transition: stroke var(--dur-micro) var(--ease), stroke-width var(--dur-micro) var(--ease);
+  }
+  .station-hit:hover .node-ring,
+  .station-hit:focus-visible .node-ring {
+    stroke: var(--ink) !important;
+    stroke-width: 8px !important;
+  }
+
+  /* Solid black center dot inside current station ring */
+  .station-hit .node-center-dot {
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease), transform var(--dur-micro) var(--ease);
+    transform-origin: center;
+    transform-box: fill-box;
+    transform: scale(0.4);
+  }
+  .station-hit.current-station .node-center-dot {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    fill: var(--ink) !important;
+  }
+  .station-hit.current-station .node-ring {
+    stroke: var(--ink) !important;
+    stroke-width: 8px !important;
+  }
+
+  /* Target station highlight on connection: ink black ring with NO center dot */
+  .station-hit.connected-target .node-ring {
+    stroke: var(--ink) !important;
+    stroke-width: 7px !important;
+  }
+  .station-hit.connected-target .node-center-dot {
+    opacity: 0 !important;
+  }
+
+  /* Cross-Line Connection SVG Path: Animated Flowing Dots in pure Ink Black */
+  :global(.connection-line-path) {
+    stroke: var(--ink) !important;
+    stroke-linecap: round !important;
+    stroke-dasharray: 2 12 !important;
+    animation: connectionDotsFlow 1.2s linear infinite !important;
+    opacity: 0.9;
+    transition: stroke-width 150ms ease, opacity 150ms ease;
+  }
+  :global(.connection-edge:hover .connection-line-path),
+  :global(.connection-edge.active-connection .connection-line-path) {
+    opacity: 1 !important;
+    stroke-width: 6px !important;
+    stroke-dasharray: 2 14 !important;
+    animation: connectionDotsFlow 0.7s linear infinite !important;
+  }
+
+  @keyframes connectionDotsFlow {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.connection-line-path) {
+      animation: none !important;
+    }
+  }
+</style>
+
+<script is:inline define:vars={{ stations, routeColors, lineNames }}>
+  const dataMap = {};
+  stations.forEach((s) => {
+    dataMap[s.id] = s;
+  });
+
+  // Cross-line curated connections graph
+  const CONNECTIONS = {
+    'flingblade': [
+      {
+        target: 'fifa-soccer',
+        reason: 'Game design theory & simulation architecture',
+        why: 'Taking game development from mechanics code into critical writing: sword physics in Unity on one side, EA Sports simulation history on the other.'
+      },
+      {
+        target: 'halo-analysis',
+        reason: 'Local multiplayer mechanics & couch co-op',
+        why: 'Both center on physical gaming constraints: client-side latency in browser WebGL, split-screen memory management in Halo.'
+      },
+      {
+        target: 'smartqueue',
+        reason: 'Interactive client runtime performance',
+        why: 'Pushed the performance envelope in the browser: WebGL shader limits on one side, real-time WebSocket state on the other.'
+      }
+    ],
+    'smartsyllabus': [
+      {
+        target: 'uoft',
+        reason: 'Born out of U of T student research',
+        why: 'The qualitative research habit turned on my own product. We ran student usability testing, saw where onboarding failed, and re-architected it.'
+      },
+      {
+        target: 'rag-assistant',
+        reason: 'Document parsing & retrieval systems',
+        why: 'Both parse unstructured course documents nobody agreed on a format for, built strictly to fail loudly rather than hallucinate dates.'
+      },
+      {
+        target: 'ip-rights',
+        reason: 'Open access & student syllabus ownership',
+        why: 'The legal argument against knowledge profitization directly motivated building open syllabus tools that put the schedule back in students hands.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Transformer architectures',
+        why: 'Reading how foundation model tokenizers work, then shipping applications that depend on token parsing in production.'
+      }
+    ],
+    'sunadvantage': [
+      {
+        target: 'job-search',
+        reason: 'Process automation & scripts',
+        why: 'The Sun Life term is where automation stopped being a hobby. Find the manual work worth removing, prove the time saved, then build the tooling.'
+      },
+      {
+        target: 'dyedurham',
+        reason: 'Regulated enterprise products',
+        why: 'Product management, then digital transformation. Four months each inside Canadian financial services, leading to the full time offer.'
+      },
+      {
+        target: 'repairability',
+        reason: 'Infrastructure stewardship & maintenance',
+        why: 'Both examine what keeps complex human systems running: group benefit operations in corporate practice, infrastructure politics in theory.'
+      }
+    ],
+    'otpp': [
+      {
+        target: 'dyedurham',
+        reason: 'Enterprise compliance constraints',
+        why: 'Two enterprise seats where the binding constraint was compliance rather than preference. You design for what regulation will tolerate.'
+      },
+      {
+        target: 'uoft',
+        reason: 'Design research & service journey mapping',
+        why: 'Design research at student scale and pension fund scale. The method is identical; the difference is the number of stakeholders signing off.'
+      }
+    ],
+    'skoll': [
+      {
+        target: 'presently',
+        reason: 'Gemini MVP surface testing',
+        why: 'Building fast prototype surfaces to evaluate user onboarding and product demand before writing heavyweight backend logic.'
+      },
+      {
+        target: 'job-portal',
+        reason: 'Candidate evaluation & ranking engines',
+        why: 'Ranking athletic recruits to roster slots or candidates to job listings: structured feature matching tested against real-world ambiguity.'
+      }
+    ],
+    'presently': [
+      {
+        target: 'skoll',
+        reason: 'Product surface testing',
+        why: 'Testing product hypotheses quickly with streamlined intake forms and prototype feedback.'
+      },
+      {
+        target: 'job-portal',
+        reason: 'Matching algorithms',
+        why: 'The same matching problem wearing different clothes: a person to a gift, a resume to a listing.'
+      }
+    ],
+    'smartqueue': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Campus student productivity',
+        why: 'Direct tools addressing real university pain points: queue congestion at office hours and semester syllabus overwhelm.'
+      },
+      {
+        target: 'flingblade',
+        reason: 'Interactive browser runtimes',
+        why: 'Early builds where client-side responsiveness determined whether users engaged or dropped off.'
+      }
+    ],
+    'khutba': [
+      {
+        target: 'friday-sermon',
+        reason: 'Evolution of scraping pipeline',
+        why: 'Same scrape, same idea, three years apart. The 2023 version emailed a Drive link and died inside a month; the rebuild drops neural audio straight into Discord.'
+      }
+    ],
+    'friday-sermon': [
+      {
+        target: 'rag-assistant',
+        reason: 'Corpus scraping & retrieval',
+        why: 'Both point at the same weekly publication archive: one narrates audio summaries, the other answers grounded questions.'
+      },
+      {
+        target: 'khutba',
+        reason: 'Predecessor prototype',
+        why: 'From a brittle script with pickle files to an automated Discord audio bot.'
+      }
+    ],
+    'rag-assistant': [
+      {
+        target: 'chinese-room',
+        reason: 'Symbol manipulation vs semantic understanding',
+        why: 'Building a RAG agent forced confronting the Chinese Room directly: retrieval is syntactic matching, but strict citation keeps it grounded.'
+      },
+      {
+        target: 'second-brain',
+        reason: 'Document synthesis',
+        why: 'Two ways to make documents answerable: cited passage retrieval on one side, rolling knowledge synthesis on the other.'
+      },
+      {
+        target: 'smartsyllabus',
+        reason: 'Document RAG',
+        why: 'Extracting calendar events and citations directly from unstructured course documents.'
+      }
+    ],
+    'second-brain': [
+      {
+        target: 'personal-ai-os',
+        reason: 'Automated personal systems',
+        why: 'Unstructured input enters one side, structured synthesis emerges, and no filing decision is ever manual.'
+      },
+      {
+        target: 'rag-assistant',
+        reason: 'Information retrieval',
+        why: 'Organizing knowledge representations for rapid cross-document discovery.'
+      }
+    ],
+    'personal-ai-os': [
+      {
+        target: 'job-search',
+        reason: 'n8n workflow pipelines',
+        why: 'Plumbing from the same season: one routes personal notes, the other routes job postings and scoring.'
+      },
+      {
+        target: 'sunadvantage',
+        reason: 'Enterprise to personal automations',
+        why: 'Copilot Studio at work, n8n at home. Same instinct, very different budget.'
+      }
+    ],
+    'job-search': [
+      {
+        target: 'job-portal',
+        reason: 'Plumbing to full desktop app',
+        why: 'The pipeline proved the ranking was worth having; the portal is what happened when I gave it resumes, a UI, and five provider fallbacks.'
+      },
+      {
+        target: 'sunadvantage',
+        reason: 'Operational workflow automation',
+        why: 'Finding high-friction manual work worth automating and building reliable tools to replace it.'
+      }
+    ],
+    'moneyball': [
+      {
+        target: 'bikeshare',
+        reason: 'R & regression analysis',
+        why: 'Same language, same term, same library. One models the count and fails honestly; the other argues with the chart and wins.'
+      },
+      {
+        target: 'aurum',
+        reason: 'Tabular data analysis',
+        why: 'Turning messy tables into actionable visual arguments someone can evaluate in seconds.'
+      }
+    ],
+    'bikeshare': [
+      {
+        target: 'dear-go-train',
+        reason: 'Transit mobility & commuter rhythms',
+        why: 'Bikeshare models commuter traffic quantitatively in R; Dear GO Train reflects on the lived human experience of regional transit.'
+      },
+      {
+        target: 'moneyball',
+        reason: 'Statistical storytelling',
+        why: 'R modeling and ggplot2 visualizations uncovering hidden dynamics in commuter and baseball datasets.'
+      },
+      {
+        target: 'aurum',
+        reason: 'Residual modeling',
+        why: 'Finding patterns in residuals and expense categories that simple linear models miss.'
+      }
+    ],
+    'job-portal': [
+      {
+        target: 'job-search',
+        reason: 'Ingestion pipeline to local UI',
+        why: 'The pipeline proved the ranking was worth having; the portal added multi-provider evaluation and a desktop interface.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Local LLM benchmark scoring',
+        why: 'Reading model internals instead of trusting API defaults: one swaps providers, the other analyzes tokenizers.'
+      },
+      {
+        target: 'aurum',
+        reason: 'Local-first desktop architecture',
+        why: 'Both run completely on disk and in the browser. Zero cloud dependencies, zero accounts required, absolute user sovereignty.'
+      }
+    ],
+    'aurum': [
+      {
+        target: 'bikeshare',
+        reason: 'Tabular aggregation & modeling',
+        why: 'One models commuter rental counts, the other models tax brackets and cash flows. Both turn raw tabular datasets into actionable answers.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Financial modeling',
+        why: 'Financial data from opposite ends of the telescope. Kronos forecasts a market; Aurum forecasts my rent.'
+      }
+    ],
+    'kronos': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Transformer architectures',
+        why: 'Dissecting foundation model tokenization and applying transformer extraction to multi-page syllabus PDFs.'
+      },
+      {
+        target: 'chinese-room',
+        reason: 'Model understanding vs prediction',
+        why: 'Evaluating whether foundation models genuinely comprehend financial time-series or simply predict token frequencies.'
+      }
+    ],
+    'repairability': [
+      {
+        target: 'sunadvantage',
+        reason: 'Infrastructure stewardship',
+        why: 'Connecting the philosophy of repairable public infrastructure with the operational maintenance of enterprise platforms.'
+      },
+      {
+        target: 'dear-go-train',
+        reason: 'Transit systems & urban politics',
+        why: 'From political theory on transit closures to personal reflections on riding the regional rails.'
+      }
+    ],
+    'chinese-room': [
+      {
+        target: 'rag-assistant',
+        reason: 'Information retrieval philosophy',
+        why: 'Why retrieval-grounded generation is the practical answer to Searle: ground every symbol in a cited source.'
+      },
+      {
+        target: 'kronos',
+        reason: 'Foundation model internals',
+        why: 'The philosophical dividing line between transformer token probabilities and genuine cognitive comprehension.'
+      }
+    ],
+    'halo-analysis': [
+      {
+        target: 'flingblade',
+        reason: 'Game design craft',
+        why: 'Critiquing split-screen mechanics in Halo while coding physics and camera controllers in Unity.'
+      },
+      {
+        target: 'fifa-soccer',
+        reason: 'Game culture & simulation history',
+        why: 'Two critical analyses of defining video game franchises: social couch multiplayer in Halo, simulation architecture in FIFA.'
+      }
+    ],
+    'dear-go-train': [
+      {
+        target: 'bikeshare',
+        reason: 'Transit flow & urban mobility',
+        why: 'Quantitative regression on commuter bike rentals paired with qualitative reflections on riding the GO train.'
+      },
+      {
+        target: 'uoft',
+        reason: 'Wayfinding & transit research',
+        why: 'Exploring transit navigation both as an everyday commuter and as a design researcher at U of T.'
+      }
+    ],
+    'ip-rights': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Open academic knowledge',
+        why: 'Challenging publisher gatekeeping in policy writing while building open tools for university students.'
+      }
+    ],
+    'fifa-soccer': [
+      {
+        target: 'flingblade',
+        reason: 'Sports simulation & game design',
+        why: 'Arguing why early game engines deserve classic status while building browser game prototypes in Unity.'
+      },
+      {
+        target: 'halo-analysis',
+        reason: 'Game design theory',
+        why: 'Analyzing foundational game design decisions that defined console and PC gaming eras.'
+      }
+    ],
+    'uoft': [
+      {
+        target: 'smartsyllabus',
+        reason: 'Student experience research',
+        why: 'Deep qualitative interviews with students directly leading to the inception and validation of SmartSyllabus.'
+      },
+      {
+        target: 'otpp',
+        reason: 'User journey mapping',
+        why: 'Synthesizing messy user interviews into clear journey maps that product teams can execute against.'
+      }
+    ],
+    'rbc': [
+      {
+        target: 'otpp',
+        reason: 'Institutional engineering',
+        why: 'Understanding software development standards and governance inside major Canadian financial institutions.'
+      }
+    ],
+    'dyedurham': [
+      {
+        target: 'sunadvantage',
+        reason: 'Financial enterprise products',
+        why: 'Product management and operations inside regulated Canadian enterprise software.'
+      }
+    ]
+  };
+
+  const inspector = document.getElementById('route-station-inspector');
+  const inspBadge = document.getElementById('inspector-badge');
+  const inspTimeframe = document.getElementById('inspector-timeframe');
+  const inspTimeframeRow = document.getElementById('inspector-timeframe-row');
+  const inspRolesTimeline = document.getElementById('inspector-roles-timeline');
+  const inspTitle = document.getElementById('inspector-title');
+  const inspLogoBox = document.getElementById('inspector-logo-box');
+  const inspLogoImg = document.getElementById('inspector-logo-img');
+  const inspRole = document.getElementById('inspector-role');
+  const inspSummary = document.getElementById('inspector-summary');
+  const inspLinkPrimary = document.getElementById('inspector-link-primary');
+  const inspLinkText = document.getElementById('inspector-link-text');
+  const inspLinkSecondary = document.getElementById('inspector-link-secondary');
+  const inspLinkSecondaryText = document.getElementById('inspector-link-secondary-text');
+  const inspConnsSection = document.getElementById('inspector-conns');
+  const inspConnsList = document.getElementById('inspector-conns-list');
+  const inspArtifactBox = document.getElementById('inspector-artifact-box');
+  const inspArtifactImg = document.getElementById('inspector-artifact-img');
+  const inspArtifactCaption = document.getElementById('inspector-artifact-caption');
+  const inspArtifactTag = document.getElementById('inspector-artifact-tag');
+
+  const nodes = document.querySelectorAll('.station-hit');
+  const connectionsLayer = document.getElementById('cross-connections-layer');
+
+  let activeStationId = 'smartsyllabus';
+  let pinnedStationId = 'smartsyllabus';
+  let restoreTimer = null;
+
+  // Render cross-line connection paths in SVG
+  function drawConnections(stationId) {
+    if (!connectionsLayer) return;
+    connectionsLayer.innerHTML = '';
+    nodes.forEach((el) => el.classList.remove('connected-target'));
+
+    const conns = CONNECTIONS[stationId] || [];
+    const sourceStation = dataMap[stationId];
+    if (!sourceStation || !conns.length) return;
+
+    const strokeColor = 'var(--ink)';
+
+    conns.forEach((c) => {
+      const targetStation = dataMap[c.target];
+      if (!targetStation) return;
+
+      const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      group.setAttribute('class', 'connection-edge');
+      group.setAttribute('data-source', stationId);
+      group.setAttribute('data-target', c.target);
+      group.style.cursor = 'pointer';
+
+      const sx = sourceStation.x;
+      const sy = sourceStation.y;
+      const tx = targetStation.x;
+      const ty = targetStation.y;
+
+      const dx = tx - sx;
+      const dy = ty - sy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      const offsetMag = Math.min(65, Math.max(25, dist * 0.18));
+      const nx = -dy / (dist || 1);
+      const ny = dx / (dist || 1);
+
+      const sign = (stationId < c.target) ? 1 : -1;
+      const cx = (sx + tx) / 2 + nx * offsetMag * sign;
+      const cy = (sy + ty) / 2 + ny * offsetMag * sign;
+
+      const d = `M ${sx} ${sy} Q ${cx} ${cy} ${tx} ${ty}`;
+
+      const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hitPath.setAttribute('d', d);
+      hitPath.setAttribute('stroke', 'transparent');
+      hitPath.setAttribute('stroke-width', '24');
+      hitPath.setAttribute('fill', 'none');
+      hitPath.setAttribute('class', 'connection-hit-pad');
+
+      const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      visPath.setAttribute('d', d);
+      visPath.setAttribute('class', 'connection-line-path');
+      visPath.setAttribute('stroke', strokeColor);
+      visPath.setAttribute('stroke-width', '4');
+      visPath.setAttribute('stroke-linecap', 'round');
+      visPath.setAttribute('stroke-dasharray', '2 12');
+      visPath.setAttribute('fill', 'none');
+
+      group.appendChild(hitPath);
+      group.appendChild(visPath);
+
+      group.addEventListener('mouseenter', () => {
+        clearTimeout(restoreTimer);
+        group.classList.add('active-connection');
+        updateTransfer(sourceStation, targetStation, c);
+      });
+
+      group.addEventListener('mouseleave', () => {
+        group.classList.remove('active-connection');
+        scheduleRestore();
+      });
+
+      group.addEventListener('click', (e) => {
+        e.stopPropagation();
+        group.classList.add('active-connection');
+        updateTransfer(sourceStation, targetStation, c);
+      });
+
+      connectionsLayer.appendChild(group);
+
+      const targetEl = document.querySelector(`.station-hit[data-station-id="${c.target}"]`);
+      if (targetEl) {
+        targetEl.classList.add('connected-target');
+      }
+    });
+  }
+
+  function updateInspector(stationId) {
+    clearTimeout(restoreTimer);
+    const s = dataMap[stationId];
+    if (!s || !inspector) return;
+
+    activeStationId = stationId;
+
+    if (inspBadge) {
+      inspBadge.className = `bullet bullet-${s.line} text-[12.5px] font-bold uppercase tracking-wider`;
+      inspBadge.style.backgroundColor = '';
+      inspBadge.style.color = '';
+      inspBadge.textContent = s.routeName;
+    }
+    if (inspTitle) inspTitle.textContent = s.label;
+    if (inspLogoBox && inspLogoImg) {
+      if (s.company) {
+        inspLogoImg.src = `/images/logos/${s.company}.png`;
+        inspLogoBox.classList.remove('hidden');
+        inspLogoBox.classList.add('inline-flex');
+      } else {
+        inspLogoBox.classList.add('hidden');
+        inspLogoBox.classList.remove('inline-flex');
+      }
+    }
+
+    if (s.roles && s.roles.length > 1) {
+      if (inspTimeframeRow) inspTimeframeRow.classList.add('hidden');
+      if (inspRolesTimeline) {
+        inspRolesTimeline.classList.remove('hidden');
+        inspRolesTimeline.innerHTML = '';
+        s.roles.forEach((r) => {
+          const item = document.createElement('div');
+          item.className = 'relative pl-1';
+          item.innerHTML = `
+            <span class="absolute -left-[22px] top-1.5 h-2.5 w-2.5 rounded-full bg-(--ink) border-2 border-(--ground)"></span>
+            <div class="text-[14.5px] font-bold text-(--ink) leading-snug">${r.title}</div>
+            <div class="text-[12px] font-mono text-(--ink-muted) mt-0.5">${r.team ? r.team + ' · ' : ''}${r.timeframe}${r.type ? ' · ' + r.type : ''}</div>
+          `;
+          inspRolesTimeline.appendChild(item);
+        });
+      }
+      if (inspRole) {
+        inspRole.textContent = 'Multiple roles';
+      }
+    } else {
+      if (inspRolesTimeline) {
+        inspRolesTimeline.classList.add('hidden');
+        inspRolesTimeline.innerHTML = '';
+      }
+      if (inspTimeframeRow) {
+        inspTimeframeRow.classList.remove('hidden');
+        if (inspTimeframe) inspTimeframe.textContent = s.timeframe;
+      }
+      if (inspRole) {
+        const orgClean = s.organization.replace(/\(.*?\)/g, '').trim().toLowerCase();
+        const lblClean = s.label.toLowerCase();
+        inspRole.textContent = orgClean === lblClean ? s.role : `${s.organization} · ${s.role}`;
+      }
+    }
+
+    if (inspSummary) inspSummary.textContent = s.summary;
+
+    // Update 3D Artifact Specimen Stage
+    if (inspArtifactBox && inspArtifactImg && inspArtifactCaption && inspArtifactTag) {
+      if (s.artifact3d) {
+        inspArtifactBox.classList.remove('hidden');
+        inspArtifactBox.classList.add('flex');
+        inspArtifactImg.src = s.artifact3d;
+        inspArtifactImg.alt = s.artifactLabel || `${s.label} Artifact Specimen`;
+        inspArtifactImg.classList.remove('hidden');
+        inspArtifactCaption.textContent = s.artifactLabel || `${s.label} Artifact Specimen`;
+        inspArtifactTag.textContent = '3D Specimen';
+        inspArtifactTag.className = 'text-(--cobalt) font-bold';
+      } else if (s.company) {
+        inspArtifactBox.classList.remove('hidden');
+        inspArtifactBox.classList.add('flex');
+        inspArtifactImg.src = `/images/logos/${s.company}.png`;
+        inspArtifactImg.alt = `${s.organization} Logo`;
+        inspArtifactImg.classList.remove('hidden');
+        inspArtifactCaption.textContent = `${s.organization} Institutional Token`;
+        inspArtifactTag.textContent = 'Station Token';
+        inspArtifactTag.className = 'text-(--ink-muted) font-bold';
+      } else {
+        inspArtifactBox.classList.remove('hidden');
+        inspArtifactBox.classList.add('flex');
+        inspArtifactImg.classList.add('hidden');
+        inspArtifactCaption.textContent = `${s.label} · Milestone Token Pending`;
+        inspArtifactTag.textContent = 'Token In Prep';
+        inspArtifactTag.className = 'text-(--ink-faint) font-bold';
+      }
+    }
+
+    if (inspLinkPrimary && inspLinkText) {
+      if (s.link) {
+        inspLinkPrimary.style.display = 'inline-flex';
+        inspLinkPrimary.setAttribute('href', s.link);
+        inspLinkText.textContent = s.linkLabel || 'Learn more';
+      } else {
+        inspLinkPrimary.style.display = 'none';
+      }
+    }
+
+    if (inspLinkSecondary) inspLinkSecondary.style.display = 'none';
+
+    // Populate connected stations pills (clear, legible 12px buttons)
+    const conns = CONNECTIONS[stationId] || [];
+    if (inspConnsSection && inspConnsList) {
+      if (conns.length > 0) {
+        inspConnsSection.style.display = 'block';
+        inspConnsList.innerHTML = '';
+        conns.forEach((c) => {
+          const target = dataMap[c.target];
+          if (!target) return;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'px-3 py-1.5 border-2 border-(--ink) font-mono text-[12px] font-bold uppercase transition-colors hover:bg-(--ink) hover:text-(--ground) flex items-center gap-2 cursor-pointer';
+          btn.innerHTML = `<span class="inline-block h-2 w-2 rounded-full shrink-0" style="background:${routeColors[target.line]}"></span><span>${target.label}</span>`;
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pinnedStationId = target.id;
+            updateInspector(target.id);
+            drawConnections(target.id);
+          });
+          inspConnsList.appendChild(btn);
+        });
+      } else {
+        inspConnsSection.style.display = 'none';
+      }
+    }
+
+    nodes.forEach((n) => {
+      n.classList.toggle('current-station', n.getAttribute('data-station-id') === stationId);
+    });
+
+    drawConnections(stationId);
+  }
+
+  function updateTransfer(source, target, conn) {
+    clearTimeout(restoreTimer);
+    if (!inspector) return;
+
+    if (inspLogoBox) {
+      inspLogoBox.classList.add('hidden');
+      inspLogoBox.classList.remove('inline-flex');
+    }
+
+    if (inspArtifactBox) {
+      inspArtifactBox.classList.add('hidden');
+      inspArtifactBox.classList.remove('flex');
+    }
+
+    if (inspRolesTimeline) {
+      inspRolesTimeline.classList.add('hidden');
+      inspRolesTimeline.innerHTML = '';
+    }
+    if (inspTimeframeRow) {
+      inspTimeframeRow.classList.remove('hidden');
+    }
+
+    if (inspBadge) {
+      inspBadge.className = 'bullet text-[12px] font-bold uppercase tracking-wider';
+      inspBadge.style.backgroundColor = 'var(--ink)';
+      inspBadge.style.color = 'var(--ground)';
+      inspBadge.textContent = 'CONNECTION';
+    }
+    if (inspTimeframe) {
+      inspTimeframe.textContent = conn.reason;
+    }
+    if (inspTitle) {
+      inspTitle.innerHTML = `
+        <span class="inline-flex items-center gap-2 flex-wrap text-[18px] sm:text-[20px] font-bold leading-snug">
+          <span class="text-(--ink)">${source.label}</span>
+          <svg class="w-4 h-4 text-(--ink) shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 16l-4-4 4-4"></path>
+            <path d="M3 12h18"></path>
+            <path d="M17 8l4 4-4 4"></path>
+          </svg>
+          <span class="text-(--ink)">${target.label}</span>
+        </span>
+      `;
+    }
+    if (inspRole) {
+      inspRole.textContent = `${source.routeName} ↔ ${target.routeName}`;
+    }
+    if (inspSummary) {
+      inspSummary.textContent = conn.why;
+    }
+
+    if (inspLinkPrimary && inspLinkText) {
+      if (source.link) {
+        inspLinkPrimary.style.display = 'inline-flex';
+        inspLinkPrimary.setAttribute('href', source.link);
+        inspLinkText.textContent = `Learn more: ${source.label}`;
+      } else {
+        inspLinkPrimary.style.display = 'none';
+      }
+    }
+
+    if (inspLinkSecondary && inspLinkSecondaryText) {
+      if (target.link) {
+        inspLinkSecondary.classList.remove('hidden');
+        inspLinkSecondary.style.display = 'inline-flex';
+        inspLinkSecondary.setAttribute('href', target.link);
+        inspLinkSecondaryText.textContent = `Learn more: ${target.label}`;
+      } else {
+        inspLinkSecondary.style.display = 'none';
+      }
+    }
+
+    if (inspConnsSection) inspConnsSection.style.display = 'none';
+  }
+
+  function scheduleRestore() {
+    clearTimeout(restoreTimer);
+    restoreTimer = setTimeout(() => {
+      updateInspector(pinnedStationId);
+    }, 300);
+  }
+
+  // Station node event listeners
+  nodes.forEach((n) => {
+    const sid = n.getAttribute('data-station-id');
+    if (!sid) return;
+
+    n.addEventListener('mouseenter', () => {
+      updateInspector(sid);
+    });
+
+    n.addEventListener('mouseleave', scheduleRestore);
+
+    n.addEventListener('click', (e) => {
+      e.stopPropagation();
+      pinnedStationId = sid;
+      updateInspector(sid);
+    });
+
+    n.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        pinnedStationId = sid;
+        updateInspector(sid);
+      }
+    });
+  });
+
+  if (inspector) {
+    inspector.addEventListener('mouseenter', () => clearTimeout(restoreTimer));
+    inspector.addEventListener('mouseleave', scheduleRestore);
+  }
+
+  // Initial load: populate with current anchor station (Sun Life)
+  updateInspector(pinnedStationId);
+</script>
