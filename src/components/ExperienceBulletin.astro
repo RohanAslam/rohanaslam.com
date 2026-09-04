@@ -2,13 +2,13 @@
 /**
  * ExperienceBulletin.astro
  *
- * Inverted Polaroid photo cluster with dark card face, crisp white typography,
- * route-colored pushpins, tighter cluster spacing, and enlarged photos.
- * - Flipped color scheme: Black/ink card face with white text and light offset depth block.
- * - Larger photos for SmartSyllabus (315px), Sun Life (295px), OT (285px), Dye & Durham (265px).
- * - Design researcher photo preserved as compact portrait snapshot (175px).
- * - Clean title of the company only (no dates or years).
- * - Photos moved closer together for a tighter cluster and future photo additions.
+ * Authentic classic Polaroid photo cluster:
+ * - Crisp white Polaroid card with 2px ink border and white bottom chin.
+ * - Bold, crystal-clear black text (title only, no dates/years).
+ * - No weird offset depth block (no random white lines peeking out).
+ * - Clean, elegant enameled transit route pins (single clean head, no awkward needle).
+ * - Enlarged primary photos with compact portrait snapshot for design research.
+ * - Tightly clustered arrangement with plenty of room to add more photos.
  */
 import CompanyLogo from './CompanyLogo.astro';
 
@@ -37,7 +37,7 @@ const pins: PinnedPhoto[] = [
     line: 2,
     tilt: '-2.5deg',
     z: 10,
-    desktopStyle: 'left: 3%; top: 8px; width: 315px;',
+    desktopStyle: 'left: 4%; top: 8px; width: 315px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -50,7 +50,7 @@ const pins: PinnedPhoto[] = [
     line: 1,
     tilt: '2deg',
     z: 12,
-    desktopStyle: 'right: 3%; top: 16px; width: 295px;',
+    desktopStyle: 'right: 4%; top: 16px; width: 295px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -63,7 +63,7 @@ const pins: PinnedPhoto[] = [
     line: 4,
     tilt: '-1deg',
     z: 15,
-    desktopStyle: 'left: 36%; top: 42px; width: 175px;',
+    desktopStyle: 'left: 36%; top: 40px; width: 175px;',
     aspectClass: 'aspect-[3/4]',
   },
   {
@@ -76,7 +76,7 @@ const pins: PinnedPhoto[] = [
     line: 5,
     tilt: '1.8deg',
     z: 11,
-    desktopStyle: 'left: 6%; bottom: 8px; width: 285px;',
+    desktopStyle: 'left: 7%; bottom: 8px; width: 285px;',
     aspectClass: 'aspect-[1.35/1]',
   },
   {
@@ -89,19 +89,19 @@ const pins: PinnedPhoto[] = [
     line: 1,
     tilt: '-2.2deg',
     z: 13,
-    desktopStyle: 'right: 6%; bottom: 12px; width: 265px;',
+    desktopStyle: 'right: 7%; bottom: 12px; width: 265px;',
     aspectClass: 'aspect-[1.35/1]',
   },
 ];
 ---
 
 <div class="experience-cluster w-full select-none" id="experience-cluster" aria-label="Pinned career experience photos">
-  {/* Desktop & Tablet Collage Stage: Compact, tightly spaced cluster with varied photo sizes */}
+  {/* Desktop & Tablet Collage Stage: Compact, tightly clustered canvas */}
   <div class="hidden sm:block relative w-full h-[490px] xl:h-[510px]">
     {
       pins.map((card, i) => (
         <article
-          class="polaroid-card group absolute bg-(--ink) text-(--ground) border-2 border-(--ink) p-2 transition-all duration-200 cursor-pointer"
+          class="polaroid-card group absolute bg-white border-2 border-(--ink) p-2 sm:p-2.5 pb-3 transition-all duration-200 cursor-pointer"
           data-index={i}
           data-tilt={card.tilt}
           style={`--card-tilt: ${card.tilt}; z-index: ${card.z}; ${card.desktopStyle}`}
@@ -109,26 +109,19 @@ const pins: PinnedPhoto[] = [
           role="button"
           aria-label={`${card.org}. Click to bring forward.`}
         >
-          {/* Flipped 3D Depth Block (Light surface block with ink border behind dark card, strictly no box-shadow!) */}
-          <div
-            class="polaroid-depth-block absolute inset-0 bg-white dark:bg-(--surface) border-2 border-(--ink) -z-10 translate-x-1.5 translate-y-1.5 transition-transform duration-200 group-hover:translate-x-2 group-hover:translate-y-2"
-            aria-hidden="true"
-          />
-
-          {/* Enameled Pushpin Tack at Top Center (colored by strategy/route line) */}
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none" aria-hidden="true">
+          {/* Clean Enameled Transit Route Pin at Top Center */}
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none" aria-hidden="true">
             <div
-              class="h-3.5 w-3.5 rounded-full border-2 border-(--ink) relative flex items-center justify-center transition-transform group-hover:scale-110"
+              class="h-4 w-4 rounded-full border-2 border-(--ink) relative transition-transform group-hover:scale-110"
               style={`background: var(--line-${card.line});`}
             >
+              {/* Crisp enamel reflection highlight */}
               <span class="absolute top-0.5 left-0.5 h-1 w-1 rounded-full bg-white opacity-90" />
-              <span class="h-1 w-1 rounded-full bg-(--ink) opacity-30" />
             </div>
-            <div class="h-1.5 w-[2px] bg-(--ink) -mt-0.5" />
           </div>
 
-          {/* Photo Frame */}
-          <div class={`relative w-full overflow-hidden border border-white/20 bg-black ${card.aspectClass}`}>
+          {/* Photo Frame with Clean 1px Ink Border */}
+          <div class={`relative w-full overflow-hidden border border-(--ink) bg-(--ground) ${card.aspectClass}`}>
             <img
               src={card.image}
               alt={card.alt}
@@ -140,12 +133,12 @@ const pins: PinnedPhoto[] = [
             />
           </div>
 
-          {/* Flipped Polaroid Chin: Bold White Company Title Only */}
-          <div class="pt-2 pb-1 px-1 flex items-center gap-2 min-w-0">
-            <div class="flex h-5 w-5 shrink-0 items-center justify-center bg-white border border-white/30 p-0.5" aria-hidden="true">
+          {/* Authentic White Polaroid Chin: Crisp Black Company Title Only */}
+          <div class="pt-2 px-0.5 flex items-center gap-2 min-w-0">
+            <div class="flex h-5 w-5 shrink-0 items-center justify-center border border-(--ink) bg-(--ground) p-0.5" aria-hidden="true">
               <CompanyLogo name={card.company} size={14} class="shrink-0" />
             </div>
-            <h3 class="text-[14px] sm:text-[15px] font-bold leading-tight text-white tracking-tight truncate">
+            <h3 class="text-[14px] sm:text-[15px] font-bold leading-tight text-(--ink) tracking-tight truncate">
               {card.org}
             </h3>
           </div>
@@ -154,12 +147,12 @@ const pins: PinnedPhoto[] = [
     }
   </div>
 
-  {/* Mobile View: Horizontal scrolling snapshot strip (compact ~240px height, no page stretching) */}
+  {/* Mobile View: Horizontal scrolling snapshot strip (compact ~240px height) */}
   <div class="sm:hidden flex gap-4 overflow-x-auto pb-4 pt-2 -mx-5 px-5 snap-x scrollbar-none">
     {
       pins.map((card, i) => (
         <article
-          class="polaroid-card group relative w-[240px] shrink-0 snap-center bg-(--ink) text-(--ground) border-2 border-(--ink) p-2 transition-all duration-200 cursor-pointer"
+          class="polaroid-card group relative w-[240px] shrink-0 snap-center bg-white border-2 border-(--ink) p-2 pb-2.5 transition-all duration-200 cursor-pointer"
           data-index={i}
           data-tilt={card.tilt}
           style={`--card-tilt: ${card.tilt}; z-index: ${card.z};`}
@@ -167,26 +160,18 @@ const pins: PinnedPhoto[] = [
           role="button"
           aria-label={card.org}
         >
-          {/* Flipped 3D Depth Block */}
-          <div
-            class="polaroid-depth-block absolute inset-0 bg-white dark:bg-(--surface) border-2 border-(--ink) -z-10 translate-x-1.5 translate-y-1.5"
-            aria-hidden="true"
-          />
-
-          {/* Enameled Pushpin Tack */}
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none" aria-hidden="true">
+          {/* Clean Enameled Pin */}
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20 pointer-events-none" aria-hidden="true">
             <div
-              class="h-3.5 w-3.5 rounded-full border-2 border-(--ink) relative flex items-center justify-center"
+              class="h-4 w-4 rounded-full border-2 border-(--ink) relative"
               style={`background: var(--line-${card.line});`}
             >
               <span class="absolute top-0.5 left-0.5 h-1 w-1 rounded-full bg-white opacity-90" />
-              <span class="h-1 w-1 rounded-full bg-(--ink) opacity-30" />
             </div>
-            <div class="h-1.5 w-[2px] bg-(--ink) -mt-0.5" />
           </div>
 
           {/* Photo Frame */}
-          <div class={`relative w-full overflow-hidden border border-white/20 bg-black ${card.aspectClass}`}>
+          <div class={`relative w-full overflow-hidden border border-(--ink) bg-(--ground) ${card.aspectClass}`}>
             <img
               src={card.image}
               alt={card.alt}
@@ -198,12 +183,12 @@ const pins: PinnedPhoto[] = [
             />
           </div>
 
-          {/* Flipped Chin: Title Only */}
-          <div class="pt-2 pb-1 px-1 flex items-center gap-2 min-w-0">
-            <div class="flex h-5 w-5 shrink-0 items-center justify-center bg-white border border-white/30 p-0.5" aria-hidden="true">
+          {/* Chin: Title Only */}
+          <div class="pt-2 px-0.5 flex items-center gap-2 min-w-0">
+            <div class="flex h-5 w-5 shrink-0 items-center justify-center border border-(--ink) bg-(--ground) p-0.5" aria-hidden="true">
               <CompanyLogo name={card.company} size={14} class="shrink-0" />
             </div>
-            <h3 class="text-[14px] font-bold leading-tight text-white tracking-tight truncate">
+            <h3 class="text-[14px] font-bold leading-tight text-(--ink) tracking-tight truncate">
               {card.org}
             </h3>
           </div>
@@ -230,10 +215,6 @@ const pins: PinnedPhoto[] = [
   /* Active clicked state */
   .polaroid-card.is-active {
     transform: rotate(0deg) scale(1.05) !important;
-  }
-
-  .polaroid-card.is-active .polaroid-depth-block {
-    transform: translate(7px, 7px);
   }
 </style>
 
