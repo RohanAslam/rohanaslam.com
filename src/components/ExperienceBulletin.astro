@@ -101,9 +101,10 @@ const pins: PinnedPhoto[] = [
     {
       pins.map((card, i) => (
         <article
-          class="polaroid-card group absolute bg-white border-2 border-(--ink) p-2 sm:p-2.5 pb-3 transition-all duration-200 cursor-pointer"
+          class="polaroid-card group absolute bg-white border-2 border-(--ink) p-2 sm:p-2.5 pb-3 transition-transform duration-200 cursor-pointer"
           data-index={i}
           data-tilt={card.tilt}
+          data-base-z={card.z}
           style={`--card-tilt: ${card.tilt}; z-index: ${card.z}; ${card.desktopStyle}`}
           tabindex="0"
           role="button"
@@ -150,9 +151,10 @@ const pins: PinnedPhoto[] = [
     {
       pins.map((card, i) => (
         <article
-          class="polaroid-card group relative w-[250px] shrink-0 snap-center bg-white border-2 border-(--ink) p-2 pb-2.5 transition-all duration-200 cursor-pointer"
+          class="polaroid-card group relative w-[250px] shrink-0 snap-center bg-white border-2 border-(--ink) p-2 pb-2.5 transition-transform duration-200 cursor-pointer"
           data-index={i}
           data-tilt={card.tilt}
+          data-base-z={card.z}
           style={`--card-tilt: ${card.tilt}; z-index: ${card.z};`}
           tabindex="0"
           role="button"
@@ -198,19 +200,21 @@ const pins: PinnedPhoto[] = [
   /* Subtle organic rotation per card */
   .polaroid-card {
     transform: rotate(var(--card-tilt, 0deg));
-    will-change: transform, z-index;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
   }
 
-  /* Lift and straighten slightly on hover or focus */
+  /* Any hovered or keyboard-focused card INSTANTLY pops in front of all other cards */
   .polaroid-card:hover,
   .polaroid-card:focus-visible {
     transform: rotate(0deg) scale(1.04) !important;
-    z-index: 50 !important;
+    z-index: 100 !important;
   }
 
-  /* Active clicked state */
+  /* Active clicked state keeps card raised above baseline cards when not hovering another card */
   .polaroid-card.is-active {
-    transform: rotate(0deg) scale(1.05) !important;
+    transform: rotate(0deg) scale(1.02);
+    z-index: 40 !important;
   }
 </style>
 
@@ -220,38 +224,38 @@ const pins: PinnedPhoto[] = [
     if (!cluster) return;
 
     const cards = Array.from(cluster.querySelectorAll('.polaroid-card'));
-    let topZ = 30;
     let activeCard = null;
 
-    function bringToFront(card) {
-      topZ += 2;
-      card.style.zIndex = topZ;
-
+    function activateCard(card) {
       if (activeCard && activeCard !== card) {
         activeCard.classList.remove('is-active');
+        activeCard.style.zIndex = activeCard.dataset.baseZ || '';
+      }
+
+      if (activeCard === card) {
+        card.classList.remove('is-active');
+        card.style.zIndex = card.dataset.baseZ || '';
+        activeCard = null;
+        return;
       }
 
       card.classList.add('is-active');
+      card.style.zIndex = '40';
       activeCard = card;
     }
 
     cards.forEach((card) => {
-      card.addEventListener('mouseenter', () => {
-        if (card !== activeCard) {
-          topZ += 1;
-          card.style.zIndex = topZ;
-        }
-      });
-
+      // Hover is handled directly by CSS :hover { z-index: 100 !important }
+      // which guarantees instantaneous stacking in front without any delay or counter bugs.
       card.addEventListener('click', (e) => {
         e.stopPropagation();
-        bringToFront(card);
+        activateCard(card);
       });
 
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          bringToFront(card);
+          activateCard(card);
         }
       });
     });
@@ -259,6 +263,7 @@ const pins: PinnedPhoto[] = [
     document.addEventListener('click', (e) => {
       if (!cluster.contains(e.target) && activeCard) {
         activeCard.classList.remove('is-active');
+        activeCard.style.zIndex = activeCard.dataset.baseZ || '';
         activeCard = null;
       }
     });
